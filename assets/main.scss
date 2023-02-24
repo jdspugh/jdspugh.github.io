@@ -7,14 +7,20 @@ body {
   counter-reset: a;
 }
 
-h1 {
+h2:before {
   content: counter(a)".";
+}
+
+h2 {
   counter-increment: a;
   counter-reset: b;
 }
 
-h2:before {
+h3:before {
   content: counter(a)"."counter(b)".";
+}
+
+h3 {
   counter-increment: b;
 }
 /* END numbered headings */
