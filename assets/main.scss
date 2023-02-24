@@ -1,4 +1,20 @@
 ---
 ---
 @import "{{site.theme}}";
-h1 { color:red; }
+
+/* START numbered headings */
+body {
+  counter-reset: a;
+}
+
+h1 {
+  content: counter(a)".";
+  counter-increment: a;
+  counter-reset: b;
+}
+
+h2:before {
+  content: counter(a)"."counter(b)".";
+  counter-increment: b;
+}
+/* END numbered headings */
