@@ -2,25 +2,25 @@
 ---
 @import "{{site.theme}}";
 
-/* START numbered headings */
-article {
+/* START numbered headings (use "article", or replace it with ".wrapper" if disqus is being used) */
+.wrapper {
   counter-reset: a;
 }
 
-article h2:before {
+.wrapper h2:before {
   content: counter(a)" ";
 }
 
-article h2 {
+.wrapper h2 {
   counter-increment: a;
   counter-reset: b;
 }
 
-article h3:before {
+.wrapper h3:before {
   content: counter(a)"."counter(b)" ";
 }
 
-article h3 {
+.wrapper h3 {
   counter-increment: b;
 }
 /* END numbered headings */
