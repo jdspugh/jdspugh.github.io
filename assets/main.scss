@@ -52,7 +52,11 @@
 
 /* fix site header to top */
 .site-header {
+  position: fixed;
   top: 0;
   width: 100%;
   background-color: #fff;
+}
+main {
+  margin-top: 55.95px;
 }
