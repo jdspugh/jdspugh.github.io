@@ -3,30 +3,30 @@
 @import "{{site.theme}}";
 
 /* START numbered headings */
-article {
+.post-content {
   counter-reset: a;
 }
 
-article h1:not(.post-title):before {
+.post-content h1:before {
   content: counter(a)" ";
 }
-article h1:not(.post-title) {
+.post-content h1 {
   counter-increment: a;
   counter-reset: b;
 }
 
-article h2:before {
+.post-content h2:before {
   content: counter(a)"."counter(b)" ";
 }
-article h2 {
+.post-content h2 {
   counter-increment: b;
   counter-reset: c;
 }
 
-article h3:before {
+.post-content h3:before {
   content: counter(a)"."counter(b)"."counter(c)" ";
 }
-article h3 {
+.post-content h3 {
   counter-increment: c;
 }
 /* END numbered headings */
