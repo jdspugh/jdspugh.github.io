@@ -10,7 +10,6 @@ article {
 article h1:not(.post-title):before {
   content: counter(a)" ";
 }
-
 article h1:not(.post-title) {
   counter-increment: a;
   counter-reset: b;
@@ -19,14 +18,21 @@ article h1:not(.post-title) {
 article h2:before {
   content: counter(a)"."counter(b)" ";
 }
-
 article h2 {
   counter-increment: b;
+  counter-reset: c;
+}
+
+article h3:before {
+  content: counter(a)"."counter(b)"."counter(c)" ";
+}
+article h3 {
+  counter-increment: c;
 }
 /* END numbered headings */
 
 
 /* fix h1 being too small (32, 26, 20) */
-h1 { font-size: 32px }
-h2 { font-size: 26px }
-h3 { font-size: 20px }
+h1 { font-size: 26px }
+h2 { font-size: 22px }
+h3 { font-size: 18px }
