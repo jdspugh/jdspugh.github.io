@@ -58,7 +58,7 @@ title: <blog entry's title>
 <blog entry's content in markdown format>
 ```
 
-GitHug Pages uses markdown syntax for blog entries. For me I mainly use:
+GitHug Pages uses markdown syntax for blog entries. For me I mainly use these features:
 
 Titles:
 ```md
@@ -79,9 +79,9 @@ console.log('Hi!')
 ```
 ~~~
 
-GitHub Pages uses the "GitHub Flavored Markdown Spec" that you can browse if you want details on everything that can be done in this markdown flavour: https://github.github.com/gfm/
+GitHub Pages uses the "GitHub Flavored Markdown Spec" that you can browse if you want details on everything that can be done in this markdown flavour: <https://github.github.com/gfm/>
 
-# Customisation
+# Custom CSS
 
 Create a file `assets/main.scss`. You can place any custom CSS at the bottom of this file e.g.:
 
@@ -114,6 +114,16 @@ article h3 {
 /* END numbered headings */
 ```
 
+# User Comments
+
+If you want users to be able to comment and discuss your posts you can easily add this feature by adding [Disqus][1] to your posts if you are using the `minima` theme. Add your [Disqus][1] shortname to the `_config.yml`:
+
+```yml
+theme: minima
+disqus:
+  shortname: tech-blog-jdspugh
+```
+
 # Summary
 
 The final directory structure of your repo will look like this:
@@ -129,3 +139,5 @@ assets
 ```
 
 I hope you found this tutorial helpful to get started with blogging using GitHub Pages. Feel free to leave any comments, and happy blogging!
+
+[1]: https://disqus.com
