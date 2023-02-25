@@ -24,3 +24,9 @@ article h2 {
   counter-increment: b;
 }
 /* END numbered headings */
+
+
+/* fix h1 being too small (32, 26, 20) */
+h1 { font-size: 32px }
+h2 { font-size: 26px }
+h3 { font-size: 20px }
