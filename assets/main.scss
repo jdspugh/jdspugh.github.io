@@ -7,11 +7,11 @@ article {
   counter-reset: a;
 }
 
-article h1:before {
+article h1:not(.post-title):before {
   content: counter(a)" ";
 }
 
-article h1 {
+article h1:not(.post-title) {
   counter-increment: a;
   counter-reset: b;
 }
