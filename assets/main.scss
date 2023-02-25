@@ -49,3 +49,13 @@
 .site-header, footer {
   box-shadow: 0 0 16px 0 #888;
 }
+
+/* fix site header to top */
+.site-header {
+  top: 0;
+  width: 100%;
+  background-color: #fff;
+}
+main {
+  margin-top: 55.95px;
+}
