@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Setting up a blog with GitHub Pages
+title: Setting up a Blog with GitHub Pages
 ---
 # Introduction
 
@@ -53,10 +53,33 @@ The content of each blog post will be of the form:
 ```yml
 ---
 layout: post
-title: Setting up a blog on GitHub Pages
+title: <blog entry's title>
 ---
-<your blog content in markdown format>
+<blog entry's content in markdown format>
 ```
+
+GitHug Pages uses markdown syntax for blog entries. For me I mainly use:
+
+Titles:
+```
+# Title 1
+## Title 2
+```
+
+Code blocks:
+~~~
+```html
+<p>This is html code</p>
+```
+~~~
+
+~~~
+```js
+console.log('Hi!')
+```
+~~~
+
+GitHub Pages uses the "GitHub Flavored Markdown Spec" that you can browse if you want details on everything that can be done in this markdown flavour: https://github.github.com/gfm/
 
 # Customisation
 
@@ -106,3 +129,5 @@ assets
 ```
 
 I hope you found this tutorial helpful to get started with blogging using GitHub Pages. Feel free to leave any comments, and happy blogging!
+
+{% include disqus.html %}
