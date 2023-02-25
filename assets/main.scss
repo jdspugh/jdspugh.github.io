@@ -8,7 +8,7 @@ article {
 }
 
 article h2:before {
-  content: counter(a)" ";
+  content: counter(a)" ";
 }
 
 article h2 {
@@ -17,7 +17,7 @@ article h2 {
 }
 
 article h3:before {
-  content: counter(a)"."counter(b)" ";
+  content: counter(a)"."counter(b)" ";
 }
 
 article h3 {
