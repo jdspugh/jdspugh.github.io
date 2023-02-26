@@ -60,13 +60,20 @@ title: <blog entry's title>
 
 GitHug Pages uses markdown syntax for blog entries. For me I mainly use these features:
 
-Titles:
+## Titles
+
+
 ```md
 # Title 1
 ## Title 2
 ```
 
-Code blocks:
+## Code blocks
+
+You can highlight your code by specifying its format after the three backticks as illustrated below.
+
+For the complete list of currently supported format see <https://github.com/github/linguist/blob/master/lib/linguist/languages.yml>
+
 ~~~html
 ```html
 <p>This is html code</p>
@@ -78,6 +85,8 @@ Code blocks:
 console.log('Hi!')
 ```
 ~~~
+
+## GitHub Flavored Markdown
 
 GitHub Pages uses the "GitHub Flavored Markdown Spec" that you can browse if you want details on everything that can be done in this markdown flavour: <https://github.github.com/gfm/>
 
@@ -129,7 +138,7 @@ disqus:
 Upload an image and create `_includes/head.html` which includes a link to your favicon image. It will be displayed on all pages.
 
 {% raw %}
-```liquid
+```handlebars
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
