@@ -27,11 +27,10 @@ layout: home
 Create a file `_config.yml`:
 
 ```yml
-title: Jonathan's Tech Blog
+title: Jonathan's Coding Journal
 first_name: Jonathan
 last_name: Pugh
 email: jdspugh@gmail.com
-description: Tech Blog
 twitter_username: jdspugh
 github_username:  jdspugh
 theme: minima
