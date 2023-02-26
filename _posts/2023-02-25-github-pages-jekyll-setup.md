@@ -62,10 +62,11 @@ GitHug Pages uses markdown syntax for blog entries. For me I mainly use these fe
 
 ## Titles
 
+Just put one or more pound signs before text you want to be a title.
 
 ```md
-# Title 1
-## Title 2
+# Title
+## Subtitle
 ```
 
 ## Code blocks
