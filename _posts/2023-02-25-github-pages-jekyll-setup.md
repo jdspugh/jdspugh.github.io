@@ -138,12 +138,14 @@ Upload an image and create `_includes/head.html` which includes a link to your f
   <link rel="icon" href="/image/blog/jonathans-tech-blog-logo.svg" type="image/svg+xml" />
   <!-- jdspugh end -->
   
+{% raw %}
   {%- seo -%}
   <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
   {%- feed_meta -%}
   {%- if jekyll.environment == 'production' and site.google_analytics -%}
     {%- include google-analytics.html -%}
   {%- endif -%}
+{% endraw %}
 </head>
 ```
 
