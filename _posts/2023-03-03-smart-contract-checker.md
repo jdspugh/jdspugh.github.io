@@ -8,13 +8,11 @@ One of the main purposes of blockchain technology is to provide decentralisation
 
 As part of human nature it seems that power and corruption more than often go hand in hand. One of the main aims of blockchain technology is to distribute power so that all members of a community hold the power rather than a single person or small group of people. This is essentially democracy embraced and enforced by technology. No central entity can overcome the group when blockchain technology is in use.
 
-When it comes to blockchains themselves there are varying degrees of decentralisation amongst different blockchains. Ethereum at this point in time is the most decentralised smart contract blockchain so we will focus on this one for the time being to keep things simple.
+When it comes to blockchains themselves there are varying degrees of decentralisation amongst different blockchains. Ethereum at this point in time is one of the most decentralised smart contract blockchain so we will focus on this one for the time being to keep things simple.
 
 Even though Ethereum is decentralised, centralised distributed applications (Dapps) can still be written. These recentralise power and go against the ethos of blackchain technology.
 
-Dapps can be centralised in many ways and it's often not possible to thouroughly check a Dapp's smart contracts for signs of centralisation if the smart contracts are large and complex.
-
-What I aim to do here is write some code to provide a guide to determining whether a smart contract could be centralised or not.
+Dapps can be centralised in many ways and it's often not possible to thouroughly check a Dapp's smart contracts for signs of centralisation if the smart contracts are large and complex. What I aim to do here is write some code to provide a guide to determining whether a smart contract could be centralised or not.
 
 # Proxy Contracts
 
@@ -22,19 +20,23 @@ Currently the number one risk factor for Dapp users is the use of proxy contract
 
 Proxy contracts can be a good thing if the developer wants to upgrade the existing functionality or fix bugs or exploits. Of course there is also the risk that they inadvertantly introduce new bugs, which is a risk even with the most well meaning developers.
 
-The proxy contract pattern is of short term benefit only. The problems comes when the Dapp becomes successful. Now the temptation to abuse the power comes into play and there is little stopping it. Most proxy contracts today are protected by a single admin. Potentially a vote from the community members could be used to guard the code changes instead of a single admin. This could provide adequate decentralisation but I don't know of any proxy contracts using this method as of yet. Even so there is still the risk the new code could introduce unforseen bugs.
+The proxy contract pattern is of short term benefit only. The problems comes when the Dapp becomes successful. Now the temptation to abuse the power comes into play and there is little stopping it. Most proxy contracts today are protected by a single admin.
 
-The proxy contract allows the admin to completely override the smart contract and run any other code in its place. The new code could be specifically designed to steal user's funds held or controlled by the smart contract.
+Potentially a vote from the community members could be used to guard the code changes instead of a single admin. This could provide adequate decentralisation but I don't know of any proxy contracts using this method as of yet. Even with decentralised proxy contracts there is still the risk that the new code could introduce unforseen bugs. But it's a much better option that a centralised admin.
 
-In my view Dapps should be deployed as immutable, decentralised smart contracts (i.e. avoiding the proxy contract pattern). They may well contain bugs in which case they will hopefully soon be found before too much investment has been made in the Dapp. Bugs can also be largely mitigated by reserving a significant portion of its funds for bug bounty programs that white hat hackers can mutually benefit from. Hackers would rather benefit from legal rewards than have the complications of covering their tracks and risking jail time or other repercussions.
+Proxy contracts allow the admins to completely override the smart contract and run any other code in its place. The new code, in the worst case, could be specifically designed to steal user's funds held or to be otherwise controlled by the smart contract.
+
+In my view, to stay with the ethos of blockchain decentralisation, Dapps should be deployed as immutable smart contracts (i.e. avoiding the proxy contract pattern). They may well contain bugs in which case they will hopefully soon be found (through auditing or experience using the contract) before too much investment has been made in the Dapp. Bugs can also be largely mitigated by reserving a significant portion of its funds for bug bounty programs that white hat hackers can mutually benefit from. Hackers would rather benefit from legal rewards than have the complications of covering their tracks and risking jail time or other repercussions.
 
 In the long term, as time progresses, certain immutable, decentralised smart contracts will prove themselves to be bullet proof and will last forever on blockchains, bug free, efficiently automating tasks for years to come.
 
 # Other forms of Smart Contract Centralisation
 
-It is often the case that an admin is assigned to a smart contract upon creation. The admin privleges can be transfered to other users after creation. The privleges can be used to activate features of the smart contract not available to other users. This is risky to the users if the smart contract allows admins to do things that could be detrimental to other users of the Dapp.
+Apart from proxy contracts, in the case of decentralised smart contract, is often the case that a single centralised admin is assigned to the smart contract upon the contract's creation. The admin privleges can often be allowed to be transfered to other users after creation. The privleges can be used to activate features of the smart contract not available to other users. This is risky to the users if the smart contract allows admins to do things that could be detrimental to other users of the Dapp.
 
-This form of centralisation differs significantly from certralisation due to proxy contracts. The smart contract code is on the blockchain, is immutable, and can be audited by anyone at anytime. So you can know what exploits (if any) the admin may attempt. In the case of a proxy contract you have no way to predict what the new smart contract might do and how you could be exploited. This is what makes them the most dangerous of all and is why they will be the focus of the rest of this article.
+An example of detrimental actions would be minting new tokens for an ERC20 contract and squandering them (if they are put to good use then minting can be beneficial). If there is no limit on this it's possible for the admin to mint a lot of new tokens and sell them causeing the price of the token to fall and diluting the worth of the other holders of the token. Again it's the temptation of centralised power on powerful smart contracts that should be avoided.
+
+This form of centralisation in decentralised smart contracts differs significantly from certralised proxy contracts. The decentralised smart contract code is immutably on the blockchain and can be audited by anyone at anytime. So you can know what exploits (if any) the admin may attempt. In the case of any proxy contract you have no way to predict what the new smart contract might do and how it could be exploited. This is what makes them the most dangerous of all for the users and is why they will be the focus of the rest of this article.
 
 # Project Goals
 
@@ -52,7 +54,8 @@ A simple checker can be built by checking the opcodes used in building proxy sma
 
 The most commononly used for proxy smart contracts is `DELEGATECALL`, then `CALLCODE`, then `CALL`. The results of the code will reflect this by counting the appearance of these opcodes in the bytecode and marking the centralisation risk with with red dots. Three red dots indicating the highest chance of centralisation i.e. the use of `DELEGATECALL`. This is the code:
 
-```javascript
+`phase1.mjs`
+```js
 import dotenv from 'dotenv';dotenv.config()
 import EVM from 'evm'
 import Web3 from 'web3'
@@ -94,8 +97,15 @@ for (const token of tokens) {
 console.log(markdownTable(table))
 ```
 
+`.env`
+```
+INFURA_API_KEY=b678d38865dd4108aeb4d488f78c6c2c
+ETHPLORER_API_KEY=freekey
+```
+
 You can run the code above and it will produce a table which lists the top tokens on the Ethereum blockchain by market cap. Each token's smart contract is checked for the three opcodes we are looking for. Based on the results a decentralisatin rating is given.
 
+`$ node phase1.mjs`
 | DELEGATECALL | CALLCODE | CALL | Address                                    | Name              | Symbol | Decentralisation               |
 | ------------ | -------- | ---- | ------------------------------------------ | ----------------- | ------ | ------------------------------ |
 |              |          |      | 0x0000000000000000000000000000000000000000 | Ethereum          | ETH    | ✅ Decentralised                |
@@ -109,8 +119,12 @@ You can run the code above and it will produce a table which lists the top token
 | 1            |          | 1    | 0xae7ab96520de3a18e5e111b5eaab095312d7fe84 | Lido Staked Ether | STETH  | 🔴🔴🔴 Potentially Centralised |
 |              |          |      | 0x6b175474e89094c44da98b954eedeac495271d0f | Dai               | DAI    | ✅ Decentralised                |
 
-Ideally you want to be using smart contracts that are marked as decentralised (✅). If you are not you should look further into the smart contract and check the audit reports if available before investing too much into them.
+## Auditing
 
-We will go through these top 10 tokens and cross check the results of this simple bytecode analysis with the source code and audit reports to see how accurate the calculated centralisation risk ratings are.
+You don't want to invest much into centralised smart contract projects because it is impossible to audit something that can change at any moment. Your investment is compleletly under the control of centralised hands.
 
-Check back soon. Cross check audit results comming!
+Ideally you want to be using the smart contracts that are marked as "✅ Decentralised". In this case you can be sure that the code will not change. In this case you can get an independant audit, or check existing public audits, and have a degree of confidence based on the results of these reports knowing that the code will never change.
+
+We will go through these top 10 tokens and cross check the results of the simple bytecode analysis tool with the source code and public audit reports to see how accurate the tool's calculated centralisation risk ratings are.
+
+**Check back soon. Cross check audit results comming!**
