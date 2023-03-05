@@ -50,9 +50,9 @@ A simple checker can be built by checking the opcodes used in building proxy sma
 |`CALLCODE` | F2 | 🔴🔴 |
 | `CALL` | F1 | 🔴 |
 
-The most commononly used for proxy smart contracts is `DELEGATECALL`, then `CALLCODE`, then `CALL`. The results of the code will reflect this by counting the appearance of these opcodes in the bytecode and marking the centralisation risk with with red dots. Three red dots indicating the highest chance of centralisation i.e. the use of `DELEGATECALL`.
+The most commononly used for proxy smart contracts is `DELEGATECALL`, then `CALLCODE`, then `CALL`. The results of the code will reflect this by counting the appearance of these opcodes in the bytecode and marking the centralisation risk with with red dots. Three red dots indicating the highest chance of centralisation i.e. the use of `DELEGATECALL`. This is the code:
 
-```js
+```javascript
 import dotenv from 'dotenv';dotenv.config()
 import EVM from 'evm'
 import Web3 from 'web3'
