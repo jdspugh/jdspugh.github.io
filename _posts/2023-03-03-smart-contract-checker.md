@@ -99,13 +99,14 @@ console.log(markdownTable(table))
 
 `.env`
 ```
-INFURA_API_KEY=b678d38865dd4108aeb4d488f78c6c2c
+INFURA_API_KEY=<your infura api key>
 ETHPLORER_API_KEY=freekey
 ```
 
 You can run the code above and it will produce a table which lists the top tokens on the Ethereum blockchain by market cap. Each token's smart contract is checked for the three opcodes we are looking for. Based on the results a decentralisatin rating is given.
 
 `$ node phase1.mjs`
+
 | DELEGATECALL | CALLCODE | CALL | Address                                    | Name              | Symbol | Decentralisation               |
 | ------------ | -------- | ---- | ------------------------------------------ | ----------------- | ------ | ------------------------------ |
 |              |          |      | 0x0000000000000000000000000000000000000000 | Ethereum          | ETH    | ✅ Decentralised                |
@@ -127,4 +128,4 @@ Ideally you want to be using the smart contracts that are marked as "✅ Decentr
 
 We will go through these top 10 tokens and cross check the results of the simple bytecode analysis tool with the source code and public audit reports to see how accurate the tool's calculated centralisation risk ratings are.
 
-**Check back soon. Cross check audit results comming!**
+*Check back soon. Cross check audit results comming!*
