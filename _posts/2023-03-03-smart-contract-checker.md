@@ -10,19 +10,19 @@ As part of human nature it seems that power and corruption more than often go ha
 
 When it comes to blockchains themselves there are varying degrees of decentralisation amongst different blockchains. Ethereum at this point in time is one of the most decentralised smart contract blockchain so we will focus on this one for the time being to keep things simple.
 
-Even though Ethereum is decentralised, centralised distributed applications (Dapps) can still be written. These recentralise power and go against the ethos of blackchain technology.
+Even though Ethereum is decentralised, centralised distributed applications (Dapps) can still be written. These recentralise power and go against the ethos of blockchain technology.
 
-Dapps can be centralised in many ways and it's often not possible to thouroughly check a Dapp's smart contracts for signs of centralisation if the smart contracts are large and complex. What I aim to do here is write some code to provide a guide to determining whether a smart contract could be centralised or not.
+Dapps can be centralised in many ways and it's often not possible to thoroughly check a Dapp's smart contracts for signs of centralisation if the smart contracts are large and complex. What I aim to do here is write some code to provide a guide to determining whether a smart contract could be centralised or not.
 
 # Proxy Contracts
 
 Currently the number one risk factor for Dapp users is the use of proxy contracts by the Dapp developer. Proxy contracts (sometimes called upgradeable contracts) allow the smart contract code to be replaced by new code by redirecting calls to the original code to another smart contract's code.
 
-Proxy contracts can be a good thing if the developer wants to upgrade the existing functionality or fix bugs or exploits. Of course there is also the risk that they inadvertantly introduce new bugs, which is a risk even with the most well meaning developers.
+Proxy contracts can be a good thing if the developer wants to upgrade the existing functionality or fix bugs or exploits. Of course there is also the risk that they inadvertently introduce new bugs, which is a risk even with the most well meaning developers.
 
 The proxy contract pattern is of short term benefit only. The problems comes when the Dapp becomes successful. Now the temptation to abuse the power comes into play and there is little stopping it. Most proxy contracts today are protected by a single admin.
 
-Potentially a vote from the community members could be used to guard the code changes instead of a single admin. This could provide adequate decentralisation but I don't know of any proxy contracts using this method as of yet. Even with decentralised proxy contracts there is still the risk that the new code could introduce unforseen bugs. But it's a much better option that a centralised admin.
+Potentially a vote from the community members could be used to guard the code changes instead of a single admin. This could provide adequate decentralisation but I don't know of any proxy contracts using this method as of yet. Even with decentralised proxy contracts there is still the risk that the new code could introduce unforeseen bugs. But it's a much better option that a centralised admin.
 
 Proxy contracts allow the admins to completely override the smart contract and run any other code in its place. The new code, in the worst case, could be specifically designed to steal user's funds held or to be otherwise controlled by the smart contract.
 
@@ -32,11 +32,11 @@ In the long term, as time progresses, certain immutable, decentralised smart con
 
 # Other forms of Smart Contract Centralisation
 
-Apart from proxy contracts, in the case of decentralised smart contract, is often the case that a single centralised admin is assigned to the smart contract upon the contract's creation. The admin privleges can often be allowed to be transfered to other users after creation. The privleges can be used to activate features of the smart contract not available to other users. This is risky to the users if the smart contract allows admins to do things that could be detrimental to other users of the Dapp.
+Apart from proxy contracts, in the case of decentralised smart contract, is often the case that a single centralised admin is assigned to the smart contract upon the contract's creation. The admin privileges can often be allowed to be transferred to other users after creation. The privileges can be used to activate features of the smart contract not available to other users. This is risky to the users if the smart contract allows admins to do things that could be detrimental to other users of the Dapp.
 
-An example of detrimental actions would be minting new tokens for an ERC20 contract and squandering them (if they are put to good use then minting can be beneficial). If there is no limit on this it's possible for the admin to mint a lot of new tokens and sell them causeing the price of the token to fall and diluting the worth of the other holders of the token. Again it's the temptation of centralised power on powerful smart contracts that should be avoided.
+An example of detrimental actions would be minting new tokens for an ERC-20 contract and squandering them (if they are put to good use then minting can be beneficial). If there is no limit on this it's possible for the admin to mint a lot of new tokens and sell them causing the price of the token to fall and diluting the worth of the other holders of the token. Again it's the temptation of centralised power on powerful smart contracts that should be avoided.
 
-This form of centralisation in decentralised smart contracts differs significantly from certralised proxy contracts. The decentralised smart contract code is immutably on the blockchain and can be audited by anyone at anytime. So you can know what exploits (if any) the admin may attempt. In the case of any proxy contract you have no way to predict what the new smart contract might do and how it could be exploited. This is what makes them the most dangerous of all for the users and is why they will be the focus of the rest of this article.
+This form of centralisation in decentralised smart contracts differs significantly from centralised proxy contracts. The decentralised smart contract code is immutably on the blockchain and can be audited by anyone at anytime. So you can know what exploits (if any) the admin may attempt. In the case of any proxy contract you have no way to predict what the new smart contract might do and how it could be exploited. This is what makes them the most dangerous of all for the users and is why they will be the focus of the rest of this article.
 
 # Project Goals
 
@@ -52,7 +52,7 @@ A simple checker can be built by checking the opcodes used in building proxy sma
 |`CALLCODE` | F2 | 🔴🔴 |
 | `CALL` | F1 | 🔴 |
 
-The most commononly used for proxy smart contracts is `DELEGATECALL`, then `CALLCODE`, then `CALL`. The results of the code will reflect this by counting the appearance of these opcodes in the bytecode and marking the centralisation risk with with red dots. Three red dots indicating the highest chance of centralisation i.e. the use of `DELEGATECALL`. This is the code:
+The most commonly used for proxy smart contracts is `DELEGATECALL`, then `CALLCODE`, then `CALL`. The results of the code will reflect this by counting the appearance of these opcodes in the bytecode and marking the centralisation risk with with red dots. Three red dots indicating the highest chance of centralisation i.e. the use of `DELEGATECALL`. This is the code:
 
 `phase1.mjs`
 ```js
@@ -103,7 +103,7 @@ INFURA_API_KEY=<your infura api key>
 ETHPLORER_API_KEY=freekey
 ```
 
-You can run the code above and it will produce a table which lists the top tokens on the Ethereum blockchain by market cap. Each token's smart contract is checked for the three opcodes we are looking for. Based on the results a decentralisatin rating is given.
+You can run the code above and it will produce a table which lists the top tokens on the Ethereum blockchain by market cap. Each token's smart contract is checked for the three opcodes we are looking for. Based on the results a decentralisation rating is given.
 
 `$ node phase1.mjs`
 
@@ -120,12 +120,129 @@ You can run the code above and it will produce a table which lists the top token
 | 1            |          | 1    | 0xae7ab96520de3a18e5e111b5eaab095312d7fe84 | Lido Staked Ether | STETH  | 🔴🔴🔴 Potentially Centralised |
 |              |          |      | 0x6b175474e89094c44da98b954eedeac495271d0f | Dai               | DAI    | ✅ Decentralised                |
 
-## Auditing
+## Auditing Cross Check
 
-You don't want to invest much into centralised smart contract projects because it is impossible to audit something that can change at any moment. Your investment is compleletly under the control of centralised hands.
+You don't want to invest much into centralised smart contract projects because it is impossible to audit something that can change at any moment. Your investment is completely under the control of the centralised hands of the admin.
 
-Ideally you want to be using the smart contracts that are marked as "✅ Decentralised". In this case you can be sure that the code will not change. In this case you can get an independant audit, or check existing public audits, and have a degree of confidence based on the results of these reports knowing that the code will never change.
+Ideally you want to be using the smart contracts that are marked as "✅ Decentralised". In this case you can be sure that the code will not change. In this case you can get an independent audit, or check existing public audits, and have a degree of confidence based on the results of these reports knowing that the code will never change.
 
-We will go through these top 10 tokens and cross check the results of the simple bytecode analysis tool with the source code and public audit reports to see how accurate the tool's calculated centralisation risk ratings are.
+We will go through these top 10 tokens and cross check the centralised smart contracts that the bytecode analysis tool detected with the source code and public audit reports to see how accurate the tool's calculated centralisation risk ratings are. There is no need to check the "✅ Decentralised" contracts as they are, for sure, immutable decentralised contracts.
 
-*Check back soon. Cross check audit results comming!*
+*More Audits coming soon!*
+
+### HEX
+
+https://etherscan.io/address/0x2b591e99afe9f32eaa6214f7b7629768c40eeb39#code
+
+
+### BUSD - Binance USD
+
+https://etherscan.io/token/0x4fabb145d64652a948d72533023f6e7a623c7c53#code
+
+From the Etherscan link we can see the proxy implementation and the `delegatecall()` in this section of code confirming BUSD is indeed a proxy smart contract.
+
+```solidity
+/**
+ * @title Proxy
+ * @dev Implements delegation of calls to other contracts, with proper
+ * forwarding of return values and bubbling of failures.
+ * It defines a fallback function that delegates all calls to the address
+ * returned by the abstract _implementation() internal function.
+ */
+contract Proxy {
+    /**
+     * @dev Fallback function.
+     * Implemented entirely in `_fallback`.
+     */
+    function () payable external {
+        _fallback();
+    }
+
+    /**
+     * @return The Address of the implementation.
+     */
+    function _implementation() internal view returns (address);
+
+    /**
+     * @dev Delegates execution to an implementation contract.
+     * This is a low level function that doesn't return to its internal call site.
+     * It will return to the external caller whatever the implementation returns.
+     * @param implementation Address to delegate.
+     */
+    function _delegate(address implementation) internal {
+        assembly {
+        // Copy msg.data. We take full control of memory in this inline assembly
+        // block because it will not return to Solidity code. We overwrite the
+        // Solidity scratch pad at memory position 0.
+            calldatacopy(0, 0, calldatasize)
+
+        // Call the implementation.
+        // out and outsize are 0 because we don't know the size yet.
+            let result := delegatecall(gas, implementation, 0, calldatasize, 0, 0)
+
+        // Copy the returned data.
+            returndatacopy(0, 0, returndatasize)
+
+            switch result
+            // delegatecall returns 0 on error.
+            case 0 { revert(0, returndatasize) }
+            default { return(0, returndatasize) }
+        }
+    }
+
+    /**
+     * @dev Function that is run as the first thing in the fallback function.
+     * Can be redefined in derived contracts to add functionality.
+     * Redefinitions must call super._willFallback().
+     */
+    function _willFallback() internal {
+    }
+
+    /**
+     * @dev fallback implementation.
+     * Extracted to enable manual triggering.
+     */
+    function _fallback() internal {
+        _willFallback();
+        _delegate(_implementation());
+    }
+}
+```
+
+### STETH - Lido Staked Ether
+
+https://etherscan.io/address/0xae7ab96520de3a18e5e111b5eaab095312d7fe84#code
+
+From the Etherscan link we can see the proxy implementation and the `delegatecall()` in this section of code confirming Lido Staked Ether is indeed a proxy smart contract.
+
+```solidity
+contract DelegateProxy is ERCProxy, IsContract {
+    uint256 internal constant FWD_GAS_LIMIT = 10000;
+
+    /**
+    * @dev Performs a delegatecall and returns whatever the delegatecall returned (entire context execution will return!)
+    * @param _dst Destination address to perform the delegatecall
+    * @param _calldata Calldata for the delegatecall
+    */
+    function delegatedFwd(address _dst, bytes _calldata) internal {
+        require(isContract(_dst));
+        uint256 fwdGasLimit = FWD_GAS_LIMIT;
+
+        assembly {
+            let result := delegatecall(sub(gas, fwdGasLimit), _dst, add(_calldata, 0x20), mload(_calldata), 0, 0)
+            let size := returndatasize
+            let ptr := mload(0x40)
+            returndatacopy(ptr, 0, size)
+
+            // revert instead of invalid() bc if the underlying call failed with invalid() it already wasted gas.
+            // if the call returned error data, forward it
+            switch result case 0 { revert(ptr, size) }
+            default { return(ptr, size) }
+        }
+    }
+}
+```
+
+# Alternatives to Proxy Contracts
+
+In the case of ERC-20 tokens, as an alternative to creating proxy contracts to handle upgrades to smart contracts, a new token can be created with a user-triggered upgrade path (e.g. a one-to-one trade-in swap to the new token) and users can choose to upgrade their tokens to the new token at any point in time. This way the user is in full control of choosing whether to upgrade or not. If the old contract is stable and useful they can stick with it. If the new contract has bugs or scams in it the user is not forced to take the upgrade. Audits can be done before choosing to upgrade and the upgrade can be undertaken with confidence.
