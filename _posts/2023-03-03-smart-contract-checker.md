@@ -134,6 +134,22 @@ We will go through these top 10 tokens and cross check the centralised smart con
 
 https://etherscan.io/address/0x2b591e99afe9f32eaa6214f7b7629768c40eeb39#code
 
+From the Etherscan link we can see this function sends ETH from the contract to the `FLUSH_ADDR` via the `transfer` function. This will be compiled into bytecode which contains one `CALL` opcode.
+
+```solidity
+    /**
+     * @dev PUBLIC FACING: Release any value that has been sent to the contract
+     */
+    function xfLobbyFlush()
+        external
+    {
+        require(address(this).balance != 0, "HEX: No value");
+
+        FLUSH_ADDR.transfer(address(this).balance);
+    }
+```
+
+Conclusion: HEX is ✅ Decentralised
 
 ### BUSD - Binance USD
 
@@ -209,6 +225,8 @@ contract Proxy {
 }
 ```
 
+Conclusion: BUSD is ❌ Centralised
+
 ### STETH - Lido Staked Ether
 
 https://etherscan.io/address/0xae7ab96520de3a18e5e111b5eaab095312d7fe84#code
@@ -243,6 +261,12 @@ contract DelegateProxy is ERCProxy, IsContract {
 }
 ```
 
+Conclusion: STETH is ❌ Centralised
+
 # Alternatives to Proxy Contracts
 
 In the case of ERC-20 tokens, as an alternative to creating proxy contracts to handle upgrades to smart contracts, a new token can be created with a user-triggered upgrade path (e.g. a one-to-one trade-in swap to the new token) and users can choose to upgrade their tokens to the new token at any point in time. This way the user is in full control of choosing whether to upgrade or not. If the old contract is stable and useful they can stick with it. If the new contract has bugs or scams in it the user is not forced to take the upgrade. Audits can be done before choosing to upgrade and the upgrade can be undertaken with confidence.
+
+# Disclaimer
+
+Information here is provided for educational purposes only. It is not financial advice.
