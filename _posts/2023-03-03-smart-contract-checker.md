@@ -149,6 +149,10 @@ From the Etherscan link we can see this function sends ETH from the contract to 
     }
 ```
 
+The second `CALL` opcode is located in the Swarm Source metadata at the end of the bytecode. This opcode will not be called because it is metadata rather than code:
+
+bzzr://e1386410ff82a380822a5c5fb950ec31ad42ac34**f1**e670c4d9b8c7329878472b
+
 Conclusion: HEX is ✅ Decentralised
 
 ### BUSD - Binance USD
