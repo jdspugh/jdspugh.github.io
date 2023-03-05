@@ -132,7 +132,7 @@ We will go through these top 10 tokens and cross check the centralised smart con
 
 ### HEX
 
-https://etherscan.io/address/0x2b591e99afe9f32eaa6214f7b7629768c40eeb39#code
+<https://etherscan.io/address/0x2b591e99afe9f32eaa6214f7b7629768c40eeb39#code>
 
 From the Etherscan link we can see this function sends ETH from the contract to the `FLUSH_ADDR` via the `transfer` function. This will be compiled into bytecode which contains one `CALL` opcode.
 
@@ -153,7 +153,7 @@ Conclusion: HEX is ✅ Decentralised
 
 ### BUSD - Binance USD
 
-https://etherscan.io/token/0x4fabb145d64652a948d72533023f6e7a623c7c53#code
+<https://etherscan.io/token/0x4fabb145d64652a948d72533023f6e7a623c7c53#code>
 
 From the Etherscan link we can see the proxy implementation and the `delegatecall()` in this section of code confirming BUSD is indeed a proxy smart contract.
 
@@ -229,7 +229,7 @@ Conclusion: BUSD is ❌ Centralised
 
 ### STETH - Lido Staked Ether
 
-https://etherscan.io/address/0xae7ab96520de3a18e5e111b5eaab095312d7fe84#code
+<https://etherscan.io/address/0xae7ab96520de3a18e5e111b5eaab095312d7fe84#code>
 
 From the Etherscan link we can see the proxy implementation and the `delegatecall()` in this section of code confirming Lido Staked Ether is indeed a proxy smart contract.
 
