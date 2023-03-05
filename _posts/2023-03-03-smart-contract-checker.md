@@ -120,11 +120,11 @@ You can run the code above and it will produce a table which lists the top token
 | 1            |          | 1    | 0xae7ab96520de3a18e5e111b5eaab095312d7fe84 | Lido Staked Ether | STETH  | 🔴🔴🔴 Potentially Centralised |
 |              |          |      | 0x6b175474e89094c44da98b954eedeac495271d0f | Dai               | DAI    | ✅ Decentralised                |
 
-## Auditing Cross Check
-
 You don't want to invest much into centralised smart contract projects because it is impossible to audit something that can change at any moment. Your investment is completely under the control of the centralised hands of the admin.
 
-Ideally you want to be using the smart contracts that are marked as "✅ Decentralised". In this case you can be sure that the code will not change. In this case you can get an independent audit, or check existing public audits, and have a degree of confidence based on the results of these reports knowing that the code will never change.
+Ideally you want to be using the smart contracts that are marked as "✅ Decentralised". In this case you can be sure that the code will not change. You can get an independent audit, or check existing public audits, and have a degree of confidence based on the results of these reports knowing that the code will never change.
+
+## Auditing Cross Check
 
 We will go through these top 10 tokens and cross check the centralised smart contracts that the bytecode analysis tool detected with the source code and public audit reports to see how accurate the tool's calculated centralisation risk ratings are. There is no need to check the "✅ Decentralised" contracts as they are, for sure, immutable decentralised contracts.
 
@@ -269,4 +269,4 @@ In the case of ERC-20 tokens, as an alternative to creating proxy contracts to h
 
 # Disclaimer
 
-Information here is provided for educational purposes only. It is not financial advice.
+The information here is provided for educational purposes only. It is not financial advice.
