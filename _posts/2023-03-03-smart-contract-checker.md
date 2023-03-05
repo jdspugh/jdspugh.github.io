@@ -44,10 +44,73 @@ To automate the analysis of smart contracts and determine if they are proxy cont
 
 A simple checker can be built by checking the opcodes used in building proxy smart contract. The three main opcodes used are:
 
-|Opcode|Hex|
-|-|-|
-| `DELEGATECALL` | F4 |
-|`CALLCODE` | F2 |
-| `CALL` | F1 |
+|Opcode|Hex|Centralisation Risk|
+|-|-|-|
+| `DELEGATECALL` | F4 | 🔴🔴🔴 |
+|`CALLCODE` | F2 | 🔴🔴 |
+| `CALL` | F1 | 🔴 |
 
-Check back here soon. Code coming!
+The most commononly used for proxy smart contracts is `DELEGATECALL`, then `CALLCODE`, then `CALL`. The results of the code will reflect this by counting the appearance of these opcodes in the bytecode and marking the centralisation risk with with red dots. Three red dots indicating the highest chance of centralisation i.e. the use of `DELEGATECALL`.
+
+```js
+import dotenv from 'dotenv';dotenv.config()
+import EVM from 'evm'
+import Web3 from 'web3'
+import { markdownTable } from 'markdown-table'
+
+async function check(blockchain, address, name='') {
+  const web3 = new Web3('https://mainnet.infura.io/v3/'+process.env.INFURA_API_KEY)
+  const r = []// result
+  await web3.eth.getCode(web3.utils.toChecksumAddress(address)).then(code=>{
+    const evm = new EVM.EVM(code)
+    let o = evm.getOpcodes()
+    r.push(o.filter(o=>'DELEGATECALL'==o.name).length||'')// opcode F4
+    r.push(o.filter(o=>'CALLCODE'==o.name).length||'')// opcode F2
+    r.push(o.filter(o=>'CALL'==o.name).length||'')// opcode F1
+  })
+  return r
+}
+
+let tokens = (await(await fetch('https://api.ethplorer.io/getTop?criteria=cap&apiKey='+(process.env.ETHPLORER_API_KEY||'freekey'))).json()).tokens.map(t=>{t.blockchain='ETH';return t})
+tokens = tokens.slice(0,10)
+const table = [['DELEGATECALL', 'CALLCODE', 'CALL', 'Address', 'Name', 'Symbol', 'Decentralisation']];
+for (const token of tokens) {
+  const r = await check(token.blockchain, token.address, token.symbol)// opcode counts
+  let d = '✅ Decentralised'// decentralised?
+  if (r[0]+r[1]+r[2]>0) {
+    if (r[0]>0) d = '🔴🔴🔴'
+    else if (r[1]>0) d = '🔴🔴'
+    else if (r[2]>0) d = '🔴'
+    d += ' Potentially Centralised'
+  }
+  table.push([
+    ...r,
+    token.address,
+    token.name,
+    token.symbol,
+    d,
+  ])
+}
+console.log(markdownTable(table))
+```
+
+You can run the code above and it will produce a table which lists the top tokens on the Ethereum blockchain by market cap. Each token's smart contract is checked for the three opcodes we are looking for. Based on the results a decentralisatin rating is given.
+
+| DELEGATECALL | CALLCODE | CALL | Address                                    | Name              | Symbol | Decentralisation               |
+| ------------ | -------- | ---- | ------------------------------------------ | ----------------- | ------ | ------------------------------ |
+|              |          |      | 0x0000000000000000000000000000000000000000 | Ethereum          | ETH    | ✅ Decentralised                |
+|              |          | 6    | 0xdac17f958d2ee523a2206206994597c13d831ec7 | Tether USD        | USDT   | 🔴 Potentially Centralised     |
+|              | 1        | 1    | 0xb8c77482e45f1f44de1745f52c74426c631bdd52 | Binance Coin      | BNB    | 🔴🔴 Potentially Centralised   |
+| 1            |          | 1    | 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 | USD Coin          | USDC   | 🔴🔴🔴 Potentially Centralised |
+|              |          | 2    | 0x2b591e99afe9f32eaa6214f7b7629768c40eeb39 | HEX               | HEX    | 🔴 Potentially Centralised     |
+|              |          |      | 0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0 | Matic Network     | MATIC  | ✅ Decentralised                |
+| 1            |          | 1    | 0x4fabb145d64652a948d72533023f6e7a623c7c53 | Binance USD       | BUSD   | 🔴🔴🔴 Potentially Centralised |
+|              |          |      | 0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce | Shiba Inu         | SHIB   | ✅ Decentralised                |
+| 1            |          | 1    | 0xae7ab96520de3a18e5e111b5eaab095312d7fe84 | Lido Staked Ether | STETH  | 🔴🔴🔴 Potentially Centralised |
+|              |          |      | 0x6b175474e89094c44da98b954eedeac495271d0f | Dai               | DAI    | ✅ Decentralised                |
+
+Ideally you want to be using smart contracts that are marked as decentralised (✅). If you are not you should look further into the smart contract and check the audit reports if available before investing too much into them.
+
+We will go through these top 10 tokens and cross check the results of this simple bytecode analysis with the source code and audit reports to see how accurate the calculated centralisation risk ratings are.
+
+Check back soon. Cross check audit results comming!
