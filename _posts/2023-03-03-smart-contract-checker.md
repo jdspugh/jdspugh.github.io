@@ -46,13 +46,15 @@ To automate the analysis of smart contracts and determine if they are proxy cont
 
 A simple checker can be built by checking the opcodes used in building proxy smart contract. The three main opcodes used are:
 
-|Opcode|Hex|Centralisation Risk|
+| Opcode | Hex | Centralisation Risk |
 |-|-|-|
 | `DELEGATECALL` | F4 | 🔴🔴🔴 |
-|`CALLCODE` | F2 | 🔴🔴 |
+| `CALLCODE` | F2 | 🔴🔴 |
 | `CALL` | F1 | 🔴 |
 
-The most commonly used for proxy smart contracts is `DELEGATECALL`, then `CALLCODE`, then `CALL`. The results of the code will reflect this by counting the appearance of these opcodes in the bytecode and marking the centralisation risk with with red dots. Three red dots indicating the highest chance of centralisation i.e. the use of `DELEGATECALL`. This is the code:
+(It should be noted that `CALLCODE` is deprecated and has been replaced by `DELEGATECALL`, even so we should still check for it in case it is still being used.)
+
+The most commonly used opcodes for proxy smart contracts are `DELEGATECALL`, then `CALLCODE`, then `CALL`. The results of the code tool will reflect this ordering by counting the appearance of these opcodes in the bytecode and marking the centralisation risk with with red dots. Three red dots indicating the highest chance of centralisation i.e. the use of `DELEGATECALL`. This is the code:
 
 `phase1.mjs`
 ```js
@@ -128,7 +130,101 @@ Ideally you want to be using the smart contracts that are marked as "✅ Decentr
 
 We will go through these top 10 tokens and cross check the centralised smart contracts that the bytecode analysis tool detected with the source code and public audit reports to see how accurate the tool's calculated centralisation risk ratings are. There is no need to check the "✅ Decentralised" contracts as they are, for sure, immutable decentralised contracts.
 
-*More Audits coming soon!*
+### BNB - Binance Coin
+
+<https://etherscan.io/token/0xB8c77482e45F1F44dE1745F52C74426C631bDD52#code>
+
+From the Etherscan link we can see this function sends ETH from the contract to the `owner` via the `transfer` function. This will be compiled into bytecode which contains one `CALL` opcode.
+
+```solidity
+	// transfer balance to owner
+	function withdrawEther(uint256 amount) {
+		if(msg.sender != owner)throw;
+		owner.transfer(amount);
+	}
+```
+
+The `CALLCODE` opcode is located in the Swarm Source metadata that has been embedded in the bytecode (see the `f2` value in bold). This opcode will not be called because it is metadata rather than code:
+
+bzzr://082734e053ffbd**f2**a3195354a3210dff3723c239a1e76ae3be0936f6aed31bee
+
+Conclusion: BNB is ✅ Decentralised
+
+### USDC - USD Coin
+
+<https://etherscan.io/token/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48#code>
+
+From the Etherscan link we can see the proxy implementation and the `delegatecall()` in this section of code confirming USDC is indeed a proxy smart contract.
+
+```solidity
+/**
+ * @title Proxy
+ * @dev Implements delegation of calls to other contracts, with proper
+ * forwarding of return values and bubbling of failures.
+ * It defines a fallback function that delegates all calls to the address
+ * returned by the abstract _implementation() internal function.
+ */
+contract Proxy {
+  /**
+   * @dev Fallback function.
+   * Implemented entirely in `_fallback`.
+   */
+  function () payable external {
+    _fallback();
+  }
+
+  /**
+   * @return The Address of the implementation.
+   */
+  function _implementation() internal view returns (address);
+
+  /**
+   * @dev Delegates execution to an implementation contract.
+   * This is a low level function that doesn't return to its internal call site.
+   * It will return to the external caller whatever the implementation returns.
+   * @param implementation Address to delegate.
+   */
+  function _delegate(address implementation) internal {
+    assembly {
+      // Copy msg.data. We take full control of memory in this inline assembly
+      // block because it will not return to Solidity code. We overwrite the
+      // Solidity scratch pad at memory position 0.
+      calldatacopy(0, 0, calldatasize)
+
+      // Call the implementation.
+      // out and outsize are 0 because we don't know the size yet.
+      let result := delegatecall(gas, implementation, 0, calldatasize, 0, 0)
+
+      // Copy the returned data.
+      returndatacopy(0, 0, returndatasize)
+
+      switch result
+      // delegatecall returns 0 on error.
+      case 0 { revert(0, returndatasize) }
+      default { return(0, returndatasize) }
+    }
+  }
+
+  /**
+   * @dev Function that is run as the first thing in the fallback function.
+   * Can be redefined in derived contracts to add functionality.
+   * Redefinitions must call super._willFallback().
+   */
+  function _willFallback() internal {
+  }
+
+  /**
+   * @dev fallback implementation.
+   * Extracted to enable manual triggering.
+   */
+  function _fallback() internal {
+    _willFallback();
+    _delegate(_implementation());
+  }
+}
+```
+
+Conclusion: USDC is ❌ Centralised
 
 ### HEX
 
@@ -149,7 +245,7 @@ From the Etherscan link we can see this function sends ETH from the contract to 
     }
 ```
 
-The second `CALL` opcode is located in the Swarm Source metadata at the end of the bytecode. This opcode will not be called because it is metadata rather than code:
+The second `CALL` opcode is located in the Swarm Source metadata that has been appended at the end of the bytecode (see the `f1` value in bold). This opcode will not be called because it is metadata rather than code:
 
 bzzr://e1386410ff82a380822a5c5fb950ec31ad42ac34**f1**e670c4d9b8c7329878472b
 
@@ -267,9 +363,13 @@ contract DelegateProxy is ERCProxy, IsContract {
 
 Conclusion: STETH is ❌ Centralised
 
-# Alternatives to Proxy Contracts
+# Safe Alternatives to Proxy Contracts
 
 In the case of ERC-20 tokens, as an alternative to creating proxy contracts to handle upgrades to smart contracts, a new token can be created with a user-triggered upgrade path (e.g. a one-to-one trade-in swap to the new token) and users can choose to upgrade their tokens to the new token at any point in time. This way the user is in full control of choosing whether to upgrade or not. If the old contract is stable and useful they can stick with it. If the new contract has bugs or scams in it the user is not forced to take the upgrade. Audits can be done before choosing to upgrade and the upgrade can be undertaken with confidence.
+
+# Phase 2
+
+The next phase of this project will be to detect and remove bytecode metadata. As seen above we got two false positives returned by the tool that were caused by the metadata being interpreted as bytecode. In order to rectify this we will need to figure out a generic way of slicing metadata from the bytecode and then decompiling the remaining bytecode into opcodes outside of the web3 api (since the api doesn't allow us to slice out any sections of the bytecode).
 
 # Disclaimer
 
