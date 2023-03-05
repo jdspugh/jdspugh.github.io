@@ -130,6 +130,27 @@ Ideally you want to be using the smart contracts that are marked as "✅ Decentr
 
 We will go through these top 10 tokens and cross check the centralised smart contracts that the bytecode analysis tool detected with the source code and public audit reports to see how accurate the tool's calculated centralisation risk ratings are. There is no need to check the "✅ Decentralised" contracts as they are, for sure, immutable decentralised contracts.
 
+### USDT - Tether
+
+<https://etherscan.io/address/0xdac17f958d2ee523a2206206994597c13d831ec7#code>
+
+The above link's page contains the Contract Security Audit [Callisto Network - July 10th, 2019](https://callisto.network/tether-token-usdt-security-audit/). The report states:
+
+_"4 owner privileges (the ability of an owner to manipulate contract, may be risky for investors)"_
+
+_"Owner can upgrade contract using deprecate and implement any logic in the new contract. And even if the new contract will be audited, at any time possible to change the address of the new contract again to not audited and insecure."_
+
+```solidity
+    // deprecate current contract in favour of a new one
+    function deprecate(address _upgradedAddress) public onlyOwner {
+        deprecated = true;
+        upgradedAddress = _upgradedAddress;
+        Deprecate(_upgradedAddress);
+    }
+```
+
+Conclusion: USDT is ❌ Centralised
+
 ### BNB - Binance Coin
 
 <https://etherscan.io/token/0xB8c77482e45F1F44dE1745F52C74426C631bDD52#code>
