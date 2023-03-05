@@ -151,7 +151,7 @@ This is the code of the `deprecate()` method:
     }
 ```
 
-The Tether smart contract is unusual in that it uses `CALL` rather than `DELEGATECALL` to implement its proxy contract functionality. This makes it harder to detect by an automated tool such as ours. Even so, we can see manually that in the code below 6 calls made with the `StandardToken(upgradedAddress)` prefix. This accounts for the 6 `CALL` opcodes found by the tool and verifies the statement made above in the public audit about the owner being able to change the contract (i.e. it is a proxy contract).
+The Tether smart contract is unusual in that it uses `CALL` rather than `DELEGATECALL` to implement its proxy contract functionality. This makes it harder to detect by an automated tool such as ours. Even so, we can see manually that in the code below 6 calls made with the `StandardToken(upgradedAddress)` prefix. This accounts for the 6 `CALL` opcodes found by the tool and verifies the statement made above in the public audit about the owner being able to change the contract at any time (i.e. it is a proxy contract).
 
 ```
     // Forward ERC20 methods to upgraded contract if this one is deprecated
