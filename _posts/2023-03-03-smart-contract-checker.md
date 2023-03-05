@@ -128,7 +128,7 @@ Ideally you want to be using the smart contracts that are marked as "✅ Decentr
 
 ## Auditing Cross Check
 
-We will go through these top 10 tokens and cross check the centralised smart contracts that the bytecode analysis tool detected with the source code and public audit reports to see how accurate the tool's calculated centralisation risk ratings are. There is no need to check the "✅ Decentralised" contracts as they are, for sure, immutable decentralised contracts.
+We will go through these top 10 tokens (by market capitalisation) and cross check the centralised smart contracts that the bytecode analysis tool detected with the source code and public audit reports to see how accurate the tool's calculated centralisation risk ratings are. There is no need to check the "✅ Decentralised" contracts as they are, for sure, immutable decentralised contracts.
 
 ### USDT - Tether
 
@@ -146,6 +146,73 @@ _"Owner can upgrade contract using deprecate and implement any logic in the new 
         deprecated = true;
         upgradedAddress = _upgradedAddress;
         Deprecate(_upgradedAddress);
+    }
+```
+
+The Tether smart contract is unusual in that it uses `CALL` rather than `DELEGATECALL` to implement its proxy contract functionality. This makes it harder to detect by an automated tool such as ours. Even so, we can see manually that in the code below 6 calls made with the `StandardToken(upgradedAddress)` prefix. This accounts for the 6 `CALL` opcodes found by the tool and verifies the statements made above in the public audit.
+
+```
+    // Forward ERC20 methods to upgraded contract if this one is deprecated
+    function transfer(address _to, uint _value) public whenNotPaused {
+        require(!isBlackListed[msg.sender]);
+        if (deprecated) {
+            return UpgradedStandardToken(upgradedAddress).transferByLegacy(msg.sender, _to, _value);
+        } else {
+            return super.transfer(_to, _value);
+        }
+    }
+
+    // Forward ERC20 methods to upgraded contract if this one is deprecated
+    function transferFrom(address _from, address _to, uint _value) public whenNotPaused {
+        require(!isBlackListed[_from]);
+        if (deprecated) {
+            return UpgradedStandardToken(upgradedAddress).transferFromByLegacy(msg.sender, _from, _to, _value);
+        } else {
+            return super.transferFrom(_from, _to, _value);
+        }
+    }
+
+    // Forward ERC20 methods to upgraded contract if this one is deprecated
+    function balanceOf(address who) public constant returns (uint) {
+        if (deprecated) {
+            return UpgradedStandardToken(upgradedAddress).balanceOf(who);
+        } else {
+            return super.balanceOf(who);
+        }
+    }
+
+    // Forward ERC20 methods to upgraded contract if this one is deprecated
+    function approve(address _spender, uint _value) public onlyPayloadSize(2 * 32) {
+        if (deprecated) {
+            return UpgradedStandardToken(upgradedAddress).approveByLegacy(msg.sender, _spender, _value);
+        } else {
+            return super.approve(_spender, _value);
+        }
+    }
+
+    // Forward ERC20 methods to upgraded contract if this one is deprecated
+    function allowance(address _owner, address _spender) public constant returns (uint remaining) {
+        if (deprecated) {
+            return StandardToken(upgradedAddress).allowance(_owner, _spender);
+        } else {
+            return super.allowance(_owner, _spender);
+        }
+    }
+
+    // deprecate current contract in favour of a new one
+    function deprecate(address _upgradedAddress) public onlyOwner {
+        deprecated = true;
+        upgradedAddress = _upgradedAddress;
+        Deprecate(_upgradedAddress);
+    }
+
+    // deprecate current contract if favour of a new one
+    function totalSupply() public constant returns (uint) {
+        if (deprecated) {
+            return StandardToken(upgradedAddress).totalSupply();
+        } else {
+            return _totalSupply;
+        }
     }
 ```
 
@@ -388,7 +455,7 @@ Conclusion: STETH is ❌ Centralised
 
 In the case of ERC-20 tokens, as an alternative to creating proxy contracts to handle upgrades to smart contracts, a new token can be created with a user-triggered upgrade path (e.g. a one-to-one trade-in swap to the new token) and users can choose to upgrade their tokens to the new token at any point in time. This way the user is in full control of choosing whether to upgrade or not. If the old contract is stable and useful they can stick with it. If the new contract has bugs or scams in it the user is not forced to take the upgrade. Audits can be done before choosing to upgrade and the upgrade can be undertaken with confidence.
 
-# Phase 2
+# Phase 2: Bytecode Splicing
 
 The next phase of this project will be to detect and remove bytecode metadata. As seen above we got two false positives returned by the tool that were caused by the metadata being interpreted as bytecode. In order to rectify this we will need to figure out a generic way of slicing metadata from the bytecode and then decompiling the remaining bytecode into opcodes outside of the web3 api (since the api doesn't allow us to slice out any sections of the bytecode).
 
