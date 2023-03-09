@@ -63,7 +63,7 @@ import EVM from 'evm'
 import Web3 from 'web3'
 import { markdownTable } from 'markdown-table'
 
-async function check(blockchain, address, name='') {
+async function check(address, name='') {
   const web3 = new Web3('https://mainnet.infura.io/v3/'+process.env.INFURA_API_KEY)
   const r = []// result
   await web3.eth.getCode(web3.utils.toChecksumAddress(address)).then(code=>{
@@ -76,11 +76,11 @@ async function check(blockchain, address, name='') {
   return r
 }
 
-let tokens = (await(await fetch('https://api.ethplorer.io/getTop?criteria=cap&apiKey='+(process.env.ETHPLORER_API_KEY||'freekey'))).json()).tokens.map(t=>{t.blockchain='ETH';return t})
+let tokens = (await(await fetch('https://api.ethplorer.io/getTop?criteria=cap&apiKey='+(process.env.ETHPLORER_API_KEY||'freekey'))).json()).tokens
 tokens = tokens.slice(0,10)
 const table = [['DELEGATECALL', 'CALLCODE', 'CALL', 'Address', 'Name', 'Symbol', 'Decentralisation']];
 for (const token of tokens) {
-  const r = await check(token.blockchain, token.address, token.symbol)// opcode counts
+  const r = await check(token.address, token.symbol)// opcode counts
   let d = '✅ Decentralised'// decentralised?
   if (r[0]+r[1]+r[2]>0) {
     if (r[0]>0) d = '🔴🔴🔴'
