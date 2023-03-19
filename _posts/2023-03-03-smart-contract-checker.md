@@ -471,7 +471,91 @@ In the case of ERC-20 tokens, as an alternative to creating proxy contracts to h
 
 # Phase 2: Bytecode Splicing
 
-The next phase of this project will be to detect and remove bytecode metadata. As seen above we got two false positives returned by the tool that were caused by the metadata being interpreted as bytecode. In order to rectify this we will need to figure out a generic way of slicing metadata from the bytecode and then decompiling the remaining bytecode into opcodes outside of the web3 api (since the api doesn't allow us to slice out any sections of the bytecode).
+## Goals
+
+The next phase of this project will be to **detect and remove bytecode metadata**. As seen above we got two false positives returned by the tool that were caused by the metadata being interpreted as bytecode. In order to rectify this we will need to figure out a generic way of slicing metadata from the bytecode and then decompiling the remaining bytecode into opcodes outside of the web3 api (since the api doesn't allow us to slice out any sections of the bytecode).
+
+## Research
+
+According to this brief article on [Solidity bytecode metadata](https://www.badykov.com/ethereum/solidity-bytecode-metadata/) we can see all we need to do it crop the code at the start of the smart contract's metadata section which begins with either `a165627a7a72305820`, `a265627a7a72305820` or `a265627a7a72315820`.
+
+Next we need to process the bytecode to produce the opcodes. Before we were getting the bytecode through the Web3 API. Now we will do it through the `evm` npm package.
+
+`phase2.mjs`
+```js
+import dotenv from 'dotenv';dotenv.config()
+import Web3 from 'web3'
+import { markdownTable } from 'markdown-table'
+import EVM from 'evm'
+
+async function check(address, name='') {
+  const web3 = new Web3('https://mainnet.infura.io/v3/'+process.env.INFURA_API_KEY)
+  const r = []// result
+  await web3.eth.getCode(web3.utils.toChecksumAddress(address)).then(code=>{
+    // crop out metadata
+    code = code.toLocaleLowerCase()// ensure we also use lowercase hexadecimal
+    let i = code.indexOf('a165627a7a72305820') || code.indexOf('a265627a7a72305820') || code.indexOf('a265627a7a72315820')// see https://www.badykov.com/ethereum/solidity-bytecode-metadata/
+    code = code.slice(0,i)
+    const o = new EVM.EVM(code).getOpcodes()
+
+    // detect opcodes
+    r.push(o.filter(o=>'DELEGATECALL'==o.name).length||'')// opcode F4
+    r.push(o.filter(o=>'CALLCODE'==o.name).length||'')// opcode F2
+    r.push(o.filter(o=>'CALL'==o.name).length||'')// opcode F1
+    r.push(i)
+  })
+  return r
+}
+
+let tokens = (await(await fetch('https://api.ethplorer.io/getTop?criteria=cap&apiKey='+(process.env.ETHPLORER_API_KEY||'freekey'))).json()).tokens
+tokens = tokens.slice(0,10)
+const table = [['DELEGATECALL', 'CALLCODE', 'CALL', 'Metadata Index', 'Address', 'Name', 'Symbol', 'Decentralisation']];
+for (const token of tokens) {
+  const r = await check(token.address, token.symbol)// opcode counts
+  let d = '✅ Decentralised'// decentralised?
+  if (r[0]+r[1]+r[2]>0) {
+    if (r[0]>0) d = '🔴🔴🔴'
+    else if (r[1]>0) d = '🔴🔴'
+    else if (r[2]>0) d = '🔴'
+    d += ' Potentially Centralised'
+  }
+  table.push([
+    ...r,
+    token.address,
+    token.name,
+    token.symbol,
+    d,
+  ])
+}
+console.log(markdownTable(table))
+```
+
+These are our phase 2 results:
+
+| DELEGATECALL | CALLCODE | CALL | Metadata Index | Address                                    | Name              | Symbol | Decentralisation               |
+| ------------ | -------- | ---- | -------------- | ------------------------------------------ | ----------------- | ------ | ------------------------------ |
+|              |          |      | -1             | 0x0000000000000000000000000000000000000000 | Ethereum          | ETH    | ✅ Decentralised                |
+|              |          | 6    | 22066          | 0xdac17f958d2ee523a2206206994597c13d831ec7 | Tether USD        | USDT   | 🔴 Potentially Centralised     |
+|              |          | 1    | 10626          | 0xb8c77482e45f1f44de1745f52c74426c631bdd52 | Binance Coin      | BNB    | 🔴 Potentially Centralised     |
+| 1            |          | 1    | 4288           | 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 | USD Coin          | USDC   | 🔴🔴🔴 Potentially Centralised |
+|              |          | 2    | -1             | 0x2b591e99afe9f32eaa6214f7b7629768c40eeb39 | HEX               | HEX    | 🔴 Potentially Centralised     |
+|              |          |      | 5810           | 0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0 | Matic Network     | MATIC  | ✅ Decentralised                |
+| 1            |          | 1    | 1986           | 0xae7ab96520de3a18e5e111b5eaab095312d7fe84 | Lido Staked Ether | STETH  | 🔴🔴🔴 Potentially Centralised |
+| 1            |          | 1    | 2928           | 0x4fabb145d64652a948d72533023f6e7a623c7c53 | Binance USD       | BUSD   | 🔴🔴🔴 Potentially Centralised |
+|              |          |      | 9620           | 0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce | Shiba Inu         | SHIB   | ✅ Decentralised                |
+|              |          |      | -1             | 0x6b175474e89094c44da98b954eedeac495271d0f | Dai               | DAI    | ✅ Decentralised                |
+
+## Conclusion
+
+Out of our limited results only the BNB token has a different results to phase 1, showing it's less likely to be a proxy contract, which it is indeed not. Overall it is a relatively simple and effective tool to decrease the amount of false positives with regards to detecting proxy smart contracts.
+
+# Phase 3: EXTCODESIZE
+
+In phase 3 we will detect `EXTCODESIZE` opcodes. If these are used in conjunction with `CALL` opcodes, the chances are that the contract is a proxy contract because the contract wants to ensure its external target contains executable code.
+
+`CALL` opcodes that don't use `EXTCODESIZE` checks are more likely to be simple ETH transfer functions rather than proxy functions.
+
+By seeing an approximately equal number of `CALL` and `EXTCODESIZE` opcodes there is a good chance the contract is a proxy contract.
 
 # Disclaimer
 
