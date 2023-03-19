@@ -453,27 +453,11 @@ contract DelegateProxy is ERCProxy, IsContract {
 
 Conclusion: STETH is ❌ Centralised
 
-# Safe Alternatives to Proxy Contracts
-
-In the case of ERC-20 tokens, as an alternative to creating proxy contracts to handle upgrades to smart contracts, a new token can be created with a user-triggered upgrade path (e.g. a one-to-one trade-in swap to the new token) and users can choose to upgrade their tokens to the new token at any point in time. This way the user is in full control of choosing whether to upgrade or not. If the old contract is stable and useful they can stick with it. If the new contract has bugs or scams in it the user is not forced to take the upgrade. Audits can be done before choosing to upgrade and the upgrade can be undertaken with confidence.
-
-# Similar Tools
-
-<https://tokensniffer.com>
-* Scam detection, auditing, and metrics
-* Support for 12 chains
-* Free to use
-
-<https://rugdoc.io>
-* Scam detection, auditing, and metrics
-* Support for 10 chains
-* Free to use
-
 # Phase 2: Bytecode Splicing
 
 ## Goals
 
-The next phase of this project will be to **detect and remove bytecode metadata**. As seen above we got two false positives returned by the tool that were caused by the metadata being interpreted as bytecode. In order to rectify this we will need to figure out a generic way of slicing metadata from the bytecode and then decompiling the remaining bytecode into opcodes outside of the web3 api (since the api doesn't allow us to slice out any sections of the bytecode).
+The next phase of this project will be to **detect and remove bytecode metadata**. As seen above we got two **false positives** returned by the tool that were caused by the metadata being interpreted as bytecode. In order to rectify this we will need to figure out a generic way of slicing metadata from the bytecode and then decompiling the remaining bytecode into opcodes outside of the web3 api (since the api doesn't allow us to slice out any sections of the bytecode).
 
 ## Research
 
@@ -556,6 +540,22 @@ In phase 3 we will detect `EXTCODESIZE` opcodes. If these are used in conjunctio
 `CALL` opcodes that don't use `EXTCODESIZE` checks are more likely to be simple ETH transfer functions rather than proxy functions.
 
 By seeing an approximately equal number of `CALL` and `EXTCODESIZE` opcodes there is a good chance the contract is a proxy contract.
+
+# Safe Alternatives to Proxy Contracts
+
+In the case of ERC-20 tokens, as an alternative to creating proxy contracts to handle upgrades to smart contracts, a new token can be created with a user-triggered upgrade path (e.g. a one-to-one trade-in swap to the new token) and users can choose to upgrade their tokens to the new token at any point in time. This way the user is in full control of choosing whether to upgrade or not. If the old contract is stable and useful they can stick with it. If the new contract has bugs or scams in it the user is not forced to take the upgrade. Audits can be done before choosing to upgrade and the upgrade can be undertaken with confidence.
+
+# Similar Tools
+
+<https://tokensniffer.com>
+* Scam detection, auditing, and metrics
+* Support for 12 chains
+* Free to use
+
+<https://rugdoc.io>
+* Scam detection, auditing, and metrics
+* Support for 10 chains
+* Free to use
 
 # Disclaimer
 
