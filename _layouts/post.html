@@ -56,6 +56,7 @@ layout: default
 
   #toc h1, #toc h2, #toc h3 {
     font-weight: normal;
+    margin: 0;
   }
 
   #toc {
@@ -101,10 +102,10 @@ layout: default
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     const elPostContent = document.querySelector('.post-content')
-    const elsHeadings = elPostContent.querySelectorAll('h1,h2,h3,h4,h5,h6')
+    const elsH = elPostContent.querySelectorAll('h1,h2,h3,h4,h5,h6')
 
     let t = ''// toc html
-    elsHeadings.forEach(e => {
+    elsH.forEach(e => {
       const l = parseInt(e.tagName.charAt(1))// heading level
       t += `<h${l}><a href="#${encodeURIComponent(e.textContent)}">${e.textContent}</a></h${l}>`
     })
