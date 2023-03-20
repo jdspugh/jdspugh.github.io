@@ -94,26 +94,12 @@ layout: default
     const elPostContent = document.querySelector('.post-content')
     const elsHeadings = elPostContent.querySelectorAll('h1,h2,h3,h4,h5,h6')
 
-    let tocHtml = ''
-    // let lo = 0// old level
+    let t = ''// toc html
     elsHeadings.forEach(e => {
-      const ln = parseInt(e.tagName.charAt(1))// new level
-
-      // if (ln > lo) {
-      //   tocHtml += new Array(ln - lo + 1).join('<ul>')
-      // } else if (ln < lo) {
-      //   tocHtml += new Array(lo - ln + 1).join('</ul>')
-      // }
-
-      // lo = ln
-      // const anchor = document.createElement('a')
-      // anchor.setAttribute('name', e.textContent)
-      // e.parentNode.insertBefore(anchor, e)
-      tocHtml += `<h${lo}><a href="#${encodeURIComponent(e.textContent)}">${e.textContent}</a></h${lo}>`
+      const l = parseInt(e.tagName.charAt(1))// heading level
+      t += `<h${l}><a href="#${encodeURIComponent(e.textContent)}">${e.textContent}</a></h${l}>`
     })
-    // tocHtml += new Array(lo + 1).join('</ul>')
-
-    document.querySelector('#toc').innerHTML += tocHtml
+    document.querySelector('#toc').innerHTML += t
   })
   </script>
   <!-- jdspugh end -->
