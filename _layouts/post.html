@@ -25,12 +25,9 @@ layout: default
   #toc-container {
     width: 100%;
     background-color: #f9f9f9;
-    box-shadow: 0 0 7px 0px #bbb;
-    padding: 8px 20px 12px;
     overflow-y: auto;
     max-height: 80vh;
     z-index: 1000;
-    box-sizing: border-box;
   }
 
   #toc-container h2 {
@@ -88,15 +85,16 @@ layout: default
     counter-increment: tc;
   }
 
-  /* Desktop styles */
+  /* Mobile */
   @media screen and (min-width: 1400px) {
     #toc-container {
       position: fixed;
       top: 20px;
       right: 20px;
       width: 300px;
-      box-shadow: none;
-      padding: 0;
+      box-shadow: 0 0 7px 0px #bbb;
+      padding: 8px 20px 12px;
+      box-sizing: border-box;
     }
   }
   </style>
