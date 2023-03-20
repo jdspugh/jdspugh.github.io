@@ -30,11 +30,16 @@ layout: default
     overflow-y: auto;
     max-height: 80vh;
     z-index: 1000;
+    box-sizing: border-box;
   }
 
   #toc-container h2 {
     margin-top: 0;
     margin-bottom: 10px;
+  }
+
+  #toc-container li {
+    outline: none;
   }
 
   /* Desktop styles */
@@ -53,26 +58,26 @@ layout: default
     const elPostContent = document.querySelector('.post-content')
     const elsHeadings = elPostContent.querySelectorAll('h1,h2,h3,h4,h5,h6')
 
-    let toc = ''
-    let level = 0
+    let tocHtml = ''
+    let lo = 0// old level
     elsHeadings.forEach(e => {
-      const openLevel = parseInt(e.tagName.charAt(1))
+      const ln = parseInt(e.tagName.charAt(1))// new level
 
-      if (openLevel > level) {
-        toc += new Array(openLevel - level + 1).join('<ul>')
-      } else if (openLevel < level) {
-        toc += new Array(level - openLevel + 1).join('</ul>')
+      if (ln > lo) {
+        tocHtml += new Array(ln - lo + 1).join('<ul>')
+      } else if (ln < lo) {
+        tocHtml += new Array(lo - ln + 1).join('</ul>')
       }
 
-      level = openLevel
+      lo = ln
       const anchor = document.createElement('a')
       anchor.setAttribute('name', e.textContent)
       e.parentNode.insertBefore(anchor, e)
-      toc += `<li><a href="#${encodeURIComponent(e.textContent)}">${e.textContent}</a></li>`
+      tocHtml += `<li><a href="#${encodeURIComponent(e.textContent)}">${e.textContent}</a></li>`
     })
-    toc += new Array(level + 1).join('</ul>')
+    tocHtml += new Array(lo + 1).join('</ul>')
 
-    document.querySelector('#toc').innerHTML += toc
+    document.querySelector('#toc').innerHTML += tocHtml
   })
   </script>
   <!-- jdspugh end -->
