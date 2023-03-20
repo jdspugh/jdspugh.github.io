@@ -158,6 +158,10 @@ Upload an image and create `_includes/head.html` which includes a link to your f
 ```
 {% endraw %}
 
+# Plugins
+
+Github pages has a number of plugins inbuilt. The up-to-date list can be found here <https://pages.github.com/versions/>. New plugins cannot be added (for to security reasons).
+
 # Summary
 
 The final directory structure of your repo will look like this:
