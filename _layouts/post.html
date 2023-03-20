@@ -107,7 +107,7 @@ layout: default
     let t = ''// toc html
     elsH.forEach(e => {
       const l = parseInt(e.tagName.charAt(1))// heading level
-      t += `<h${l}><a href="#${encodeURIComponent(e.textContent)}">${e.textContent}</a></h${l}>`
+      t += `<h${l}><a href="#${e.id}">${e.textContent}</a></h${l}>`
     })
     document.querySelector('#toc').innerHTML += t
   })
