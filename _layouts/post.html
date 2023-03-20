@@ -54,6 +54,30 @@ layout: default
     text-overflow: ellipsis;
   }
 
+  #toc-container {
+    counter-reset: ta;
+  }
+  #toc-container>ul:before {
+    content: counter(ta)" ";
+  }
+  #toc-container>ul {
+    counter-increment: ta;
+    counter-reset: tb;
+  }
+  #toc-container>ul>ul:before {
+    content: counter(ta)"."counter(tb)" ";
+  }
+  #toc-container>ul>ul {
+    counter-increment: tb;
+    counter-reset: tc;
+  }
+  #toc-container>ul>ul>ul:before {
+    content: counter(ta)"."counter(tb)"."counter(tc)" ";
+  }
+  #toc-container>ul>ul>ul {
+    counter-increment: tc;
+  }
+
   /* Desktop styles */
   @media screen and (min-width: 800px) {
     #toc-container {
