@@ -15,6 +15,68 @@ layout: default
       {%- endif -%}</p>
   </header>
 
+  <!-- jdspugh start -->
+  <div id="toc-container">
+    <h2>Table of Contents</h2>
+    <div id="toc"></div>
+  </div>
+
+  <style>
+  #toc-container {
+    width: 100%;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 80vh;
+    z-index: 1000;
+  }
+
+  #toc-container h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+
+  /* Desktop styles */
+  @media screen and (min-width: 768px) {
+    #toc-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 250px;
+    }
+  }
+  </style>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const elPostContent = document.querySelector('.post-content')
+    const elsHeadings = elPostContent.querySelectorAll('h1,h2,h3,h4,h5,h6')
+
+    let toc = ''
+    let level = 0
+    elsHeadings.forEach(e => {
+      const openLevel = parseInt(e.tagName.charAt(1))
+
+      if (openLevel > level) {
+        toc += new Array(openLevel - level + 1).join('<ul>')
+      } else if (openLevel < level) {
+        toc += new Array(level - openLevel + 1).join('</ul>')
+      }
+
+      level = openLevel
+      const anchor = document.createElement('a')
+      anchor.setAttribute('name', e.textContent)
+      e.parentNode.insertBefore(anchor, e)
+      toc += `<li><a href="#${encodeURIComponent(e.textContent)}">${e.textContent}</a></li>`
+    })
+    toc += new Array(level + 1).join('</ul>')
+
+    document.querySelector('#toc').innerHTML += toc
+  })
+  </script>
+  <!-- jdspugh end -->
+
   <div class="post-content e-content" itemprop="articleBody">
     {{ content }}
   </div>
@@ -25,73 +87,3 @@ layout: default
 
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>
-
-<!-- jdspugh start -->
-<div id="toc-container">
-  <h2>Table of Contents</h2>
-  <div id="toc"></div>
-</div>
-
-<style>
-#toc-container {
-  width: 100%;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  padding: 10px;
-  overflow-y: auto;
-  max-height: 80vh;
-  z-index: 1000;
-}
-
-#toc-container h2 {
-  margin-top: 0;
-  margin-bottom: 10px;
-}
-
-/* Desktop styles */
-@media screen and (min-width: 768px) {
-  #toc-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 250px;
-  }
-}
-
-/* Mobile styles */
-@media screen and (max-width: 767px) {
-  #toc-container {
-    position: static;
-    margin-bottom: 20px;
-  }
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const postContent = document.querySelector('.post-content')
-  const headings = postContent.querySelectorAll('h1,h2,h3,h4,h5,h6')
-
-  let toc = ''
-  let level = 0
-  headings.forEach(heading => {
-    const openLevel = parseInt(heading.tagName.charAt(1))
-
-    if (openLevel > level) {
-      toc += new Array(openLevel - level + 1).join('<ul>')
-    } else if (openLevel < level) {
-      toc += new Array(level - openLevel + 1).join('</ul>')
-    }
-
-    level = openLevel
-    const anchor = document.createElement('a')
-    anchor.setAttribute('name', heading.textContent)
-    heading.parentNode.insertBefore(anchor, heading)
-    toc += `<li><a href="#${encodeURIComponent(heading.textContent)}">${heading.textContent}</a></li>`
-  })
-  toc += new Array(level + 1).join('</ul>')
-
-  document.querySelector('#toc').innerHTML += toc
-})
-</script>
-<!-- jdspugh end -->
