@@ -38,12 +38,14 @@
 .post-content h3 { font-size: 18px }
 
 /* fix anchor scroll position */
-.post-content h1:before, .post-content h2:before, .post-content h3:before {
+.post-content h1:after, .post-content h2:after, .post-content h3:after {
+  content: '';
   display: block;
   height: 80px;
   margin-top: -80px;
   visibility: hidden;
-  pointer-events: none;
+  display: inline-block;
+  padding-top: 80px;
 }
 
 /* h1 spacing and underline */
