@@ -39,7 +39,6 @@
 
 /* fix anchor scroll position */
 .post-content h1:before, .post-content h2:before, .post-content h3:before {
-  content: '';
   display: block;
   height: 80px;
   margin-top: -80px;
