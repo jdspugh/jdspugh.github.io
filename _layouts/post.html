@@ -26,4 +26,68 @@ layout: default
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>
 
-123
+<!-- jdspugh start -->
+<div id="toc-container">
+  <h2>Table of Contents</h2>
+  <div id="toc"></div>
+</div>
+
+<style>
+#toc-container {
+  width: 100%;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 10px;
+  overflow-y: auto;
+  max-height: 80vh;
+  z-index: 1000;
+}
+
+#toc-container h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+/* Desktop styles */
+@media screen and (min-width: 768px) {
+  #toc-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 250px;
+  }
+}
+
+/* Mobile styles */
+@media screen and (max-width: 767px) {
+  #toc-container {
+    position: static;
+    margin-bottom: 20px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  var toc = ""
+  var level = 0
+
+  document.getElementById("main-content").innerHTML
+    .replace(/<(h[1-6])[^>]*>([^<]+)<\/\1>/g, (str, openTag, title) => {
+      var openLevel = parseInt(openTag.charAt(1))
+
+      if (openLevel > level) {
+        toc += (new Array(openLevel - level + 1)).join("<ul>")
+      } else if (openLevel < level) {
+        toc += (new Array(level - openLevel + 1)).join("</ul>")
+      }
+
+      level = parseInt(openTag.charAt(1))
+      return "<" + openTag + "><a name=\"" + title + "\"></a>" + title + "</" + openTag + ">"
+    })
+
+  toc += (new Array(level + 1)).join("</ul>")
+  document.getElementById("toc").innerHTML += toc
+})
+</script>
+<!-- jdspugh end -->
