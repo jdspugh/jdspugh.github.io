@@ -54,6 +54,10 @@ layout: default
     text-overflow: ellipsis;
   }
 
+  #toc h1, #toc h2, #toc h3 {
+    font-weight: normal;
+  }
+
   #toc {
     counter-reset: ta;
   }
@@ -61,6 +65,7 @@ layout: default
     content: counter(ta)" ";
   }
   #toc h1 {
+    font-size: 16px;
     counter-increment: ta;
     counter-reset: tb;
   }
@@ -68,6 +73,8 @@ layout: default
     content: counter(ta)"."counter(tb)" ";
   }
   #toc h2 {
+    margin-left: 1em;
+    font-size: 14px;
     counter-increment: tb;
     counter-reset: tc;
   }
@@ -75,6 +82,8 @@ layout: default
     content: counter(ta)"."counter(tb)"."counter(tc)" ";
   }
   #toc h3 {
+    margin-left: 2em;
+    font-size: 12px;
     counter-increment: tc;
   }
 
