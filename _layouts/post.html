@@ -57,24 +57,24 @@ layout: default
   #toc {
     counter-reset: ta;
   }
-  #toc>ul:before {
+  #toc h1:before {
     content: counter(ta)" ";
   }
-  #toc>ul {
+  #toc h1 {
     counter-increment: ta;
     counter-reset: tb;
   }
-  #toc>ul>ul:before {
+  #toc h2:before {
     content: counter(ta)"."counter(tb)" ";
   }
-  #toc>ul>ul {
+  #toc h2 {
     counter-increment: tb;
     counter-reset: tc;
   }
-  #toc>ul>ul>ul:before {
+  #toc h3:before {
     content: counter(ta)"."counter(tb)"."counter(tc)" ";
   }
-  #toc>ul>ul>ul {
+  #toc h3 {
     counter-increment: tc;
   }
 
@@ -95,23 +95,23 @@ layout: default
     const elsHeadings = elPostContent.querySelectorAll('h1,h2,h3,h4,h5,h6')
 
     let tocHtml = ''
-    let lo = 0// old level
+    // let lo = 0// old level
     elsHeadings.forEach(e => {
       const ln = parseInt(e.tagName.charAt(1))// new level
 
-      if (ln > lo) {
-        tocHtml += new Array(ln - lo + 1).join('<ul>')
-      } else if (ln < lo) {
-        tocHtml += new Array(lo - ln + 1).join('</ul>')
-      }
+      // if (ln > lo) {
+      //   tocHtml += new Array(ln - lo + 1).join('<ul>')
+      // } else if (ln < lo) {
+      //   tocHtml += new Array(lo - ln + 1).join('</ul>')
+      // }
 
-      lo = ln
-      const anchor = document.createElement('a')
-      anchor.setAttribute('name', e.textContent)
-      e.parentNode.insertBefore(anchor, e)
-      tocHtml += `<li><a href="#${encodeURIComponent(e.textContent)}">${e.textContent}</a></li>`
+      // lo = ln
+      // const anchor = document.createElement('a')
+      // anchor.setAttribute('name', e.textContent)
+      // e.parentNode.insertBefore(anchor, e)
+      tocHtml += `<h${lo}><a href="#${encodeURIComponent(e.textContent)}">${e.textContent}</a></h${lo}>`
     })
-    tocHtml += new Array(lo + 1).join('</ul>')
+    // tocHtml += new Array(lo + 1).join('</ul>')
 
     document.querySelector('#toc').innerHTML += tocHtml
   })
