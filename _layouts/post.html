@@ -69,24 +69,28 @@ layout: default
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  const postContent = document.querySelector('.post-content')
+  const headings = postContent.querySelectorAll('h1,h2,h3,h4,h5,h6')
+
   let toc = ''
   let level = 0
+  headings.forEach(heading => {
+    const openLevel = parseInt(heading.tagName.charAt(1))
 
-  document.querySelector('.post-content').innerHTML
-    .replace(/<(h[1-6])[^>]*>([^<]+)<\/\1>/g, (str, openTag, title) => {
-      let openLevel = parseInt(openTag.charAt(1))
+    if (openLevel > level) {
+      toc += new Array(openLevel - level + 1).join('<ul>')
+    } else if (openLevel < level) {
+      toc += new Array(level - openLevel + 1).join('</ul>')
+    }
 
-      if (openLevel > level) {
-        toc += (new Array(openLevel - level + 1)).join('<ul>')
-      } else if (openLevel < level) {
-        toc += (new Array(level - openLevel + 1)).join('</ul>')
-      }
+    level = openLevel
+    const anchor = document.createElement('a')
+    anchor.setAttribute('name', heading.textContent)
+    heading.parentNode.insertBefore(anchor, heading)
+    toc += `<li><a href="#${encodeURIComponent(heading.textContent)}">${heading.textContent}</a></li>`
+  })
+  toc += new Array(level + 1).join('</ul>')
 
-      level = parseInt(openTag.charAt(1))
-      return '<' + openTag + '><a name="' + title + '"></a>' + title + '</' + openTag + '>'
-    })
-
-  toc += (new Array(level + 1)).join('</ul>')
   document.querySelector('#toc').innerHTML += toc
 })
 </script>
