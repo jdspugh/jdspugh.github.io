@@ -25,7 +25,7 @@ layout: default
   #toc-container {
     width: 100%;
     background-color: #f9f9f9;
-    border: 1px solid #ccc;
+    box-shadow: 0 0 7px 0px #bbb;
     padding: 10px;
     overflow-y: auto;
     max-height: 80vh;
@@ -38,8 +38,12 @@ layout: default
     margin-bottom: 10px;
   }
 
+  #toc-container ul:first-child {
+    margin-left: 0;
+  }
+
   #toc-container ul {
-    margin: 0;
+    margin-left: 1em;
   }
 
   #toc-container li {
