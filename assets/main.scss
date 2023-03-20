@@ -32,10 +32,20 @@
 /* END numbered headings */
 
 /* fix h1 being too small */
-.post-content h1, h2, h3 { font-weight: bold }
+.post-content h1, h2, h3 {font-weight: bold }
 .post-content h1 { font-size: 26px }
 .post-content h2 { font-size: 22px }
 .post-content h3 { font-size: 18px }
+
+/* fix anchor scroll position */
+.post-content h1:before, .post-content h2:before, .post-content h3:before {
+  content: '';
+  display: block;
+  height: 80px;
+  margin-top: -80px;
+  visibility: hidden;
+  pointer-events: none;
+}
 
 /* h1 spacing and underline */
 .post-content h1 {

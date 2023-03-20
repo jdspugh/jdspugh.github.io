@@ -16,20 +16,20 @@ layout: default
   </header>
 
   <!-- jdspugh start -->
-  <div id="toc-container">
+  <div id="toc-outer">
     <h2>Table of Contents</h2>
     <div id="toc"></div>
   </div>
 
   <style>
-  #toc-container {
+  #toc-outer {
     width: 100%;
     overflow-y: auto;
     max-height: 80vh;
     z-index: 1000;
   }
 
-  #toc-container h2 {
+  #toc-outer h2 {
     margin-top: 0;
     margin-bottom: 10px;
   }
@@ -86,7 +86,7 @@ layout: default
 
   /* Mobile */
   @media screen and (min-width: 1400px) {
-    #toc-container {
+    #toc-outer {
       position: fixed;
       top: 20px;
       right: 20px;
