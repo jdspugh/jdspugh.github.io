@@ -5,17 +5,17 @@ title: Floating Table-of-Contents for Github Pages
 {% raw %}
 # Introduction
 
-In this post we are going to create a responsive table of contents for your Github Pages blog. As this code is implemented in this blog you should be able to see the table of contents right now and play around with it. The implementation should work with any theme without modification but in this case I'm working with the Minima theme.
+In this post we are going to create a responsive table-of-contents for your Github Pages blog. As this code is implemented in this blog you should be able to see the table-of-contents right now and play around with it. The implementation should work with any theme without modification but in this case I'm working with the Minima theme.
 
-I created the table of contents code because I wanted an easy way to navigate to sections of my blog posts. Since most of the content is reference material it is really convenient to be able to jump to the relevant section at the click of a button.
+I created the table-of-contents code because I wanted an easy way to navigate to sections of my blog posts. Since most of the content is reference material it is really convenient to be able to jump to the relevant section at the click of a button.
 
 If you have not already setup your Github Pages blog, follow my instructions at [Setting up a Blog with GitHub Pages](https://jdspugh.github.io/2023/02/25/github-pages-jekyll-setup.html).
 
 # UX Design
 
-I wanted a floating table of contents for desktop devices that sits to the side of the article and is always visible. Any heading can be clicked in order bring that section into view.
+I wanted a floating table-of-contents for desktop devices that sits to the side of the article and is always visible. Any heading can be clicked in order bring that section into view.
 
-On mobile devices I wanted the table of contents to appear at the top of the article only. Since scrolling is an easy and fast operation on modern mobile devices it was enough that the user could scroll back to the top of the article if they wanted to navigate using the table of contents again.
+On mobile devices I wanted the table-of-contents to appear at the top of the article only. Since scrolling is an easy and fast operation on modern mobile devices it was enough that the user could scroll back to the top of the article if they wanted to navigate using the table-of-contents again.
 
 # Implementation
 
@@ -55,11 +55,11 @@ layout: default
 </article>
 ```
 
-We are going to be modifying this file only to create the table of contents.
+We are going to be modifying this file only to create the table-of-contents.
 
 ## Modify your local copy of post.html
 
-This is the modified version of `post.html` with all the code we require for the table of contents:
+This is the modified version of `post.html` with all the code we require for the table-of-contents:
 
 ```handlebars
 ---
@@ -232,7 +232,7 @@ The html is a simple placeholder that will get filled by some javascript code th
 
 ## CSS
 
-This CSS applies formatting to the table of contents for mobile devices. The CSS also includes some code for numbering the table of contents headings.
+This CSS applies formatting to the table-of-contents for mobile devices. The CSS also includes some code for numbering the table-of-contents headings.
 
 ```css
 #toc-outer {
@@ -300,7 +300,7 @@ This CSS applies formatting to the table of contents for mobile devices. The CSS
 
 ### Responsive
 
-Once the screen width is over `1400px` some new styling is applied that floats the table of contents to the right. The `position: fixed` floats it. The `top: 20px` and `right: 20px` pin it to the top right of the screen. The rest of the CSS is just styling.
+Once the screen width is over `1400px` some new styling is applied that floats the table-of-contents to the right. The `position: fixed` floats it. The `top: 20px` and `right: 20px` pin it to the top right of the screen. The rest of the CSS is just styling.
 
 ```css
   /* Desktop */
@@ -320,7 +320,7 @@ Once the screen width is over `1400px` some new styling is applied that floats t
 
 ### Anchors
 
-One final piece of the puzzle is setting the `scroll-margin-top`. You can adjust or remove this piece of code depending on how your theme works. But if you have a floating nav bar at the top of your theme you will find this useful to position the document correctly when any of the table of contents items are clicked. Without it you may find the heading hidden underneath the nav bar after clicking in the table of contents.
+One final piece of the puzzle is setting the `scroll-margin-top`. You can adjust or remove this piece of code depending on how your theme works. But if you have a floating nav bar at the top of your theme you will find this useful to position the document correctly when any of the table-of-contents items are clicked. Without it you may find the heading hidden underneath the nav bar after clicking in the table-of-contents.
 
 ```css
 /* set anchor scroll-to position */
@@ -329,5 +329,5 @@ One final piece of the puzzle is setting the `scroll-margin-top`. You can adjust
 
 # Summary
 
-I hope you can use this code for your Github Pages blog also. Your main trouble will be getting the right version of your theme's `post.html` to modify. Once you have it a straight copy and paste of the table of contents code into the file should have it working in no time!
+I hope you can use this code for your Github Pages blog also. Your main trouble will be getting the right version of your theme's `post.html` to modify. Once you have it a straight copy and paste of the table-of-contents code into the file should have it working in no time!
 {% endraw %}
