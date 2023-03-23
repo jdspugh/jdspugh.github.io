@@ -181,6 +181,8 @@ image
     jonathans-tech-blog-logo.svg
 ```
 
+If you wish to take you blog setup further you can take a look at my article on setting up a [Floating Table-of-Contents for Github Pages](https://jdspugh.github.io/2023/03/23/github-pages-toc.html).
+
 I hope you found this tutorial helpful to get started with blogging using GitHub Pages. Feel free to leave any comments, and happy blogging!
 
 [1]: https://disqus.com
