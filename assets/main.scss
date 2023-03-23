@@ -2,9 +2,6 @@
 ---
 @import "{{site.theme}}";
 
-/* fix anchor scroll-to position */
-:target { scroll-margin-top: 70px }
-
 /* START numbered headings */
 .post-content {
   counter-reset: a;
