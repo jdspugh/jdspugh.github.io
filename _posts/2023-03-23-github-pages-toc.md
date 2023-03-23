@@ -2,6 +2,7 @@
 layout: post
 title: Floating Table-of-Contents for Github Pages
 ---
+{% raw %}
 # Introduction
 
 In this post we are going to create a responsive table of contents for your Github Pages blog. As this code is implemented in this blog you should be able to see the table of contents right now and play around with it. The implementation should work with any theme without modification but in this case I'm working with the Minima theme.
@@ -329,3 +330,4 @@ One final piece of the puzzle is setting the `scroll-margin-top`. You can adjust
 # Summary
 
 I hope you can use this code for your Github Pages blog also. Your main trouble will be getting the right version of your theme's `post.html` to modify. Once you have it a straight copy and paste of the table of contents code into the file should have it working in no time!
+{% endraw %}
