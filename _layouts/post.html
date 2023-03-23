@@ -22,6 +22,9 @@ layout: default
   </div>
 
   <style>
+  /* set anchor scroll-to position */
+  :target { scroll-margin-top: 70px }
+
   #toc-outer {
     width: 100%;
     overflow-y: auto;
@@ -84,7 +87,7 @@ layout: default
     counter-increment: tc;
   }
 
-  /* Mobile */
+  /* Desktop */
   @media screen and (min-width: 1400px) {
     #toc-outer {
       position: fixed;
