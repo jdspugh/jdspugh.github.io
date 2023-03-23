@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Floating Table of Contents for Github Pages Posts
+title: Floating Table-of-Contents for Github Pages
 ---
 # Introduction
 
@@ -24,7 +24,7 @@ The first step will be to make a copy of your theme's `_layouts/post.html` file 
 
 In my case (using the Minima theme) the `post.html` file it's located at <https://github.com/jekyll/minima/blob/2.5-stable/_layouts/post.html>. Since Github Pages currently uses Minima version 2.5 I needed to select the `2.5-stable` branch and use the file there. Here is the contents:
 
-```html
+```handlebars
 ---
 layout: default
 ---
@@ -60,7 +60,7 @@ We are going to be modifying this file only to create the table of contents.
 
 This is the modified version of `post.html` with all the code we require for the table of contents:
 
-```html
+```handlebars
 ---
 layout: default
 ---
