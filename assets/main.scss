@@ -2,6 +2,9 @@
 ---
 @import "{{site.theme}}";
 
+/* fix anchor scroll-to position */
+:target { scroll-margin-top: 70px }
+
 /* START numbered headings */
 .post-content {
   counter-reset: a;
@@ -36,17 +39,6 @@
 .post-content h1 { font-size: 26px }
 .post-content h2 { font-size: 22px }
 .post-content h3 { font-size: 18px }
-
-/* fix anchor scroll position */
-.post-content h1:after, .post-content h2:after, .post-content h3:after {
-  content: '';
-  display: block;
-  height: 80px;
-  margin-top: -80px;
-  visibility: hidden;
-  display: inline-block;
-  padding-top: 80px;
-}
 
 /* h1 spacing and underline */
 .post-content h1 {
