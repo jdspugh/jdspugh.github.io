@@ -8,26 +8,26 @@ To produce a login system that is simpler, more secure than traditional username
 
 # Background
 
-I was using the app that comes with my Roidme Eve robot vacuum cleaner and was impressed by its login system. I'm so used to using the conventional Username/Password system that I didn't really think of any other way of implementing it. The Roidme app doesn't store the password but rather sends a verification code to your email which you enter in order to enter the app. The verification code is sent to your email address.
+I was using the app that comes with my Roidme Eve robot vacuum cleaner and was impressed by its login system. I'm so used to using the conventional **username/password login** system (let's call it **UPL**) that I didn't really think of any other way of implementing it. The Roidme app doesn't store the password but rather sends a verification code to your email which you enter in order to enter the app. Let's abbreviate this **minimalist login system** to **MLS**.
 
 # UX
 
 ## Username/Password Login Flow
 
-A traditional username/password login flow looks something like this:
+The traditional UPL login flow looks something like this:
 
 <figure>
   <img src="/image/blog/2023-03-23-minimalist-login-system/username-password-login-flow.svg" alt="Username/Password Login Flow"/>
-  <figcaption>Username/Password Login Flow</figcaption>
+  <figcaption>UPL Login Flow</figcaption>
 </figure>
 
 ## Minimalist Login Flow
 
-Our minimalist approach gives a much simpler flow:
+Our MLS approach gives a much simpler flow:
 
 <figure>
   <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="Verification Code Login Flow"/>
-  <figcaption>Verification Code Login Flow</figcaption>
+  <figcaption>MLS Flow</figcaption>
 </figure>
 
 # Database Schema
@@ -60,14 +60,14 @@ A secure token gets created on the server when a user correctly enters their ver
 
 The cookie is sent to the server with every browser request. The server will cross reference the cookie's value with the `token` stored in the database to make sure that the user is still logged in.
 
-<dl>
-<dt>HttpOnly</dt>
-<dd>This attribute prevents JavaScript from accessing the cookie, which can help protect against cross-site scripting (XSS) attacks. By marking a cookie as HttpOnly, it can only be accessed by the server only and not client-side scripts.</dd>
-<dt>Secure</dt>
-<dd>The Secure attribute ensures that the cookie is only sent over HTTPS connections. This prevents the cookie from being transmitted over insecure HTTP connections, protecting it from eavesdropping and man-in-the-middle attacks.</dd>
-<dt>SameSite</dt>
-<dd>The SameSite attribute controls when the browser sends cookies along with cross-site requests. By setting the SameSite attribute to "Strict" or "Lax", you can reduce the risk of cross-site request forgery (CSRF) attacks. With the "Strict" setting, the cookie is only sent for requests originating from the same site. With the "Lax" setting, the cookie is sent for same-site requests and some cross-site requests, like navigating to another website via a link.</dd>
-</dl>
+### HttpOnly
+This attribute prevents JavaScript from accessing the cookie, which can help protect against cross-site scripting (XSS) attacks. By marking a cookie as HttpOnly, it can only be accessed by the server only and not client-side scripts.
+
+### Secure
+The Secure attribute ensures that the cookie is only sent over HTTPS connections. This prevents the cookie from being transmitted over insecure HTTP connections, protecting it from eavesdropping and man-in-the-middle attacks.
+
+### SameSite
+With the "Strict" setting, the cookie is only sent for requests originating from the same site. With the "Lax" setting, the cookie is sent for same-site requests and some cross-site requests.
 
 # Security
 
