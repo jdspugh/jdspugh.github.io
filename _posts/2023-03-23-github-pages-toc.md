@@ -169,7 +169,7 @@ layout: default
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     const elPostContent = document.querySelector('.post-content')
-    const elsH = elPostContent.querySelectorAll('h1,h2,h3,h4,h5,h6')
+    const elsH = elPostContent.querySelectorAll('h1,h2,h3')
 
     let t = ''// toc html
     elsH.forEach(e => {
@@ -212,13 +212,13 @@ The html is a simple placeholder that will get filled by some javascript code th
 
 ## javascript
 
-`elsH` becomes filled with references to all the header elements in the blog post. `<a>` elements are created for each header element in `elsH` that link to the relevant heading's anchor in the post. These are then inserted into the html placeholder I talked about above.
+`elsH` becomes filled with references to the level 1 to level 3 header elements in the blog post. `<a>` elements are created for each header element in `elsH` that link to the relevant heading's anchor in the post. These are then inserted into the html placeholder I talked about above.
 
 ```js
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     const elPostContent = document.querySelector('.post-content')
-    const elsH = elPostContent.querySelectorAll('h1,h2,h3,h4,h5,h6')
+    const elsH = elPostContent.querySelectorAll('h1,h2,h3')
 
     let t = ''// toc html
     elsH.forEach(e => {
