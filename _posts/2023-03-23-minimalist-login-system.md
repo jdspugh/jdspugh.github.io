@@ -8,13 +8,13 @@ To produce a login system that is simpler, more secure than traditional username
 
 # Terminology
 
-Let's call the conventional username/password login system **UPL**.
+Let's call the conventional Username/Password Login system **UPL**.
 
-Let's call the minimalist login system **MLS**.
+Let's call the Minimalist Login System **MLS**.
 
 # Background
 
-I was using the app that comes with my Roidme Eve robot vacuum cleaner and was impressed by its login system. I'm so used to using the conventional UPL system that I didn't really think of any other way of implementing it. The Roidme app doesn't store the password but rather sends a verification code to your email which you enter in order to enter the app.
+I was using the iOS app that comes with my Roidme Eve robot vacuum cleaner and was impressed by its login system. I'm so used to using the conventional UPL system that I didn't really think of any other way of implementing it. The Roidme app doesn't store the password but rather sends a verification code to your email which you enter in order to enter the app. This is the basis of the MLS.
 
 # UX
 
@@ -38,8 +38,6 @@ Our MLS approach gives a much simpler flow:
 
 # Database Schema
 
-Both database schemas will use a random token that is stored in the database and also in a secure cookie upon successful login in order to remember that the user is still logged in between browser sessions. The cookie's contents can be compared with the value stored in the database.
-
 ## UPL Fields
 
 | Field Name    | Data Type |
@@ -55,6 +53,12 @@ Both database schemas will use a random token that is stored in the database and
 | verificationCode          | INTEGER |
 
 ## Common Fields
+
+Both database schemas will use a random token that is stored in the database and also in a browser cookie upon successful login in order to identify the logged-in user between requests and also is optionally persistent between browser sessions.
+
+The cookie's contents can be compared with the value stored in the database in the `token` field.
+
+The cookie will be a 12-character base64 string. This gives 72 bits of entropy which is considered [strong and sufficient for securing financial information][1].
 
 | Field Name                | Type    |
 |---------------------------|---------|
@@ -134,3 +138,5 @@ In the MLS users do not have to remember or manage passwords, which simplifies t
 # Next Steps
 
 Rate limiting. A rate limiter will be built so that we can have 6-digit verification codes. This will improve the user experience at the cost of some code complexity.
+
+[1]: https://www.pleacher.com/mp/mlessons/algebra/mobentr2.html
