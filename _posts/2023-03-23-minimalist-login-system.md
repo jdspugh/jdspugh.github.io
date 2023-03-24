@@ -6,27 +6,33 @@ title: Minimalist Login System using Node.js
 
 To produce a login system that is simpler, more secure than traditional username/password login systems.
 
+# Terminology
+
+Let's call the conventional username/password login system **UPL**.
+
+Let's call the minimalist login system **MLS**.
+
 # Background
 
-I was using the app that comes with my Roidme Eve robot vacuum cleaner and was impressed by its login system. I'm so used to using the conventional **username/password login** system (let's call it **UPL**) that I didn't really think of any other way of implementing it. The Roidme app doesn't store the password but rather sends a verification code to your email which you enter in order to enter the app. Let's abbreviate this **minimalist login system** to **MLS**.
+I was using the app that comes with my Roidme Eve robot vacuum cleaner and was impressed by its login system. I'm so used to using the conventional UPL system that I didn't really think of any other way of implementing it. The Roidme app doesn't store the password but rather sends a verification code to your email which you enter in order to enter the app.
 
 # UX
 
-## Username/Password Login Flow
+## UPL Flow
 
 The traditional UPL login flow looks something like this:
 
 <figure>
-  <img src="/image/blog/2023-03-23-minimalist-login-system/username-password-login-flow.svg" alt="Username/Password Login Flow"/>
-  <figcaption>UPL Login Flow</figcaption>
+  <img src="/image/blog/2023-03-23-minimalist-login-system/username-password-login-flow.svg" alt="UPL Flow"/>
+  <figcaption>UPL Flow</figcaption>
 </figure>
 
-## Minimalist Login Flow
+## MLS Flow
 
 Our MLS approach gives a much simpler flow:
 
 <figure>
-  <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="Verification Code Login Flow"/>
+  <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="MLS Flow"/>
   <figcaption>MLS Flow</figcaption>
 </figure>
 
@@ -34,14 +40,14 @@ Our MLS approach gives a much simpler flow:
 
 Both database schemas will use a random token that is stored in the database and also in a secure cookie upon successful login in order to remember that the user is still logged in between browser sessions. The cookie's contents can be compared with the value stored in the database.
 
-## UPL DB Fields
+## UPL Fields
 
 | Field Name    | Data Type |
 |---------------|-----------|
 | email         | TEXT      |
 | password_hash | TEXT      |
 
-## MLS DB Fields
+## MLS Fields
 
 | Field Name                | Type    |
 |---------------------------|---------|
@@ -60,13 +66,13 @@ A secure token gets created on the server when a user correctly enters their ver
 
 The cookie is sent to the server with every browser request. The server will cross reference the cookie's value with the `token` stored in the database to make sure that the user is still logged in.
 
-### HttpOnly
+#### HttpOnly
 This attribute prevents JavaScript from accessing the cookie, which can help protect against cross-site scripting (XSS) attacks. By marking a cookie as HttpOnly, it can only be accessed by the server only and not client-side scripts.
 
-### Secure
+#### Secure
 The Secure attribute ensures that the cookie is only sent over HTTPS connections. This prevents the cookie from being transmitted over insecure HTTP connections, protecting it from eavesdropping and man-in-the-middle attacks.
 
-### SameSite
+#### SameSite
 With the "Strict" setting, the cookie is only sent for requests originating from the same site. With the "Lax" setting, the cookie is sent for same-site requests and some cross-site requests.
 
 # Security
