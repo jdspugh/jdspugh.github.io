@@ -54,7 +54,7 @@ Our MLS approach gives a much simpler flow:
 
 * `verificationCode` - A 12-character base64 string. This gives 72 bits of entropy which is considered [strong and sufficient for securing financial information][1].
 
-  If the `verificationCode` is removed from the database upon successful login the risks of phishing attacks, replay attacks, email breaches and database breaches can be greatly reduced.
+  Note: If the `verificationCode` is removed from the database upon successful login the risks of phishing attacks, replay attacks, email breaches and database breaches can be greatly reduced.
 
 ## Common Fields
 
@@ -83,6 +83,8 @@ The cookie is sent to the server with every browser request. The server will cro
 
 # MLS vs UPL
 
+Here is a comparison of MLS vs UPL. The issues are listed in rough order of importance. Green cells indicate a positive outcomes and red cells a negative outcome. Technically we can see a many more advantages in using the MLS vs the UPL system.
+
 <table>
   <tr>
     <th>Issue</th>
@@ -90,19 +92,14 @@ The cookie is sent to the server with every browser request. The server will cro
     <th>UPL</th>
   </tr>
   <tr>
-    <td>Password management</td>
-    <td style="background-color:#D4E7CE">No need to remember or manage passwords</td>
-    <td style="background-color:#F2C5C6">Requires remembering and managing passwords</td>
-  </tr>
-  <tr>
     <td>Credential theft</td>
     <td style="background-color: #D4E7CE">Lower risk, temporary verification codes</td>
     <td style="background-color: #F2C5C6">Higher risk, static passwords can be stolen</td>
   </tr>
   <tr>
-    <td>One-time-use verification codes</td>
-    <td style="background-color: #D4E7CE">Each verification code is generated for a single login attempt and expires after a short period of time or upon successful login</td>
-    <td style="background-color: #F2C5C6">N/A</td>
+    <td>Backend security complexity</td>
+    <td style="background-color: #D4E7CE">Simplified security requirements</td>
+    <td style="background-color: #F2C5C6">Requires secure storage and handling of passwords</td>
   </tr>
   <tr>
     <td>Phishing attacks</td>
@@ -115,44 +112,14 @@ The cookie is sent to the server with every browser request. The server will cro
     <td style="background-color: #F2C5C6">Vulnerable to such attacks</td>
   </tr>
   <tr>
-    <td>Backend security complexity</td>
-    <td style="background-color: #D4E7CE">Simplified security requirements</td>
+    <td>Compliance with data protection regulations</td>
+    <td style="background-color: #D4E7CE">Potentially simpler compliance</td>
     <td style="background-color: #F2C5C6">Requires secure storage and handling of passwords</td>
   </tr>
   <tr>
-    <td>Familiarity</td>
-    <td style="background-color: #F2C5C6">Less familiar, may require user education and adaptation</td>
-    <td style="background-color: #D4E7CE">Widely used and familiar, easier adoption</td>
-  </tr>
-  <tr>
-    <td>User trust</td>
-    <td style="background-color: #F2C5C6">May need time to gain user trust</td>
-    <td style="background-color: #D4E7CE">Well-established and trusted by users</td>
-  </tr>
-  <tr>
-    <td>Login speed</td>
-    <td style="background-color: #F2C5C6">Potentially slower, requires email verification code</td>
-    <td style="background-color: #D4E7CE">Faster for users with memorized credentials</td>
-  </tr>
-  <tr>
-    <td>Email dependency</td>
-    <td style="background-color: #F2C5C6">Dependent on email service availability</td>
-    <td style="background-color: #D4E7CE">Independent of email services</td>
-  </tr>
-  <tr>
-    <td>Offline access</td>
-    <td style="background-color: #F2C5C6">Requires email access to retrieve verification code</td>
-    <td style="background-color: #D4E7CE">Login possible with stored credentials</td>
-  </tr>
-  <tr>
-    <td>Adaptability to different user groups</td>
-    <td style="background-color: #D4E7CE">More accessible and user-friendly for users with cognitive or memory impairments</td>
-    <td style="background-color: #F2C5C6">May be less accessible for some user groups</td>
-  </tr>
-<tr>
-    <td>User registration</td>
-    <td style="background-color: #D4E7CE">Faster and more seamless registration process</td>
-    <td style="background-color: #F2C5C6">Potentially slower registration and authentication process</td>
+    <td>System admin</td>
+    <td style="background-color: #D4E7CE">Reduced maintenance overhead for system administrators</td>
+    <td style="background-color: #F2C5C6">Requires regular monitoring and updating of password policies</td>
   </tr>
   <tr>
     <td>Password-related support</td>
@@ -160,14 +127,19 @@ The cookie is sent to the server with every browser request. The server will cro
     <td style="background-color: #F2C5C6">Higher volume of password-related support requests</td>
   </tr>
   <tr>
+    <td>Password management</td>
+    <td style="background-color:#D4E7CE">No need to remember or manage passwords</td>
+    <td style="background-color:#F2C5C6">Requires remembering and managing passwords</td>
+  </tr>
+  <tr>
+    <td>Adaptability to different user groups</td>
+    <td style="background-color: #D4E7CE">More accessible and user-friendly for users with cognitive or memory impairments</td>
+    <td style="background-color: #F2C5C6">May be less accessible for some user groups</td>
+  </tr>
+  <tr>
     <td>Security for shared devices</td>
     <td style="background-color: #D4E7CE">Reduced risk of password theft</td>
     <td style="background-color: #F2C5C6">Higher risk of password theft on shared or public devices</td>
-  </tr>
-  <tr>
-    <td>Password change process</td>
-    <td style="background-color: #D4E7CE">No need for a password change process</td>
-    <td style="background-color: #F2C5C6">Requires password change process</td>
   </tr>
   <tr>
     <td>Risk of password reuse</td>
@@ -175,26 +147,56 @@ The cookie is sent to the server with every browser request. The server will cro
     <td style="background-color: #F2C5C6">Higher risk of account compromise due to password reuse</td>
   </tr>
   <tr>
+    <td>One-time-use verification codes</td>
+    <td style="background-color: #D4E7CE">Each verification code is generated for a single login attempt and expires after a short period of time or upon successful login</td>
+    <td style="background-color: #F2C5C6">N/A</td>
+  </tr>
+  <tr>
+    <td>Login speed</td>
+    <td style="background-color: #F2C5C6">Potentially slower, requires email verification code</td>
+    <td style="background-color: #D4E7CE">Faster for users with memorized credentials</td>
+  </tr>
+  <tr>
+    <td>Offline access</td>
+    <td style="background-color: #F2C5C6">Requires email access to retrieve verification code</td>
+    <td style="background-color: #D4E7CE">Login possible with stored credentials</td>
+  </tr>  
+  <tr>
+    <td>Email dependency</td>
+    <td style="background-color: #F2C5C6">Dependent on email service availability</td>
+    <td style="background-color: #D4E7CE">Independent of email services</td>
+  </tr>  
+  <tr>
+    <td>User trust</td>
+    <td style="background-color: #F2C5C6">May need time to gain user trust</td>
+    <td style="background-color: #D4E7CE">Well-established and trusted by users</td>
+  </tr>
+  <tr>
+    <td>Familiarity</td>
+    <td style="background-color: #F2C5C6">Less familiar, may require user education and adaptation</td>
+    <td style="background-color: #D4E7CE">Widely used and familiar, easier adoption</td>
+  </tr>  
+  <tr>
     <td>Email security awareness</td>
     <td style="background-color: #D4E7CE">Encourages users to secure their email accounts</td>
     <td style="background-color: #F2C5C6">No direct impact on email security awareness</td>
-  </tr>
+  </tr>  
   <tr>
-    <td>Compliance with data protection regulations</td>
-    <td style="background-color: #D4E7CE">Potentially simpler compliance</td>
-    <td style="background-color: #F2C5C6">Requires secure storage and handling of passwords</td>
-  </tr>
+    <td>User registration</td>
+    <td style="background-color: #D4E7CE">Faster and more seamless registration process</td>
+    <td style="background-color: #F2C5C6">Potentially slower registration and authentication process</td>
+  </tr>  
   <tr>
-    <td>Maintenance burden</td>
-    <td style="background-color: #D4E7CE">Reduced maintenance overhead for system administrators</td>
-    <td style="background-color: #F2C5C6">Requires regular monitoring and updating of password policies</td>
+    <td>Password change process</td>
+    <td style="background-color: #D4E7CE">No need for a password change process</td>
+    <td style="background-color: #F2C5C6">Requires password change process</td>
   </tr>
 </table>
 
 # Next Steps
 
-At the moment we use 72 bits of entropy for the verification code. This prevents brute force attacks. The disadvantage is that it can be inconvenient for the user trying to login as they need to either copy-and-paste the code or type all 12 base64 characters. Characters such as `0` / `O` or `1` / `I` can look similar to each other and cause frustration if not identified correctly. Also there is a small chance that random offensive words could be accidentally created.
+At the moment we use 72 bits of entropy for the verification code. This prevents brute force attacks. The disadvantage is that it can be inconvenient for the user trying to login as they need to either copy-paste the code or type all 12 base64 characters. Other minor problems that would need to be worked around are that characters such as `0` / `O` or `1` / `I` can potentially look similar to each other and cause frustration if not identified correctly by the user (we could provide a clickable link that contains the verification code in the email but this introduces a potential additional phishing attack vector). Additionally there is a small chance that random offensive words could be accidentally created with the base64 character set.
 
-A more convenient way would be using a 6-digit code that would not have any of the aforementioned problems. Using 6 digits would mean that the system would be vulnerable to brute-force attacks as it would be easy to automate 999999 login attempts in a short space of time. In order to prevent this, we can create a rate limiter that would allow only a small number of incorrect attempts over time per user. Using the proposed 6-digit code will improve the user experience at the cost of some code complexity.
+**A more convenient way** would be using a **6-digit code** that would not have any of the aforementioned problems. Using 6 digits would mean that the system would be vulnerable to brute-force attacks as it would be easy to automate 999999 login attempts in a short space of time. In order to prevent this, we can create a rate limiter that would allow only a small number of incorrect attempts over time per user. Using the proposed 6-digit code will improve the user experience at the cost of some code additional complexity. In this case we consider it worth implementing considering the trade offs.
 
 [1]: https://www.pleacher.com/mp/mlessons/algebra/mobentr2.html
