@@ -209,7 +209,7 @@ Both UPL and MLS are vulnerable to server-side password logging attacks. This is
 To prevent this in UPL the user's password salt can be sent to the client with which the password can be hashed client-side before sending to the server. The password hashes are then compared
 
 <figure>
-  <img src="/image/blog/2023-03-23-minimalist-login-system/username-password-login-flow.svg" alt="UPL Flow"/>
+  <img src="/image/blog/2023-03-23-minimalist-login-system/upl-client-side-salting.svg" alt="UPL Flow"/>
   <figcaption>UPL Client Side Salting</figcaption>
 </figure>
 
