@@ -31,7 +31,7 @@ The traditional UPL flow looks something like this:
 
 ## MLS Flow
 
-Our MLS approach gives a much simpler flow:
+Our MLS approach gives a much simpler flow. In terms of the number of screen that need to be designed and developed, it is a lot fewer:
 
 <figure>
   <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="MLS Flow"/>
