@@ -44,24 +44,33 @@ Our MLS approach gives a much simpler flow:
 
 | Field Name    | Data Type |
 |---------------|-----------|
-| password_hash | TEXT      |
+|`password_salt`| TEXT      |
+|`password_hash`| TEXT      |
+
+UPL systems can store plaintext passwords, but this is a major security weakness as if the database is compromised - by internal or external actors - all the users' accounts will be accessible by the attacker.
+
+In order to mitigate this risk, passwords are usually hashed with a one-way hash function and stored as hashes in the database. This way the plain text is not viewable, nor calculable, as the hash function is one-way only.
+
+One-way hashes do still have the vulnerability of rainbow table attacks on the hashes. To mitigate these, each password needs to be stored with its own random salt - hence the `password_salt` field.
 
 ## MLS Fields
 
 | Field Name                | Data Type |
 |---------------------------|-----------|
-| verificationCode          | TEXT      |
+| `verificationCode`        | TEXT      |
 
 * `verificationCode` - A 12-character base64 string. This gives 72 bits of entropy which is considered [strong and sufficient for securing financial information][1].
 
-  Note: If the `verificationCode` is removed from the database upon successful login the risks of phishing attacks, replay attacks, email breaches and database breaches can be greatly reduced.
+  The `verificationCode` cannot be salted
+
+  Note: The `verificationCode` should be removed from the database upon successful login to minimise risks of phishing attacks, replay attacks, email breaches and database breaches.
 
 ## Common Fields
 
 | Field Name                | Data Type |
 |---------------------------|-----------|
-| email                     | TEXT      |
-| token                     | TEXT      |
+| `email`                   | TEXT      |
+| `token`                   | TEXT      |
 
 * `email` - The user's email address is not strictly necessary in a UPL system, but without it there would be no mechanism for password recovery. The user's email address is always required for MLS.
 
@@ -93,8 +102,8 @@ Here is a comparison of MLS vs UPL. The issues are listed in rough order of impo
   </tr>
   <tr>
     <td>Credential theft</td>
-    <td style="background-color: #D4E7CE">Lower risk, temporary verification codes</td>
-    <td style="background-color: #F2C5C6">Higher risk, static passwords can be stolen</td>
+    <td style="background-color: #D4E7CE">Lower risk, temporary verification codes. A new one is created each time the user logs into a new session.</td>
+    <td style="background-color: #F2C5C6">Higher risk, static passwords can be stolen and remain valid until the user changes their password.</td>
   </tr>
   <tr>
     <td>Backend security complexity</td>
@@ -192,6 +201,17 @@ Here is a comparison of MLS vs UPL. The issues are listed in rough order of impo
     <td style="background-color: #F2C5C6">Requires password change process</td>
   </tr>
 </table>
+
+## Password logging
+
+Both UPL and MLS are vulnerable to server-side password logging attacks. This is where the server logs (or otherwise displays) the incoming password from the client (or verification code in the case of MLS).
+
+To prevent this in UPL the user's password salt can be sent to the client with which the password can be hashed client-side before sending to the server. The password hashes are then compared
+
+<figure>
+  <img src="/image/blog/2023-03-23-minimalist-login-system/username-password-login-flow.svg" alt="UPL Flow"/>
+  <figcaption>UPL Client Side Salting</figcaption>
+</figure>
 
 # Next Steps
 
