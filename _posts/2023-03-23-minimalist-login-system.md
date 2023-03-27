@@ -8,52 +8,63 @@ To produce a login system that is simpler and more secure than traditional usern
 
 # Terminology
 
-* **UPL** - traditional Username/Password Login
+* **UP** - traditional Username/Password login
 
-* **MLS** - new Minimalist Login System
+* **VC** - Verification Code login System
 
 # Background
 
-I was using the iOS app that comes with my Roidme Eve robot vacuum cleaner and was impressed by its login system. I'm so used to using the conventional UPL system that I didn't really think of any other way of implementing it. The Roidme app doesn't store the password but rather sends a verification code to your email which you enter at the app's login screen in order to enter the app. I found it quick, convenient, and simple. Since I had recently gone through the process of designing a UPL system I immediately recognised the potential to greatly simplify the user interface complexity, and likewise, the code complexity.
+I was using the iOS app that comes with my Roidme Eve robot vacuum cleaner and was impressed by its login system. I'm so used to using the conventional UP system that I didn't really think of any other way of implementing it. The Roidme app doesn't store the password but rather sends a verification code to your email which you enter at the app's login screen in order to enter the app. I found it quick, convenient, and simple. Since I had recently gone through the process of designing a UP system I immediately recognised the potential to greatly simplify the user interface complexity, and likewise, the code complexity.
 
 There has also been a spate of **password thefts** and in light of this and the 664 (and growing) hacked websites listed on [';--have i been pwned?](https://haveibeenpwned.com/) I realised that a user authentication system that does **not store passwords** would be **hugely beneficial** to internet users around the world.
 
 # UX
 
-## UPL Flow
+## UP Flow
 
-The traditional UPL flow looks something like this:
-
-<figure>
-  <img src="/image/blog/2023-03-23-minimalist-login-system/username-password-login-flow.svg" alt="UPL Flow"/>
-  <figcaption>UPL Flow</figcaption>
-</figure>
-
-## MLS Flow
-
-Our MLS approach gives a much simpler flow. In terms of the number of screen that need to be designed and developed, it is a lot fewer:
+The traditional UP flow looks something like this:
 
 <figure>
-  <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="MLS Flow"/>
-  <figcaption>MLS Flow</figcaption>
+  <img src="/image/blog/2023-03-23-minimalist-login-system/username-password-login-flow.svg" alt="UP Flow"/>
+  <figcaption>UP Flow</figcaption>
 </figure>
+
+## VC Flow
+
+Our VC approach gives a much simpler flow. In terms of the number of screen that need to be designed and developed, it is a lot fewer:
+
+<!-- <figure>
+  <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="VC Flow"/>
+  <figcaption>VC Flow</figcaption>
+</figure> -->
+
+```mermaid
+flowchart LR
+    Login --Send verification code--> Email
+    Email --Enter verification code--> Login
+    Login --Correct verification code?--> Dashboard
+
+    style Login fill:#FBE1C8
+    style Dashboard fill:#D4E7CE
+    style Email fill:#C9DEF0
+```
 
 # Database Schema
 
-## UPL Fields
+## UP Fields
 
 | Field Name    | Data Type |
 |---------------|-----------|
 |`password_salt`| TEXT      |
 |`password_hash`| TEXT      |
 
-UPL systems can store plaintext passwords, but this is a major security weakness as if the database is compromised - by internal or external actors - all the users' accounts will be accessible by the attacker.
+UP systems can store plaintext passwords, but this is a major security weakness as if the database is compromised - by internal or external actors - all the users' accounts will be accessible by the attacker.
 
 In order to mitigate this risk, passwords are usually hashed with a one-way hash function and stored as hashes in the database. This way the plain text is not viewable, nor calculable, as the hash function is one-way only.
 
 One-way hashes do still have the vulnerability of rainbow table attacks on the hashes. To mitigate these, each password needs to be stored with its own random salt - hence the `password_salt` field.
 
-## MLS Fields
+## VC Fields
 
 | Field Name                | Data Type |
 |---------------------------|-----------|
@@ -72,7 +83,7 @@ One-way hashes do still have the vulnerability of rainbow table attacks on the h
 | `email`                   | TEXT      |
 | `token`                   | TEXT      |
 
-* `email` - The user's email address is not strictly necessary in a UPL system, but without it there would be no mechanism for password recovery. The user's email address is always required for MLS.
+* `email` - The user's email address is not strictly necessary in a UP system, but without it there would be no mechanism for password recovery. The user's email address is always required for VC.
 
 * `token` - Both database schemas will use a random token that is stored in the database and also in a browser cookie upon successful login in order to identify the logged-in user between requests and can also persist between browser sessions.
 
@@ -90,19 +101,19 @@ A secure `token` gets created on the server when a user correctly enters their v
 
 The cookie is sent to the server with every browser request. The server will cross reference the cookie's value with the `token` stored in the database to make sure that the user is still logged in.
 
-# MLS vs UPL
+# VC vs UP
 
-Here is a comparison of MLS vs UPL. The issues are listed in rough order of importance. Green cells indicate a positive outcomes and red cells a negative outcome. Technically we can see a many more advantages in using the MLS vs the UPL system.
+Here is a comparison of VC vs UP. The issues are listed in rough order of importance. Green cells indicate a positive outcomes and red cells a negative outcome. Technically we can see a many more advantages in using the VC vs the UP system.
 
 <table>
   <tr>
     <th>Issue</th>
-    <th>MLS</th>
-    <th>UPL</th>
+    <th>VC</th>
+    <th>UP</th>
   </tr>
   <tr>
     <td>Credential theft</td>
-    <td style="background-color: #D4E7CE">Lower risk, temporary verification codes. A new one is created each time the user logs into a new session.</td>
+    <td style="background-color: #D4E7CE">Lower risk, temporary verification codes.<br /><br />A new random verification code is created each time the user requests one and it is removed from the database once they have successfully logged in. Codes should be removed after a few minutes for added security.<br /><br />If all credentials are stolen all users can be safely logged out in order to invalidate the stolen credentials.</td>
     <td style="background-color: #F2C5C6">Higher risk, static passwords can be stolen and remain valid until the user changes their password.</td>
   </tr>
   <tr>
@@ -204,14 +215,48 @@ Here is a comparison of MLS vs UPL. The issues are listed in rough order of impo
 
 ## Password logging
 
-Both UPL and MLS are vulnerable to server-side password logging attacks. This is where the server logs (or otherwise displays) the incoming password from the client (or verification code in the case of MLS).
+Both UP and VC are vulnerable to server-side password logging attacks. This is where the server logs (or otherwise displays) the incoming password from the client (or verification code in the case of VC).
 
-To prevent this in UPL the user's password salt can be sent to the client with which the password can be hashed client-side before sending to the server. The password hashes are then compared
+To prevent this in UP the user's password salt can be sent to the client with which the password can be hashed client-side before sending to the server. The password hashes are then compared
 
 <figure>
-  <img src="/image/blog/2023-03-23-minimalist-login-system/upl-client-side-salting.svg" alt="UPL Flow"/>
-  <figcaption>UPL Client Side Salting</figcaption>
+  <img src="/image/blog/2023-03-23-minimalist-login-system/upl-client-side-salting.svg" alt="UP Flow"/>
+  <figcaption>UP Client Side Salting</figcaption>
 </figure>
+
+# Implementation Checklist
+
+Email
+
+1. User email validation: Ensure that the user provides a valid email address during the login process.
+
+1. Email delivery: Send the generated verification code to the user's email address securely and promptly.
+
+Verification code
+
+1. Unique verification code generation: Generate unique codes for each login attempt.
+
+1. Code expiration: Implement a time limit for verification code validity (e.g., 10-15 minutes).
+
+1. Verification code input: Provide a user interface for the user to input the received verification code.
+
+1. Code validation: Verify the inputted code against the stored code for the email address, considering the expiration time.
+
+1. Authentication: Grant access to the user upon successful code validation.
+
+1. User session management: Create and manage user sessions after successful authentication, including session expiration and handling of concurrent sessions.
+
+1. User data protection: Ensure the secure storage and handling of user data (e.g., email addresses).
+
+1. Logging and monitoring: Implement logging and monitoring for login attempts, successful logins, and other relevant events.
+
+1. Error handling: Handle errors gracefully, providing informative error messages to users when appropriate.
+
+1. Responsive: Test on differing screen sizes on mobile and desktop devices.
+
+# UI
+
+
 
 # Next Steps
 
