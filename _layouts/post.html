@@ -16,11 +16,12 @@ layout: default
   </header>
 
   <!-- jdspugh start -->
+
+  <!-- toc start -->
   <div id="toc-outer">
     <h2>Table of Contents</h2>
     <div id="toc"></div>
   </div>
-
   <style>
   /* set anchor scroll-to position */
   :target { scroll-margin-top: 70px }
@@ -101,7 +102,6 @@ layout: default
     }
   }
   </style>
-
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     const elPostContent = document.querySelector('.post-content')
@@ -115,12 +115,22 @@ layout: default
     document.querySelector('#toc').innerHTML += t
   })
   </script>
+  <!-- toc end -->
 
+  <!-- mermaid start -->
+  <style>
+  code.language-mermaid {
+    display: flex;
+    justify-content: center;
+  }
+  </style>
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.0.2/+esm'
-    mermaid.initialize({startOnLoad:true})
+    mermaid.initialize({startOnLoad:true,theme:'neutral'})
     mermaid.run({querySelector:'code.language-mermaid'})
   </script>
+  <!-- mermaid end -->
+
   <!-- jdspugh end -->
 
   <div class="post-content e-content" itemprop="articleBody">
