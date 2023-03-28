@@ -2,6 +2,14 @@
 layout: post
 title: Minimalist Login System using Node.js
 ---
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
 # Goal
 
 To produce a login system that is simpler and more secure than traditional username/password login systems.
@@ -37,14 +45,6 @@ Our VC approach gives a much simpler flow. In terms of the number of screen that
   <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="VC Flow"/>
   <figcaption>VC Flow</figcaption>
 </figure> -->
-
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
 
 # Database Schema
 
