@@ -123,7 +123,7 @@ layout: default
     display: flex;
     justify-content: center;
   }
-  pre:has(code.language-mermaid) {
+  pre:has(code.language-mermaid), code.language-mermaid {
     background-color: transparent;
   }
   .edgeLabel {
@@ -132,8 +132,11 @@ layout: default
     color: #111;
     padding: 0 3px;
   }
-  .node rect, .nodeLabel {
-    stroke: #214f78;
+  .node rect {
+    stroke: #214f78 !important;
+  }
+  .nodeLabel {
+    color: #214f78 !important;
   }
   </style>
   <script type="module">
