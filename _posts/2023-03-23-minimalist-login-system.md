@@ -2,111 +2,6 @@
 layout: post
 title: Minimalist Login System using Node.js
 ---
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
-
-```geojson
-{
-  "type": "FeatureCollection",
-  "features": [
-    {
-      "type": "Feature",
-      "id": 1,
-      "properties": {
-        "ID": 0
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-              [-90,35],
-              [-90,30],
-              [-85,30],
-              [-85,35],
-              [-90,35]
-          ]
-        ]
-      }
-    }
-  ]
-}
-```
-
-```topojson
-{
-  "type": "Topology",
-  "transform": {
-    "scale": [0.0005000500050005, 0.00010001000100010001],
-    "translate": [100, 0]
-  },
-  "objects": {
-    "example": {
-      "type": "GeometryCollection",
-      "geometries": [
-        {
-          "type": "Point",
-          "properties": {"prop0": "value0"},
-          "coordinates": [4000, 5000]
-        },
-        {
-          "type": "LineString",
-          "properties": {"prop0": "value0", "prop1": 0},
-          "arcs": [0]
-        },
-        {
-          "type": "Polygon",
-          "properties": {"prop0": "value0",
-            "prop1": {"this": "that"}
-          },
-          "arcs": [[1]]
-        }
-      ]
-    }
-  },
-  "arcs": [[[4000, 0], [1999, 9999], [2000, -9999], [2000, 9999]],[[0, 0], [0, 9999], [2000, 0], [0, -9999], [-2000, 0]]]
-}
-```
-
-```stl
-solid cube_corner
-  facet normal 0.0 -1.0 0.0
-    outer loop
-      vertex 0.0 0.0 0.0
-      vertex 1.0 0.0 0.0
-      vertex 0.0 0.0 1.0
-    endloop
-  endfacet
-  facet normal 0.0 0.0 -1.0
-    outer loop
-      vertex 0.0 0.0 0.0
-      vertex 0.0 1.0 0.0
-      vertex 1.0 0.0 0.0
-    endloop
-  endfacet
-  facet normal -1.0 0.0 0.0
-    outer loop
-      vertex 0.0 0.0 0.0
-      vertex 0.0 0.0 1.0
-      vertex 0.0 1.0 0.0
-    endloop
-  endfacet
-  facet normal 0.577 0.577 0.577
-    outer loop
-      vertex 1.0 0.0 0.0
-      vertex 0.0 1.0 0.0
-      vertex 0.0 0.0 1.0
-    endloop
-  endfacet
-endsolid
-```
-
-
-
 # Goal
 
 To produce a login system that is simpler and more secure than traditional username/password login systems.
@@ -142,6 +37,17 @@ Our VC approach gives a much simpler flow. In terms of the number of screen that
   <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="VC Flow"/>
   <figcaption>VC Flow</figcaption>
 </figure> -->
+
+```mermaid
+flowchart LR
+  Login --Send verification code--> Email
+  Email --Enter verification code--> Login
+  Login --Correct verification code?--> Dashboard
+
+  classDef default fill:#C9DEF0
+  style Login fill:#FBE1C8
+  style Dashboard fill:#D4E7CE
+```
 
 # Database Schema
 
