@@ -33,20 +33,20 @@ The traditional UP flow looks something like this:
 
 Our VC approach gives a much simpler flow. In terms of the number of screen that need to be designed and developed, it is a lot fewer:
 
-<!-- <figure>
+<!--1 <figure>
   <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="VC Flow"/>
   <figcaption>VC Flow</figcaption>
 </figure> -->
 
-```mermaid
+```mermaid 
 flowchart LR
     Login --Send verification code--> Email
     Email --Enter verification code--> Login
     Login --Correct verification code?--> Dashboard
 
+    classDef default fill:#C9DEF0
     style Login fill:#FBE1C8
     style Dashboard fill:#D4E7CE
-    style Email fill:#C9DEF0
 ```
 
 # Database Schema
