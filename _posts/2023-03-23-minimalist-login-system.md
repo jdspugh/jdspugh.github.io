@@ -1,7 +1,6 @@
 ---
 layout: post
 title: Minimalist Login System using Node.js
-mermaid: true
 ---
 ```mermaid
 graph TD;
