@@ -38,15 +38,12 @@ Our VC approach gives a much simpler flow. In terms of the number of screen that
   <figcaption>VC Flow</figcaption>
 </figure> -->
 
-```mermaid 
-flowchart LR
-    Login --Send verification code--> Email
-    Email --Enter verification code--> Login
-    Login --Correct verification code?--> Dashboard
-
-    classDef default fill:#C9DEF0
-    style Login fill:#FBE1C8
-    style Dashboard fill:#D4E7CE
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
 ```
 
 # Database Schema
