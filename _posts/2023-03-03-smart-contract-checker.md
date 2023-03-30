@@ -547,6 +547,8 @@ In the case of ERC-20 tokens, as an alternative to creating proxy contracts to h
 
 # Similar Tools
 
+## Recommended
+
 <https://tokensniffer.com>
 * Scam detection, auditing, and metrics
 * Support for 12 chains
@@ -556,6 +558,11 @@ In the case of ERC-20 tokens, as an alternative to creating proxy contracts to h
 * Scam detection, auditing, and metrics
 * Support for 10 chains
 * Free to use
+
+## Not recommended
+
+<https://cer.live>
+* Does not detect proxy contracts
 
 # Disclaimer
 
