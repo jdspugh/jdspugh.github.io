@@ -143,11 +143,11 @@ layout: default
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.0.2/+esm'
     mermaid.initialize({startOnLoad:true,theme:'neutral'})
     await mermaid.run({querySelector:'code.language-mermaid'})
-    // set min rect width
-    const minWidth = 140
-    document.querySelectorAll('rect').forEach(e=>{
-      if (parseFloat(e.getAttribute('width')) < minWidth) e.setAttribute('width',minWidth)
-    })
+    // // set min rect width
+    // const minWidth = 140
+    // document.querySelectorAll('rect').forEach(e=>{
+    //   if (parseFloat(e.getAttribute('width')) < minWidth) e.setAttribute('width',minWidth)
+    // })
   </script>
   <!-- mermaid end -->
 

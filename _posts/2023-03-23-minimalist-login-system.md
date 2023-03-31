@@ -33,21 +33,10 @@ The traditional UP flow looks something like this:
 
 Our VC approach gives a much simpler flow. In terms of the number of screen that need to be designed and developed, it is a lot fewer:
 
-<!--1 <figure>
+<figure>
   <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="VC Flow"/>
   <figcaption>VC Flow</figcaption>
-</figure> -->
-
-```mermaid
-flowchart LR
-  Login --Send verification code--> Email
-  Email --Enter verification code--> Login
-  Login --Correct verification code?--> Dashboard
-
-  classDef default fill:#C9DEF0
-  style Login fill:#FBE1C8
-  style Dashboard fill:#D4E7CE
-```
+</figure>
 
 # Database Schema
 
@@ -60,7 +49,7 @@ flowchart LR
 
 UP systems can store plaintext passwords, but this is a major security weakness as if the database is compromised - by internal or external actors - all the users' accounts will be accessible by the attacker.
 
-In order to mitigate this risk, passwords are usually hashed with a one-way hash function and stored as hashes in the database. This way the plain text is not viewable, nor calculable, as the hash function is one-way only.
+In order to mitigate this risk, passwords should be hashed with a strong one-way hash function and stored as hashes in the database. This way the plain text is not viewable, nor calculable, as the hash function is one-way only.
 
 One-way hashes do still have the vulnerability of rainbow table attacks on the hashes. To mitigate these, each password needs to be stored with its own random salt - hence the `password_salt` field.
 
