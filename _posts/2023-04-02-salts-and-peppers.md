@@ -15,7 +15,7 @@ A salt or pepper is a value added as additional input to a hash function to prot
 Consider a typical application that stores usernames and passwords. The naive strategy would be to store the usernames and password in a database without encryption:
 
 | Username (Text) | Password (Text) |
-| --- | --- |
+|-|-|
 | user1 | qwerty |
 | user2 | 12345678 |
 
@@ -28,9 +28,10 @@ If the database is compromised the usernames and password are directly exposed a
 A better strategy is to store the hash of the password. In this case we are using the SHA256 hash function.
 
 | Username (Text) | SHA256 Hashed Password (Hex) |
-|---|---|
+|-|-|
 | user1 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
 | user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
+
 <figcaption>Application's Password Hashed User Table</figcaption>
 
 # Rainbow Tables
@@ -41,6 +42,7 @@ Since the SHA256 hash function is designed to be irreversible you might think th
 |-|-|
 | qwerty | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
 | 12345678 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
+
 <figcaption>Very Short Rainbow Table</figcaption>
 
 By adding a large number of passwords and their hashes to the table the attacker can then search the table for the corresponding `SHA256 Hash`  in the user table and, if found, retrieve the corresponding `Password` from the rainbow table.
@@ -53,6 +55,7 @@ A "pepper" (or secret salt) is a fixed value that can be combined with the passw
 |-|-|
 | wtWy8vb3Ov4FFiFFqwerty | df4c1098fd7a782870ff0ffe6a6c6b8620eeec9e1af4ee3d64309890828baf10 |
 | wtWy8vb3Ov4FFiFF12345678 | 25471749ca6342ea353734f0b63baabab77826edbeb3df886177c47dc3b16ef0 |
+
 <figcaption>Very Short Rainbow Table with Pepper</figcaption>
 
 Now we see that the rainbow table we created before will no longer be applicable to our newly peppered passwords as the SHA256 values don't match any more.
@@ -112,6 +115,7 @@ The generally accepted best practise for salts is to use 128-bit random salts th
 |-|-|-|-|
 | user1 | qwerty | 3299942662eb7925245e6b16a1fb8db4 | 5f9eb7a905e2159f2bcde6414020e03815dc7fd4655841d36d34be091a009d30 |
 | user2 | 12345678 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
+
 <figcaption>Application's Unencrypted User Table</figcaption>
 
 An attacker then needs to create a rainbow table per uniquely salted hash rather than one rainbow table that can be used on all hashes (all hashes with the same salt). This effectively renders rainbow tables useless.
