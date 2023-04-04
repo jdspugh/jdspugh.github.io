@@ -246,4 +246,4 @@ You can choose the bit size of a random salt based on the table below. If you ha
 </tbody>
 </table>
 
-<figcaption>Table from [Birthday attack - Wikipedia](https://en.wikipedia.org/wiki/Birthday_attack)</figcaption>
+<figcaption>Table from <a href="https://en.wikipedia.org/wiki/Birthday_attack">Birthday attack - Wikipedia</a></figcaption>
