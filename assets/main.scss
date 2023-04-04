@@ -75,4 +75,12 @@ figcaption {
 
 table {
   margin-bottom: 15px;/* make same as figure */
+  overflow-x: scroll;
+  display: block;
+}
+table::-webkit-scrollbar {
+  width: 7px;
+}
+table::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, .5);
 }
