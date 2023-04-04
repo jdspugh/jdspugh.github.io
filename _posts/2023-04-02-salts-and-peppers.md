@@ -87,6 +87,24 @@ console.log(process.env.PEPPER)
 
 # Salt
 
+Salts, like peppers, are combined with password before hashing for added security.
+
+## Unique Salts
+
+Unlike a pepper which is constant, the primary goal of the salt is to be unique per user.
+
+One might think that you could then use the username or email address of a user as the salt. While this initially seems a great idea you would not be able to change the username or email address without also creating a new password.
+
+## Sequential Salts
+
+One might also consider using a sequence number to ensure unique salts. This could work but would be vulnerable to the problems short salts have. This vulnerability could be overcome by using pepper in combination with a sequence number. If the pepper is sufficiently large and random it can make sequential salts stronger.
+
+## Short Salts
+
+If a salt is too short, an attacker may precompute a table of every possible salt combined with every likely password. Using a long salt ensures such a table would be prohibitively large. Another solution is to use pepper in combination with salts as also suggested with sequential salts.
+
+## 128-Bit Random Salts
+
 The generally accepted best practise for salts is to use 128-bit random salts that are combined with the password before hashing.
 
 | Username (Text) | Password (Text) | Salt (Hex) | Hash (Hex) |
@@ -97,7 +115,7 @@ The generally accepted best practise for salts is to use 128-bit random salts th
 
 An attacker then needs to create a rainbow table per uniquely salted hash rather than one rainbow table that can be used on all hashes (all hashes with the same salt). This effectively renders rainbow tables useless.
 
-# Why 128-Bit?
+### Collisions
 
 You can choose the bit size of a random salt based on the table below. If you have a lot of users and only a few salts (due to choosing a small salt bit size) then precomputed attack tables can be made that attack all the users with that same salt.
 
@@ -224,18 +242,3 @@ Table from [Birthday attack - Wikipedia](https://en.wikipedia.org/wiki/Birthday_
 </tr>
 </tbody>
 </table>
-
-# Salt Uniqueness
-
-The primary goal of the salt is to be unique.
-One might think that you could then use the username or email address of a user as the salt. While this initially seems a great idea you would not be able to change the username or email address without also creating a new password.
-
-# Sequential Salts
-
-One might also consider using a sequence number to ensure unique salts. This could work but would be vulnerable to the problems short salts have. This could be overcome though by using pepper in combination with a sequence number.
-
-# Short Salts
-
-If a salt is too short, an attacker may precompute a table of every possible salt appended to every likely password. Using a long salt ensures such a table would be prohibitively large. Another solution is to use pepper in combination with salts.
-
-A pepper can be used to make short, sequential salts stronger.
