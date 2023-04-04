@@ -2,9 +2,15 @@
 layout: post
 title: Mermaid for Github Pages
 ---
+# What is Mermaid?
+
+[Mermaid](https://mermaid.js.org) allows us to use simple markup code to create complex **software engineering diagrams**, such as flowchart, sequence diagrams and class diagrams, that are easily editable. For more details see https://mermaid.js.org.
+
 # Goal
 
 To allow us to use **mermaid diagrams** in our **github pages**.
+
+(Mermaid actually already works for .md files in your Github repos, but is not yet installed by default for Github Pages.)
 
 # Copy post.html
 
@@ -24,11 +30,15 @@ Edit your `_layouts/post.html` to include:
 </script>
 ```
 
-You can set the theme by changing `theme:'neutral'` to the Mermaid theme of your choice e.g. `default`, `neutral`, `dark`, `forest` or `base`.
+You can set the [Mermaid](https://mermaid.js.org/) theme by changing:
+```js
+theme:'neutral'
+```
+to the [Mermaid](https://mermaid.js.org/) theme of your choice e.g. `default`, `neutral`, `dark`, `forest` or `base`.
 
 # Test Mermaid
 
-In your `_posts`  folder you can create or edit a post. Surround your Mermaid diagram with three backticks, and the word mermaid after the first three backticks:
+In your `_posts`  folder you can create or edit a post. Surround your [Mermaid](https://mermaid.js.org/) diagram with three backticks, and the word [mermaid](https://mermaid.js.org/) after the first three backticks:
 
 ````
 ```mermaid
@@ -37,7 +47,12 @@ flowchart TB
 ```
 ````
 
-If the installation happened correctly the Mermaid markdown will be rendered as a diagram.
+If the installation happened correctly the [Mermaid](https://mermaid.js.org/) markdown will be rendered as a diagram.
+
+<figure>
+  <img src="/image/blog/2023-04-03-github-pages-mermaid/mermaid-flowchart-example.png" alt="Mermaid Flowchart Example" />
+  <figcaption>Mermaid Flowchart Example</figcaption>
+</figure>
 
 # Make it pretty
 
@@ -65,6 +80,13 @@ pre:has(code.language-mermaid), code.language-mermaid {
   color: #214f78 !important;
 }
 </style>
+```
+
+The result should look like this:
+
+```mermaid
+flowchart TB
+    A & B--> C & D
 ```
 
 You can add or edit more CSS to customise the appearance as you like.
