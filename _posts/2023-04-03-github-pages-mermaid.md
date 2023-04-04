@@ -88,6 +88,7 @@ The Mermaid markdown should now transform to look like this:
 flowchart TB
     A & B--> C & D
 ```
+<figcaption>Mermaid Flowchart Example</figcaption>
 
 You can add or edit more CSS to customise the appearance as you like.
 
