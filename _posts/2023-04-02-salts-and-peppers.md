@@ -46,9 +46,8 @@ By adding a large number of passwords and their hashes to the table the attacker
 
 # Pepper
 
-Here we add what is known as a "pepper" in front of the password to produce different hash values compared with the previous table. A pepper is a randomly chosen value that doesn't change:
+A "pepper" (or secret salt) is a fixed value that can be combined with the password to produce different hash values compared with the previous table. A pepper is a randomly chosen value that doesn't change:
 
-`Pepper = "wtWy8vb3Ov4FFiFF"`
 | Password (Text) | SHA256 Hash (Hex) |
 |-|-|
 | wtWy8vb3Ov4FFiFFqwerty | df4c1098fd7a782870ff0ffe6a6c6b8620eeec9e1af4ee3d64309890828baf10 |
@@ -59,11 +58,32 @@ Now we see that the rainbow table we created before will no longer be applicable
 
 This is secure if the pepper is kept secret. But if the pepper is discovered the attacker can easily make a new rainbow table with the pepper in front of each password and use this to attack the peppered user table.
 
-# Pepper
+Also, if the pepper is lost, password verification is no longer possible as the correct hash cannot be generated without the pepper. All users would have to create new passwords.
 
-A pepper (or secret salt) is a fixed value that is combined with the salt and the password before hashing. It can be used to make short, sequential salts stronger. The pepper needs to be securely stored and managed separately from the database. If the pepper is lost, it can make password verification impossible, as the correct hash cannot be generated without the pepper.
+## Node.js
 
-In Node.js we can store the pepper in a ".env" file that can be accessed by the "dotenv" package.
+In a Node.js implementation we would store the pepper in a `.env` file that can be accessed by the `dotenv` package. For security reasons (especially if using a public code repo) make sure you remove the `.env` file from your version control system by modifying your `.gitignore` file:
+
+`.gitignore`
+```
+.env
+```
+
+Add the pepper value to the `.env` file:
+
+`.env`
+```shell
+PEPPER=wtWy8vb3Ov4FFiFF
+```
+
+Now you can read it from your Node.js code:
+
+`app.mjs`
+```js
+import dotenv from 'dotenv'
+dotenv.config()
+console.log(process.env.PEPPER)
+```
 
 # Salt
 
@@ -217,3 +237,5 @@ One might also consider using a sequence number to ensure unique salts. This cou
 # Short Salts
 
 If a salt is too short, an attacker may precompute a table of every possible salt appended to every likely password. Using a long salt ensures such a table would be prohibitively large. Another solution is to use pepper in combination with salts.
+
+A pepper can be used to make short, sequential salts stronger.
