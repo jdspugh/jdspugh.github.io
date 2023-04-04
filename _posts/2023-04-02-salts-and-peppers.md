@@ -126,8 +126,6 @@ You can choose the bit size of a random salt based on the table below. If you ha
 
 2<sup>64</sup> will be just enough if we're expecting ≈8 000 000 000 users i.e. one account for everyone in the world. You'll be getting on average 2 collisions per salt.
 
-Table from [Birthday attack - Wikipedia](https://en.wikipedia.org/wiki/Birthday_attack)
-
 <table>
 <tbody>
 <tr>
@@ -247,3 +245,5 @@ Table from [Birthday attack - Wikipedia](https://en.wikipedia.org/wiki/Birthday_
 </tr>
 </tbody>
 </table>
+
+<figcaption>Table from [Birthday attack - Wikipedia](https://en.wikipedia.org/wiki/Birthday_attack)</figcaption>
