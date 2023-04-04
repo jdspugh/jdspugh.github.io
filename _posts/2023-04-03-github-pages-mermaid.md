@@ -82,7 +82,7 @@ pre:has(code.language-mermaid), code.language-mermaid {
 </style>
 ```
 
-The Mermaid markdown should now transform to look like this:
+The [Mermaid][1] markdown should now transform to look like this:
 
 ```mermaid
 flowchart TB
