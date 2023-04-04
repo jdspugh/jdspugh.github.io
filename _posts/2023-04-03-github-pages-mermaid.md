@@ -4,7 +4,7 @@ title: Mermaid for Github Pages
 ---
 # What is Mermaid?
 
-[Mermaid](1) allows us to use simple markup code to create complex **software engineering diagrams**, such as flowchart, sequence diagrams and class diagrams, that are easily editable. For more details see https://mermaid.js.org.
+[Mermaid](1) allows us to use simple markup code to create complex **software engineering diagrams**, such as flowchart, sequence diagrams and class diagrams, that are easily editable. For more details see <https://mermaid.js.org>.
 
 # Goal
 
