@@ -124,7 +124,7 @@ An attacker then needs to create a rainbow table per uniquely salted hash rather
 
 You can choose the bit size of a random salt based on the table below. If you have a lot of users and only a few salts (due to choosing a small salt bit size) then precomputed attack tables can be made that attack all the users with that same salt.
 
-2<sup>64</sup> will be just enough if we're expecting ≈8 000 000 000 users i.e. one account for everyone in the world. You'll be getting on average 2 collisions per salt.
+2<sup>64</sup> will be just enough if we're expecting ≈8 000 000 000 users i.e. one account for everyone in the world. You'll be getting on average 2 collisions per salt:
 
 <table>
 <tbody>
@@ -247,3 +247,7 @@ You can choose the bit size of a random salt based on the table below. If you ha
 </table>
 
 <figcaption>Table from <a href="https://en.wikipedia.org/wiki/Birthday_attack">Birthday attack - Wikipedia</a></figcaption>
+
+# Conclusion
+
+Combining the user's password with a random 128-bit salt provides strong password protection, even in the case of a database breach.
