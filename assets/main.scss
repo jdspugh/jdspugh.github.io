@@ -79,7 +79,8 @@ table {
   display: block;
 }
 table::-webkit-scrollbar {
-  width: 7px;
+  width: 5px;
+  border-radius: 9px;
 }
 table::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, .5);
