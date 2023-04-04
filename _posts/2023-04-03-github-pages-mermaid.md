@@ -4,7 +4,7 @@ title: Mermaid for Github Pages
 ---
 # What is Mermaid?
 
-[Mermaid](https://mermaid.js.org) allows us to use simple markup code to create complex **software engineering diagrams**, such as flowchart, sequence diagrams and class diagrams, that are easily editable. For more details see https://mermaid.js.org.
+[Mermaid](1) allows us to use simple markup code to create complex **software engineering diagrams**, such as flowchart, sequence diagrams and class diagrams, that are easily editable. For more details see https://mermaid.js.org.
 
 # Goal
 
@@ -30,15 +30,15 @@ Edit your `_layouts/post.html` to include:
 </script>
 ```
 
-You can set the [Mermaid](https://mermaid.js.org/) theme by changing:
+You can set the [Mermaid](1) theme by changing:
 ```js
 theme:'neutral'
 ```
-to the [Mermaid](https://mermaid.js.org/) theme of your choice e.g. `default`, `neutral`, `dark`, `forest` or `base`.
+to the [Mermaid](1) theme of your choice e.g. `default`, `neutral`, `dark`, `forest` or `base`.
 
 # Test Mermaid
 
-In your `_posts`  folder you can create or edit a post. Surround your [Mermaid](https://mermaid.js.org/) diagram with three backticks, and the word [mermaid](https://mermaid.js.org/) after the first three backticks:
+In your `_posts`  folder you can create or edit a post. Surround your [Mermaid](1) diagram with three backticks, and the word [mermaid](1) after the first three backticks:
 
 ````
 ```mermaid
@@ -47,7 +47,7 @@ flowchart TB
 ```
 ````
 
-If the installation happened correctly the [Mermaid](https://mermaid.js.org/) markdown will be rendered as a diagram.
+If the installation happened correctly the [Mermaid](1) markdown will be rendered as a diagram.
 
 <figure>
   <img src="/image/blog/2023-04-03-github-pages-mermaid/mermaid-flowchart-example.png" alt="Mermaid Flowchart Example" />
@@ -82,7 +82,7 @@ pre:has(code.language-mermaid), code.language-mermaid {
 </style>
 ```
 
-The result should look like this:
+The Mermaid markdown should now transform to look like this:
 
 ```mermaid
 flowchart TB
@@ -90,3 +90,5 @@ flowchart TB
 ```
 
 You can add or edit more CSS to customise the appearance as you like.
+
+[1]: https://mermaid.js.org/
