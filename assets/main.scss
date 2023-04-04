@@ -77,6 +77,7 @@ table {
   margin-bottom: 15px;/* make same as figure */
   overflow-x: scroll;
   display: block;
+  border: none !important;
 }
 table::-webkit-scrollbar {
   width: 5px;
