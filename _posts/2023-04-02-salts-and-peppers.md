@@ -15,7 +15,7 @@ A salt or pepper is a value added as additional input to a hash function to prot
 Consider a typical application that stores usernames and passwords. The naive strategy would be to store the usernames and password in a database without encryption:
 
 | Username (Text) | Password (Text) |
-|-|-|
+| - | - |
 | user1 | qwerty |
 | user2 | 12345678 |
 <figcaption>Application's Unencrypted User Table</figcaption>
@@ -27,7 +27,7 @@ If the database is compromised the usernames and password are directly exposed a
 A better strategy is to store the hash of the password. In this case we are using the SHA256 hash function.
 
 | Username (Text) | SHA256 Hashed Password (Hex) |
-|-|-|
+|---|---|
 | user1 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
 | user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
 <figcaption>Application's Password Hashed User Table</figcaption>
