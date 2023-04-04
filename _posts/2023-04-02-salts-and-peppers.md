@@ -83,215 +83,127 @@ You can choose the bit size of a random salt based on the table below. If you ha
 
 2<sup>64</sup> will be just enough if we're expecting ≈8 000 000 000 users i.e. one account for everyone in the world. You'll be getting on average 2 collisions per salt.
 
-In MongoDB, use the Long() function to cast to an Int64.
-
 Table from [Birthday attack - Wikipedia](https://en.wikipedia.org/wiki/Birthday_attack)
 
-<table class="wikitable" style="white-space:nowrap; text-align:center;">
-
-<tbody><tr>
-<th rowspan="2">Bits
-</th>
-<th rowspan="2">Possible Outputs
-</th>
-<th colspan="10">Desired Probability of Random Collision
-</th></tr>
+<table>
+<tbody>
 <tr>
-<th><span>10<sup>−18</sup></span>
-</th>
-<th><span>10<sup>−15</sup></span>
-</th>
-<th><span>10<sup>−12</sup></span>
-</th>
-<th><span>10<sup>−9</sup></span>
-</th>
-<th><span>10<sup>−6</sup></span>
-</th>
-<th>0.1%
-</th>
-<th>1%
-</th>
-<th>25%
-</th>
-<th>50%
-</th>
-<th>75%
-</th></tr>
+  <th rowspan="2">Bits</th>
+  <th rowspan="2">Possible Outputs</th>
+  <th colspan="10">Desired Probability of Random Collision</th>
+</tr>
 <tr>
-<th scope="row">16
-</th>
-<th scope="row">2<sup>16</sup> (~6.5 x 10<sup>4</sup>)
-</th>
-<td>&lt;2
-</td>
-<td>&lt;2
-</td>
-<td>&lt;2
-</td>
-<td>&lt;2
-</td>
-<td>&lt;2
-</td>
-<td>11
-</td>
-<td>36
-</td>
-<td>190
-</td>
-<td>300
-</td>
-<td>430
-</td></tr>
+  <th><span>10<sup>−18</sup></span></th>
+  <th><span>10<sup>−15</sup></span></th>
+  <th><span>10<sup>−12</sup></span></th>
+  <th><span>10<sup>−9</sup></span></th>
+  <th><span>10<sup>−6</sup></span></th>
+  <th>0.1%</th>
+  <th>1%</th>
+  <th>25%</th>
+  <th>50%</th>
+  <th>75%</th>
+</tr>
 <tr>
-<th scope="row">32
-</th>
-<th scope="row">2<sup>32</sup> (~<span><4.3<span>×</span>10<sup>9</sup></span>)
-</th>
-<td>&lt;2
-</td>
-<td>&lt;2
-</td>
-<td>&lt;2
-</td>
-<td>3
-</td>
-<td>93
-</td>
-<td>2900
-</td>
-<td>9300
-</td>
-<td>50,000
-</td>
-<td>77,000
-</td>
-<td>110,000
-</td></tr>
+  <th scope="row">16</th>
+  <th scope="row">2<sup>16</sup> (~6.5 x 10<sup>4</sup>)</th>
+  <td>&lt;2</td>
+  <td>&lt;2</td>
+  <td>&lt;2</td>
+  <td>&lt;2</td>
+  <td>&lt;2</td>
+  <td>11</td>
+  <td>36</td>
+  <td>190</td>
+  <td>300</td>
+  <td>430</td>
+</tr>
 <tr>
-<th scope="row">64
-</th>
-<th scope="row">2<sup>64</sup> (~<span>1.8<span>×</span>10<sup>19</sup></span>)
-</th>
-<td>6
-</td>
-<td>190
-</td>
-<td>6100
-</td>
-<td>190,000
-</td>
-<td>6,100,000
-</td>
-<td><span>1.9<span>×</span>10<sup>8</sup></span>
-</td>
-<td><span>6.1<span>×</span>10<sup>8</sup></span>
-</td>
-<td><span>3.3<span>×</span>10<sup>9</sup></span>
-</td>
-<td><span>5.1<span>×</span>10<sup>9</sup></span>
-</td>
-<td><span>7.2<span>×</span>10<sup>9</sup></span>
-</td></tr>
+  <th scope="row">32</th>
+  <th scope="row">2<sup>32</sup> (~<span><4.3<span>×</span>10<sup>9</sup></span>)</th>
+  <td>&lt;2</td>
+  <td>&lt;2</td>
+  <td>&lt;2</td>
+  <td>3</td>
+  <td>93</td>
+  <td>2900</td>
+  <td>9300</td>
+  <td>50,000</td>
+  <td>77,000</td>
+  <td>110,000</td>
+</tr>
 <tr>
-<th scope="row">128
-</th>
-<th scope="row">2<sup>128</sup> (~<span>3.4<span>×</span>10<sup>38</sup></span>)
-</th>
-<td><span>2.6<span>×</span>10<sup>10</sup></span>
-</td>
-<td><span>8.2<span>×</span>10<sup>11</sup></span>
-</td>
-<td><span>2.6<span>×</span>10<sup>13</sup></span>
-</td>
-<td><span>8.2<span>×</span>10<sup>14</sup></span>
-</td>
-<td><span>2.6<span>×</span>10<sup>16</sup></span>
-</td>
-<td><span>8.3<span>×</span>10<sup>17</sup></span>
-</td>
-<td><span>2.6<span>×</span>10<sup>18</sup></span>
-</td>
-<td><span>1.4<span>×</span>10<sup>19</sup></span>
-</td>
-<td><span>2.2<span>×</span>10<sup>19</sup></span>
-</td>
-<td><span>3.1<span>×</span>10<sup>19</sup></span>
-</td></tr>
+  <th scope="row">64</th>
+  <th scope="row">2<sup>64</sup> (~<span>1.8<span>×</span>10<sup>19</sup></span>)</th>
+  <td>6</td>
+  <td>190</td>
+  <td>6100</td>
+  <td>190,000</td>
+  <td>6,100,000</td>
+  <td><span>1.9<span>×</span>10<sup>8</sup></span></td>
+  <td><span>6.1<span>×</span>10<sup>8</sup></span></td>
+  <td><span>3.3<span>×</span>10<sup>9</sup></span></td>
+  <td><span>5.1<span>×</span>10<sup>9</sup></span></td>
+  <td><span>7.2<span>×</span>10<sup>9</sup></span></td>
+</tr>
 <tr>
-<th scope="row">256
-</th>
-<th scope="row">2<sup>256</sup> (~<span>1.2<span>×</span>10<sup>77</sup></span>)
-</th>
-<td><span>4.8<span>×</span>10<sup>29</sup></span>
-</td>
-<td><span>1.5<span>×</span>10<sup>31</sup></span>
-</td>
-<td><span>4.8<span>×</span>10<sup>32</sup></span>
-</td>
-<td><span>1.5<span>×</span>10<sup>34</sup></span>
-</td>
-<td><span>4.8<span>×</span>10<sup>35</sup></span>
-</td>
-<td><span>1.5<span>×</span>10<sup>37</sup></span>
-</td>
-<td><span>4.8<span>×</span>10<sup>37</sup></span>
-</td>
-<td><span>2.6<span>×</span>10<sup>38</sup></span>
-</td>
-<td><span>4.0<span>×</span>10<sup>38</sup></span>
-</td>
-<td><span>5.7<span>×</span>10<sup>38</sup></span>
-</td></tr>
+  <th scope="row">128</th>
+  <th scope="row">2<sup>128</sup> (~<span>3.4<span>×</span>10<sup>38</sup></span>)</th>
+  <td><span>2.6<span>×</span>10<sup>10</sup></span></td>
+  <td><span>8.2<span>×</span>10<sup>11</sup></span></td>
+  <td><span>2.6<span>×</span>10<sup>13</sup></span></td>
+  <td><span>8.2<span>×</span>10<sup>14</sup></span></td>
+  <td><span>2.6<span>×</span>10<sup>16</sup></span></td>
+  <td><span>8.3<span>×</span>10<sup>17</sup></span></td>
+  <td><span>2.6<span>×</span>10<sup>18</sup></span></td>
+  <td><span>1.4<span>×</span>10<sup>19</sup></span></td>
+  <td><span>2.2<span>×</span>10<sup>19</sup></span></td>
+  <td><span>3.1<span>×</span>10<sup>19</sup></span></td>
+</tr>
 <tr>
-<th scope="row">384
-</th>
-<th scope="row">2<sup>384</sup> (~<span>3.9<span>×</span>10<sup>115</sup></span>)
-</th>
-<td><span>8.9<span>×</span>10<sup>48</sup></span>
-</td>
-<td><span>2.8<span>×</span>10<sup>50</sup></span>
-</td>
-<td><span>8.9<span>×</span>10<sup>51</sup></span>
-</td>
-<td><span>2.8<span>×</span>10<sup>53</sup></span>
-</td>
-<td><span>8.9<span>×</span>10<sup>54</sup></span>
-</td>
-<td><span>2.8<span>×</span>10<sup>56</sup></span>
-</td>
-<td><span>8.9<span>×</span>10<sup>56</sup></span>
-</td>
-<td><span>4.8<span>×</span>10<sup>57</sup></span>
-</td>
-<td><span>7.4<span>×</span>10<sup>57</sup></span>
-</td>
-<td><span>1.0<span>×</span>10<sup>58</sup></span>
-</td></tr>
+  <th scope="row">256</th>
+  <th scope="row">2<sup>256</sup> (~<span>1.2<span>×</span>10<sup>77</sup></span>)</th>
+  <td><span>4.8<span>×</span>10<sup>29</sup></span></td>
+  <td><span>1.5<span>×</span>10<sup>31</sup></span></td>
+  <td><span>4.8<span>×</span>10<sup>32</sup></span></td>
+  <td><span>1.5<span>×</span>10<sup>34</sup></span></td>
+  <td><span>4.8<span>×</span>10<sup>35</sup></span></td>
+  <td><span>1.5<span>×</span>10<sup>37</sup></span></td>
+  <td><span>4.8<span>×</span>10<sup>37</sup></span></td>
+  <td><span>2.6<span>×</span>10<sup>38</sup></span></td>
+  <td><span>4.0<span>×</span>10<sup>38</sup></span></td>
+  <td><span>5.7<span>×</span>10<sup>38</sup></span></td>
+</tr>
 <tr>
-<th scope="row">512
-</th>
-<th scope="row">2<sup>512</sup> (~<span>1.3<span>×</span>10<sup>154</sup></span>)
-</th>
-<td><span>1.6<span>×</span>10<sup>68</sup></span>
-</td>
-<td><span>5.2<span>×</span>10<sup>69</sup></span>
-</td>
-<td><span>1.6<span>×</span>10<sup>71</sup></span>
-</td>
-<td><span>5.2<span>×</span>10<sup>72</sup></span>
-</td>
-<td><span>1.6<span>×</span>10<sup>74</sup></span>
-</td>
-<td><span>5.2<span>×</span>10<sup>75</sup></span>
-</td>
-<td><span>1.6<span>×</span>10<sup>76</sup></span>
-</td>
-<td><span>8.8<span>×</span>10<sup>76</sup></span>
-</td>
-<td><span>1.4<span>×</span>10<sup>77</sup></span>
-</td>
-<td><span>1.9<span>×</span>10<sup>77</sup></span>
-</td></tr></tbody></table>
+  <th scope="row">384</th>
+  <th scope="row">2<sup>384</sup> (~<span>3.9<span>×</span>10<sup>115</sup></span>)</th>
+  <td><span>8.9<span>×</span>10<sup>48</sup></span></td>
+  <td><span>2.8<span>×</span>10<sup>50</sup></span></td>
+  <td><span>8.9<span>×</span>10<sup>51</sup></span></td>
+  <td><span>2.8<span>×</span>10<sup>53</sup></span></td>
+  <td><span>8.9<span>×</span>10<sup>54</sup></span></td>
+  <td><span>2.8<span>×</span>10<sup>56</sup></span></td>
+  <td><span>8.9<span>×</span>10<sup>56</sup></span></td>
+  <td><span>4.8<span>×</span>10<sup>57</sup></span></td>
+  <td><span>7.4<span>×</span>10<sup>57</sup></span></td>
+  <td><span>1.0<span>×</span>10<sup>58</sup></span></td>
+</tr>
+<tr>
+  <th scope="row">512</th>
+  <th scope="row">2<sup>512</sup> (~<span>1.3<span>×</span>10<sup>154</sup></span>)</th>
+  <td><span>1.6<span>×</span>10<sup>68</sup></span></td>
+  <td><span>5.2<span>×</span>10<sup>69</sup></span></td>
+  <td><span>1.6<span>×</span>10<sup>71</sup></span></td>
+  <td><span>5.2<span>×</span>10<sup>72</sup></span></td>
+  <td><span>1.6<span>×</span>10<sup>74</sup></span></td>
+  <td><span>5.2<span>×</span>10<sup>75</sup></span></td>
+  <td><span>1.6<span>×</span>10<sup>76</sup></span></td>
+  <td><span>8.8<span>×</span>10<sup>76</sup></span></td>
+  <td><span>1.4<span>×</span>10<sup>77</sup></span></td>
+  <td><span>1.9<span>×</span>10<sup>77</sup></span></td>
+</tr>
+</tbody>
+</table>
 
 # Salt Uniqueness
 
