@@ -61,7 +61,12 @@ main {
   margin-top: 55.95px;
 }
 
-/* captions */
+figure {
+  text-align: center;
+}
+figure img {
+  display: inline-block;
+}
 figcaption {
   text-align: center;
   font-style: italic;
