@@ -18,6 +18,7 @@ Consider a typical application that stores usernames and passwords. The naive st
 | --- | --- |
 | user1 | qwerty |
 | user2 | 12345678 |
+
 <figcaption>Application's Unencrypted User Table</figcaption>
 
 If the database is compromised the usernames and password are directly exposed and can be used to login to any user's account.
