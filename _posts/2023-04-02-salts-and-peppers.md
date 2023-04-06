@@ -8,7 +8,7 @@ Here we are going to take a deep dive into salts and peppers and their use in th
 
 # What are Salts & Peppers?
 
-A salt or pepper is a value added as additional input to a hash function to protect the hash from rainbow table attacks. Below we will explain step-by-step how and why this is done.
+A salt or pepper is a value added as additional input to a hash function to protect the hash from rainbow table attacks. Below we will explain step-by-step how and why this is done and what rainbow tables are.
 
 # Storing Passwords
 
@@ -25,9 +25,9 @@ If the database is compromised the usernames and password are directly exposed a
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. In this case we are using the SHA256 hash function.
+A better strategy is to store the hash of the password. In this case we are using the SHA-256 hash function.
 
-| Username (Text) | SHA256 Hashed Password (Hex) |
+| Username (Text) | SHA-256 Hashed Password (Hex) |
 |-|-|
 | user1 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
 | user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
@@ -36,33 +36,31 @@ A better strategy is to store the hash of the password. In this case we are usin
 
 # Rainbow Tables
 
-Since the SHA256 hash function is designed to be irreversible you might think that the passwords are now safe in the database, even if it is compromised. The reality is that users often choose very bad passwords (such as the ones I chose: `qwerty` and `12345678`). What an attacker can do is prepare a table of common passwords and corresponding hashes. This is known as a **rainbow table**:
+Since the SHA-256 hash function is designed to be irreversible you might think that the passwords are now safe in the database, even if it is compromised. The reality is that users often choose very bad passwords (such as the ones I chose: `qwerty` and `12345678`). What an attacker can do is prepare a table of common passwords and corresponding hashes. This is known as a **rainbow table**:
 
-| Password (Text) | SHA256 Hash (Hex) |
+| Password (Text) | SHA-256 Hash (Hex) |
 |-|-|
 | qwerty | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
 | 12345678 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
 
 <figcaption>Very Short Rainbow Table</figcaption>
 
-By adding a large number of passwords and their hashes to the table the attacker can then search the table for the corresponding `SHA256 Hash`  in the user table and, if found, retrieve the corresponding `Password` from the rainbow table.
+By adding a large number of passwords and their hashes to the table the attacker can then search the table for the corresponding `SHA-256 Hash`  in the user table and, if found, retrieve the corresponding `Password` from the rainbow table.
 
 # Pepper
 
-A "pepper" (or secret salt) is a fixed value that can be combined with the password to produce different hash values compared with the previous table. A pepper is a randomly chosen value that doesn't change:
+A "pepper" (or secret salt) is a fixed value that can be combined with the password to produce different hash values compared with the previous table. A pepper is a randomly chosen value that doesn't change throughout the lifetime of the application:
 
-| Password (Text) | SHA256 Hash (Hex) |
+| Password (Text) | SHA-256 Hash (Hex) |
 |-|-|
 | wtWy8vb3Ov4FFiFFqwerty | df4c1098fd7a782870ff0ffe6a6c6b8620eeec9e1af4ee3d64309890828baf10 |
 | wtWy8vb3Ov4FFiFF12345678 | 25471749ca6342ea353734f0b63baabab77826edbeb3df886177c47dc3b16ef0 |
 
 <figcaption>Very Short Rainbow Table with Pepper</figcaption>
 
-Now we see that the rainbow table we created before will no longer be applicable to our newly peppered passwords as the SHA256 values don't match any more.
+Now we see that the rainbow table we created before will no longer be applicable to our newly peppered passwords as the SHA-256 values don't match any more. This is secure if the pepper is kept secret. But if the pepper is discovered the attacker can easily make a new rainbow table with the pepper in front of each password and use this to attack the peppered user table.
 
-This is secure if the pepper is kept secret. But if the pepper is discovered the attacker can easily make a new rainbow table with the pepper in front of each password and use this to attack the peppered user table.
-
-Also, if the pepper is lost, password verification is no longer possible as the correct hash cannot be generated without the pepper. All users would have to create new passwords.
+If the pepper is lost, password verification is no longer possible as the correct hash cannot be generated without the pepper. All users would have to create new passwords.
 
 ## Node.js
 
@@ -91,17 +89,15 @@ console.log(process.env.PEPPER)
 
 # Salt
 
-Salts, like peppers, are combined with password before hashing for added security.
+Salts, like peppers, are combined with password before hashing for added security. Salts are different to peppers in that they are usually unique for each user.
 
 ## Unique Salts
 
-Unlike a pepper which is constant, the primary goal of the salt is to be unique per user.
-
-One might think that you could then use the username or email address of a user as the salt. While this initially seems a great idea you would not be able to change the username or email address without also creating a new password.
+One might think that you could then use the username or email address of a user as the salt to ensure uniqueness. While this initially seems a great idea you would not be able to change the username or email address without also creating a new password. Let's look at some other strategies then:
 
 ## Sequential Salts
 
-One might also consider using a sequence number to ensure unique salts. This could work but would be vulnerable to the problems short salts have. This vulnerability could be overcome by using pepper in combination with a sequence number. If the pepper is sufficiently large and random it can make sequential salts stronger.
+One might also consider using a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may precompute a table of known salts combined with likely passwords. This vulnerability can be be mitigated by using pepper in combination with a sequence number. If the pepper is sufficiently large and random the attacker would not know which sequence numbers to use.
 
 ## Short Salts
 
@@ -124,7 +120,7 @@ An attacker then needs to create a rainbow table per uniquely salted hash rather
 
 You can choose the bit size of a random salt based on the table below. If you have a lot of users and only a few salts (due to choosing a small salt bit size) then precomputed attack tables can be made that attack all the users with that same salt.
 
-2<sup>64</sup> will be just enough if we're expecting ≈8 000 000 000 users i.e. one account for everyone in the world. You'll be getting on average 2 collisions per salt:
+From the below table we can see that 2<sup>64</sup> will be just enough if we're expecting ≈8 000 000 000 users i.e. one account for everyone in the world. You'll be getting on average 2 collisions per salt:
 
 <table>
 <tbody>
@@ -246,7 +242,7 @@ You can choose the bit size of a random salt based on the table below. If you ha
 </tbody>
 </table>
 
-<figcaption>Table from <a href="https://en.wikipedia.org/wiki/Birthday_attack">Birthday attack - Wikipedia</a></figcaption>
+<figcaption>Random Collision Probabilities<br />(from <a href="https://en.wikipedia.org/wiki/Birthday_attack">Birthday attack - Wikipedia</a>)</figcaption>
 
 # Conclusion
 
