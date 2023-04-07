@@ -5,7 +5,7 @@ title: Floating Table-of-Contents for Github Pages
 {% raw %}
 # Introduction
 
-In this post we are going to create a responsive table-of-contents for your Github Pages blog. As this code is implemented in this blog you should be able to see the table-of-contents right now and play around with it. The implementation should work with any theme without modification but in this case I'm working with the Minima theme.
+In this post we are going to create a responsive floating table-of-contents for your Github Pages blog. As this code is implemented in this blog you should be able to see the table-of-contents right now and play around with it. The implementation should work with any theme without modification but in this case I'm working with the Minima theme.
 
 I created the table-of-contents code because I wanted an easy way to navigate to sections of my blog posts. Since most of the content is reference material it is really convenient to be able to jump to the relevant section at the click of a button.
 
