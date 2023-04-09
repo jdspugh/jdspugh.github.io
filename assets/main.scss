@@ -32,7 +32,10 @@
 /* END numbered headings */
 
 /* fix h1 being too small */
-.post-content h1, h2, h3 {font-weight: bold }
+.post-content h1, h2, h3 {
+  font-weight: bold;
+  line-height: 1.25;
+}
 .post-content h1 { font-size: 26px }
 .post-content h2 { font-size: 22px }
 .post-content h3 { font-size: 18px }
@@ -59,6 +62,14 @@
 }
 main {
   margin-top: 55.95px;
+}
+
+/* don't flow over on small screen widths */
+.site-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 
 figure {
