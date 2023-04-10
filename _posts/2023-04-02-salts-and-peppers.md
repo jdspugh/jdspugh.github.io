@@ -25,7 +25,7 @@ If the database is compromised the usernames and password are directly exposed a
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. In this case we are using the SHA-256 hash function.
+A better strategy is to store the hash of the password. In this case we are using the SHA-256 hash function for simplicity. (do not use SHA-256 in a production environment because it is a fast hash and will be easy to crack - see below).
 
 `Hash = SHA-256(password)`
 
@@ -38,7 +38,7 @@ A better strategy is to store the hash of the password. In this case we are usin
 
 # Rainbow Tables
 
-Since the SHA-256 hash function is designed to be irreversible you might think that the passwords are now safe in the database, even if it is compromised. The reality is that users often choose very bad passwords (such as the ones I chose: `qwerty` and `12345678`). What an attacker can do is prepare a table of common passwords and corresponding hashes. This is known as a **rainbow table**:
+Since the SHA-256 hash function is designed to be irreversible you might think that the passwords are now safe in the database, even if it is compromised. The reality is that users often choose very weak passwords (such as the ones I chose: `qwerty` and `12345678`). What an attacker can do is prepare a table of common passwords and corresponding hashes. This is known as a **rainbow table**:
 
 | Password | Hash |
 |-|-|
@@ -68,7 +68,7 @@ If the pepper is lost, password verification is no longer possible as the correc
 
 ## Node.js Implementation
 
-In a Node.js implementation we would store the pepper in a `.env` file that can be accessed by the `dotenv` package. For security reasons (especially if using a public code repo) make sure you remove the `.env` file from your version control system by modifying your `.gitignore` file:
+In a Node.js implementation we would commonly store the pepper in a `.env` file that can be accessed by the `dotenv` package. For security reasons (especially if using a public code repo) make sure you remove the `.env` file from your version control system by modifying your `.gitignore` file to include:
 
 `.gitignore`
 ```
@@ -82,7 +82,7 @@ Add the pepper value to the `.env` file:
 PEPPER=wtWy8vb3Ov4FFiFF
 ```
 
-Now you can read it from your Node.js code:
+Now you can read the pepper from your Node.js code:
 
 `app.mjs`
 ```js
@@ -97,15 +97,15 @@ Salts, like peppers, are combined with password before hashing for added securit
 
 ## Unique Salts
 
-One might think that you could then use the username or email address of a user as the salt to ensure uniqueness. While this initially seems a great idea you would not be able to change the username or email address without also creating a new password. Let's look at some other strategies then:
+One might think that you could then use the username or email address of a user as the salt to ensure uniqueness. While this initially seems a great idea you would not be able to change the username or email address without also creating a new password. Let's look at some other strategies then.
 
 ## Sequential Salts
 
-One might also consider using a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a rainbow table of known salts combined with likely passwords. This vulnerability can be be mitigated by using pepper in combination with a sequence number. If the pepper is sufficiently large and random the attacker would not know which sequence numbers to use and their rainbow table could not be reused on other applications (i.e. with different peppers) making them pointless to create.
+One might also consider using a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a rainbow table of known salts combined with likely passwords. This vulnerability can be be mitigated by using pepper in combination with a sequence number. If the pepper is sufficiently large and random the attacker would not know which sequence numbers to use. And even if they did find the range of sequence numbers, their rainbow table could not be reused on other applications or deployments (with different peppers) making them pointless to create.
 
 ## Short Salts
 
-If a salt is too short, an attacker may precompute a table of every possible salt combined with every likely password. Using a long salt ensures such a table would be prohibitively large. Another solution is to use pepper in combination with salts as also suggested with sequential salts.
+If a salt is too short, an attacker may precompute a table of every possible salt combined with every likely password. Using a long salt ensures such a table would be prohibitively large. Another solution is to use a pepper in combination with salts as also suggested with sequential salts.
 
 ## 128-Bit Random Salts
 
@@ -122,9 +122,9 @@ The generally accepted best practise for salts is to produce a 128-bit random sa
 
 ### Collisions
 
-You can choose the bit size of a random salt based on the table below. If you have a lot of users and only a few salts (due to choosing a small salt bit size) then precomputed attack tables can be made that attack all the users with that same salt.
+If you wish to optimise the length of your salt to save on storage space you can choose the bit size of your random salt based on the table below. If you have a lot of users and only a few salts (due to choosing a small salt bit size) then rainbow tables can be made that attack all the users with that same salt, making it more efficient for the attacker.
 
-From the below table we can see that 2<sup>64</sup> will be just enough if we're expecting ≈8 000 000 000 users i.e. one account for everyone in the world. You'll be getting on average 2 collisions per salt:
+From the below table we can see that 2<sup>64</sup> will be just enough if we're expecting ≈8 000 000 000 users i.e. one account for everyone in the world. You'll be getting on average 2 collisions per salt, which is acceptable. So we can optimise our salt to be 64-bit. Bear in mind, as mentioned before, the generally accepted best practise is 128-bits.
 
 <table>
 <tbody>
