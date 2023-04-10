@@ -14,7 +14,7 @@ A salt or pepper is a value added as additional input to a hash function to prot
 
 Consider a typical application that stores usernames and passwords. The naive strategy would be to store the usernames and password in a database without encryption:
 
-| Username (Text) | Password (Text) |
+| Username | Password |
 |-|-|
 | user1 | qwerty |
 | user2 | 12345678 |
@@ -27,7 +27,9 @@ If the database is compromised the usernames and password are directly exposed a
 
 A better strategy is to store the hash of the password. In this case we are using the SHA-256 hash function.
 
-| Username (Text) | SHA-256 Hashed Password (Hex) |
+`Hash = SHA-256(password)`
+
+| Username | Hash |
 |-|-|
 | user1 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
 | user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
@@ -38,23 +40,25 @@ A better strategy is to store the hash of the password. In this case we are usin
 
 Since the SHA-256 hash function is designed to be irreversible you might think that the passwords are now safe in the database, even if it is compromised. The reality is that users often choose very bad passwords (such as the ones I chose: `qwerty` and `12345678`). What an attacker can do is prepare a table of common passwords and corresponding hashes. This is known as a **rainbow table**:
 
-| Password (Text) | SHA-256 Hash (Hex) |
+| Password | Hash |
 |-|-|
 | qwerty | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
 | 12345678 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
 
 <figcaption>Very Short Rainbow Table</figcaption>
 
-By adding a large number of passwords and their hashes to the table the attacker can then search the table for the corresponding `SHA-256 Hash`  in the user table and, if found, retrieve the corresponding `Password` from the rainbow table.
+By adding a large number of passwords and their hashes to the table the attacker can then search the table for the corresponding `Hash`  in the user table and, if found, retrieve the corresponding `Password` from the rainbow table.
 
 # Pepper
 
-A "pepper" (or secret salt) is a fixed value that can be combined with the password to produce different hash values compared with the previous table. A pepper is a randomly chosen value that doesn't change throughout the lifetime of the application:
+A "pepper" (or secret salt) is a fixed value stored separately from the database. It is combined with the password to produce different hash values compared with the previous table. The pepper is randomly chosen and doesn't change throughout the lifetime of the application:
 
-| Password (Text) | SHA-256 Hash (Hex) |
+`Hash = SHA-256(pepper + password)`
+
+| Password | Hash |
 |-|-|
-| wtWy8vb3Ov4FFiFFqwerty | df4c1098fd7a782870ff0ffe6a6c6b8620eeec9e1af4ee3d64309890828baf10 |
-| wtWy8vb3Ov4FFiFF12345678 | 25471749ca6342ea353734f0b63baabab77826edbeb3df886177c47dc3b16ef0 |
+| qwerty | df4c1098fd7a782870ff0ffe6a6c6b8620eeec9e1af4ee3d64309890828baf10 |
+| 12345678 | 25471749ca6342ea353734f0b63baabab77826edbeb3df886177c47dc3b16ef0 |
 
 <figcaption>Very Short Rainbow Table with Pepper</figcaption>
 
@@ -62,7 +66,7 @@ Now we see that the rainbow table we created before will no longer be applicable
 
 If the pepper is lost, password verification is no longer possible as the correct hash cannot be generated without the pepper. All users would have to create new passwords.
 
-## Node.js
+## Node.js Implementation
 
 In a Node.js implementation we would store the pepper in a `.env` file that can be accessed by the `dotenv` package. For security reasons (especially if using a public code repo) make sure you remove the `.env` file from your version control system by modifying your `.gitignore` file:
 
@@ -89,7 +93,7 @@ console.log(process.env.PEPPER)
 
 # Salt
 
-Salts, like peppers, are combined with password before hashing for added security. Salts are different to peppers in that they are usually unique for each user.
+Salts, like peppers, are combined with password before hashing for added security. Salts are different to peppers in that they are usually unique and stored in the database alongside the username.
 
 ## Unique Salts
 
@@ -97,7 +101,7 @@ One might think that you could then use the username or email address of a user 
 
 ## Sequential Salts
 
-One might also consider using a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may precompute a table of known salts combined with likely passwords. This vulnerability can be be mitigated by using pepper in combination with a sequence number. If the pepper is sufficiently large and random the attacker would not know which sequence numbers to use.
+One might also consider using a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a rainbow table of known salts combined with likely passwords. This vulnerability can be be mitigated by using pepper in combination with a sequence number. If the pepper is sufficiently large and random the attacker would not know which sequence numbers to use and their rainbow table could not be reused on other applications (i.e. with different peppers) making them pointless to create.
 
 ## Short Salts
 
@@ -105,16 +109,16 @@ If a salt is too short, an attacker may precompute a table of every possible sal
 
 ## 128-Bit Random Salts
 
-The generally accepted best practise for salts is to use 128-bit random salts that are combined with the password before hashing.
+The generally accepted best practise for salts is to produce a 128-bit random salt per user that is combined with the password before hashing. The username, salt and hash are stored in the database and the original password is discarded. An attacker then cannot predict the text to be hashed in order to create their rainbow table, thereby rendering rainbow table attacks ineffective.
 
-| Username (Text) | Password (Text) | Salt (Hex) | Hash (Hex) |
-|-|-|-|-|
-| user1 | qwerty | 3299942662eb7925245e6b16a1fb8db4 | 5f9eb7a905e2159f2bcde6414020e03815dc7fd4655841d36d34be091a009d30 |
-| user2 | 12345678 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
+`Hash = SHA-256(salt + password)`
+
+| Username | Salt | Hash |
+|-|-|-|
+| user1 | 3299942662eb7925245e6b16a1fb8db4 | 5f9eb7a905e2159f2bcde6414020e03815dc7fd4655841d36d34be091a009d30 |
+| user2 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
 
 <figcaption>Application's Unencrypted User Table</figcaption>
-
-An attacker then needs to create a rainbow table per uniquely salted hash rather than one rainbow table that can be used on all hashes (all hashes with the same salt). This effectively renders rainbow tables useless.
 
 ### Collisions
 
@@ -244,6 +248,25 @@ From the below table we can see that 2<sup>64</sup> will be just enough if we're
 
 <figcaption>Random Collision Probabilities<br />(from <a href="https://en.wikipedia.org/wiki/Birthday_attack">Birthday attack - Wikipedia</a>)</figcaption>
 
+# Brute Force Attacks
+
+These days hashes can be computed very fast. If the correct hashing algorithm and parameters are not used then user tables can be vulnerable to brute force attacks.
+
+Consumer grade hardware these days can compute over 100 000 000 000 000 SHA-256 hashes per second. So weak passwords hashed with a known salt using SHA-256 can be cracked in sub second time. This can be prevented by ensuring you are using a sufficiently slow hashing algorithm. Note that consumer grade hardware can compute 10 000 000 000 000 scrypt hashes per second and scrypt is considered a slow hash - so check the algorithm and its parameters. We recommend using **Argon2**. Argon2 can only be hashed at about 1 000 hashes per second on consumer grade hardware. Even still you will need to **tune the parameters** for your application’s needs - making it fast enough that the user experience is not compromised, and slow enough that it remains secure.
+
+Brute force attacks can also be prevented by using a **long random pepper**. This is secure even if the database has been compromised but the pepper is still hidden at some other location. By adding the pepper the attacker cannot compute any reasonable range of known hashes, even when the salt is known. With Argon2, the slowest algorithm we have considered, hashes can be created in the order of hundreds per second with today's consumer grade hardware. This means that common passwords with know salts could still be cracked, so the use of a pepper is still recommended.
+
+The other option is forcing users to choose **strong passwords**. This will make it difficult or impossible for them to be cracked but also opens other security issues as strong passwords cannot be easily memorized by users. So the user needs to store them in a password manager, on paper or electronically. This comes with its own problems and if we can solve the problem without resorting to strong passwords it will be better for the users and will also result in less customer support requests for us.
+
 # Conclusion
 
-Combining the user's password with a random 128-bit salt provides strong password protection, even in the case of a database breach.
+Hashing the user's password with a correctly configured Argon2 algorithm and using a random 128-bit salt and random 128-bit pepper provides very strong password protection, even in the case of a database breach. If the pepper is discovered it will still offer good protection.
+
+# Further Reading
+
+* How to securely hash passwords?, <https://security.stackexchange.com/questions/211/how-to-securely-hash-passwords>
+
+* Client-Plus-Server Password Hashing as a Potential Way to Improve Security Against Brute Force Attacks without Overloading the Server, "Sergeant Major" Hare, 2015, <http://ithare.com/client-plus-server-password-hashing-as-a-potential-way-to-improve-security-against-brute-force-attacks-without-overloading-server/>
+
+* Method to Protect Passwords in Databases for Web
+Applications, Scott Contini, 2014, <https://eprint.iacr.org/2015/387.pdf>
