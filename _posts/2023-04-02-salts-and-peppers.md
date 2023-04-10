@@ -25,7 +25,7 @@ If the database is compromised the usernames and password are directly exposed a
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. In this case we are using the SHA-256 hash function for simplicity. (do not use SHA-256 in a production environment because it is a fast hash and will be easy to crack - see below).
+A better strategy is to store the hash of the password. In this case we are using the SHA-256 hash function for simplicity (do not use SHA-256 in a production environment because it is a fast hash and will be easy to crack - see below).
 
 `Hash = SHA-256(password)`
 
@@ -250,7 +250,7 @@ From the below table we can see that 2<sup>64</sup> will be just enough if we're
 
 # Brute Force Attacks
 
-These days hashes can be computed very fast. If the correct hashing algorithm and parameters are not used then user tables can be vulnerable to brute force attacks.
+These days hashes can be computed very quickly. This is mainly due to the rise of cryptocurrencies and the advent of specialised mining hardware. Because of this, if the correct hashing algorithm and parameters are not used then user tables can be vulnerable to brute force attacks.
 
 Consumer grade hardware these days can compute over 100 000 000 000 000 SHA-256 hashes per second. So weak passwords hashed with a known salt using SHA-256 can be cracked in sub second time. This can be prevented by ensuring you are using a sufficiently slow hashing algorithm. Note that consumer grade hardware can compute 10 000 000 000 000 scrypt hashes per second and scrypt is considered a slow hash - so check the algorithm and its parameters. We recommend using **Argon2**. Argon2 can only be hashed at about 1 000 hashes per second on consumer grade hardware. Even still you will need to **tune the parameters** for your application’s needs - making it fast enough that the user experience is not compromised, and slow enough that it remains secure.
 
