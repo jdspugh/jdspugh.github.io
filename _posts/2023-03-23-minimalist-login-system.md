@@ -4,7 +4,7 @@ title: Minimalist Login System using Node.js
 ---
 # Goal
 
-To produce a login system that is simpler and more secure than traditional username/password login systems.
+To produce a login system that is simpler and more secure than traditional username/password login systems. We will make an implementation using Node.js and Express.
 
 # Terminology
 
@@ -16,13 +16,13 @@ To produce a login system that is simpler and more secure than traditional usern
 
 I was using the iOS app that comes with my Roidme Eve robot vacuum cleaner and was impressed by its login system. I'm so used to using the conventional UP system that I didn't really think of any other way of implementing it. The Roidme app doesn't store the password but rather sends a verification code to your email which you enter at the app's login screen in order to enter the app. I found it quick, convenient, and simple. Since I had recently gone through the process of designing a UP system I immediately recognised the potential to greatly simplify the user interface complexity, and likewise, the code complexity.
 
-There has also been a spate of **password thefts** and in light of this and the 664 (and growing) hacked websites listed on [';--have i been pwned?](https://haveibeenpwned.com/) I realised that a user authentication system that does **not store passwords** would be **hugely beneficial** to internet users around the world.
+There has also been a spate of **password thefts** and in light of this and the 650+ hacked websites listed on [';--have i been pwned?](https://haveibeenpwned.com/) I realised that a user authentication system that does **not store passwords** would be **hugely beneficial** to internet users around the world.
 
 # UX
 
 ## UP Flow
 
-The traditional UP flow looks something like this:
+The traditional UP flow looks something like this. It requires 8 UI screens to be designed:
 
 <figure>
   <img src="/image/blog/2023-03-23-minimalist-login-system/username-password-login-flow.svg" alt="UP Flow"/>
@@ -31,12 +31,82 @@ The traditional UP flow looks something like this:
 
 ## VC Flow
 
-Our VC approach gives a much simpler flow. In terms of the number of screen that need to be designed and developed, it is a lot fewer:
+Our VC approach gives a much simpler flow with only 3 UI screens to be designed:
 
 <figure>
   <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="VC Flow"/>
   <figcaption>VC Flow</figcaption>
 </figure>
+
+# Sequence Diagrams
+
+<!-- ## UP
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant Browser
+  participant Email
+  participant Server
+  participant Database  
+  autonumber
+  User->>Browser: Enter login page url
+  Browser->>Server: Request login page
+  Server->>Browser: Return login page
+  User->>Browser: Enter email address
+  User->>Browser: Request verification code
+  Browser->>Server: Request verification code (email)
+  Server->>Email: Send verification code to user's email
+  Server->>Database: Save hashed verification code
+  Email->>User: Retrieve verification code
+  User->>Browser: Enter verification code
+  Browser->>Server: Submit hashed verification code
+  Note right of Browser: Hashed to prevent server-side<br />credential harvesting
+  Server->>Database: Find hashed verification code
+  Database->>Server: Result
+  alt Found
+    Server->>Browser: Return dashboard page
+  else Not found
+    Server->>Browser: Show error message
+  end
+``` -->
+
+## VC
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant Browser
+  participant Email
+  participant Server
+  participant Database  
+  autonumber
+  User->>Browser: Enter login page url
+  Browser->>Server: Request login page
+  Server->>Browser: Return login page
+  User->>Browser: Enter email address
+  User->>Browser: Request verification code
+  Browser->>Server: Request verification code (email)
+  Note over Server: Generate salt
+  Server->>Browser: Return salt
+  Note over Server: Generate verification code
+  Server->>Email: Email verification code
+  Note over Server: hash = SHA256(pepper + Argon2(salt + verification code))
+  Server->>Database: Save (hash, salt)
+  Email->>User: Retrieve verification code
+  User->>Browser: Enter verification code
+  Note over Browser: hash1 = Argon2(salt + verification code)
+  Browser->>Server: Submit (hash1)
+%%   Note right of Browser: Hashed to prevent server-side<br />credential harvesting
+  Note over Server: hash2 = SHA256(pepper + hash1)
+  Server->>Database: Exists (hash2) ?
+  Database->>Server: Result
+  alt Exists
+    Server->>Browser: Return dashboard page
+  else Doesn't Exist
+    Server->>Browser: Return error message
+  end
+```
 
 # Database Schema
 
@@ -44,14 +114,14 @@ Our VC approach gives a much simpler flow. In terms of the number of screen that
 
 | Field Name    | Data Type |
 |---------------|-----------|
-|`password_salt`| TEXT      |
 |`password_hash`| TEXT      |
+|`password_salt`| TEXT      |
 
-UP systems can store plaintext passwords, but this is a major security weakness as if the database is compromised - by internal or external actors - all the users' accounts will be accessible by the attacker.
+* `password_hash` - UP systems can store plaintext passwords, but this is a major security weakness as if the database is compromised - by internal or external actors - all the users' accounts will be accessible by the attacker.
 
-In order to mitigate this risk, passwords should be hashed with a strong one-way hash function and stored as hashes in the database. This way the plain text is not viewable, nor calculable, as the hash function is one-way only.
+  In order to mitigate this risk, passwords should be hashed with a strong one-way hash function (e.g. SHA256 or SHA512) and stored as hashes in the database. This way the plain text is not viewable, nor decodable, as the hash function is one-way only.
 
-One-way hashes do still have the vulnerability of rainbow table attacks on the hashes. To mitigate these, each password needs to be stored with its own random salt - hence the `password_salt` field.
+* `password_salt` - One-way hashes do still have the vulnerability of rainbow table attacks on the hashes. To mitigate these, each password needs to be stored with its own random salt - hence the `password_salt` field.
 
 ## VC Fields
 
@@ -242,6 +312,20 @@ Verification code
 1. Error handling: Handle errors gracefully, providing informative error messages to users when appropriate.
 
 1. Responsive: Test on differing screen sizes on mobile and desktop devices.
+
+# Attack Vectors
+
+## VC
+
+| | Server-Side Credential Harvesting | Brute Force | Rainbow Tables | Pass-the-Hash | Same Hash | Replay Attack | Sign Up DOS |
+|-|-|-|-|-|-|-|-|
+| Client side hashing |
+| Cpu + memory intensive hash (e.g. Argon2 with large hash 256/512 bits) |
+| Salt |
+| Server side hashing |
+| Rate limiting |
+| HTTPS / WSS |
+| Email Verification |
 
 # UI
 
