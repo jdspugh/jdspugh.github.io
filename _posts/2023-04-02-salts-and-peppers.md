@@ -23,7 +23,7 @@ Consider a typical application that stores usernames and passwords. The naive st
 
 If the database is compromised (e.g. through direct access or SQL injection attacks) the usernames and password are directly exposed and can be used to login to any user's account.
 
-## Node.js Implementation
+Here is a simple Node.js implementation using Express.js and SQLite for you to try:
 
 ```js
 import express from 'express'
@@ -36,7 +36,7 @@ app.use(express.urlencoded({extended:false}))
 const db = betterSqlite3('users.db')
 db.exec('CREATE TABLE IF NOT EXISTS users (username TEXT UNIQUE, password TEXT)')
 
-// Show login page
+// Show registration page
 app.get('/', (req, res) => {
   res.send(`
 <h1>Register</h1>
@@ -48,7 +48,7 @@ app.get('/', (req, res) => {
   `)
 })
 
-// Store username and password in database
+// Process registration form
 app.post('/register', async (req, res) => {
   const { u, p } = req.body
   try {
@@ -64,7 +64,7 @@ app.listen(3000)
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. In this case we are using the SHA-256 hash function for simplicity (do not use SHA-256 in a production environment because it is a fast hash and will be easy to crack - see below).
+A better strategy is to store the hash of the password. In this case we are using the SHA-256 hash function for simplicity. Do not use SHA-256 in a production environment because it is a fast hash and will be easy to crack using brute force methods as we will discuss later. Use Argon2 or a similar slow hash function instead.
 
 `Hash = SHA-256(password)`
 
@@ -83,8 +83,9 @@ Since the SHA-256 hash function is designed to be irreversible you might think t
 |-|-|
 | qwerty | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
 | 12345678 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
+| ... | ... |
 
-<figcaption>Very Short Rainbow Table</figcaption>
+<figcaption>Rainbow Table</figcaption>
 
 By adding a large number of passwords and their hashes to the table the attacker can then search the table for the corresponding `Hash`  in the user table and, if found, retrieve the corresponding `Password` from the rainbow table. Note that if user passwords where strong (long and random) then rainbow tables would be ineffective.
 
@@ -92,7 +93,7 @@ By adding a large number of passwords and their hashes to the table the attacker
 
 A pepper (or secret salt) is a fixed value stored separately from the database (preferable in some form of secure storage). It is combined with the password to produce different hash values compared with the previous table. The pepper is randomly chosen and doesn't change throughout the lifetime of the application:
 
-`Hash = SHA-256(pepper + password)`
+`Hash = SHA-256(password + pepper)`
 
 | Password | Hash |
 |-|-|
@@ -103,7 +104,7 @@ A pepper (or secret salt) is a fixed value stored separately from the database (
 
 Now we see that the rainbow table we created before will no longer be applicable to our newly peppered passwords as the SHA-256 values don't match any more. This is secure if the pepper is kept secret. But if the pepper is discovered the attacker can easily make a new rainbow table with the pepper in front of each password and use this to attack the peppered user table.
 
-If the pepper is lost, password verification is no longer possible as the correct hash cannot be generated without the pepper. All users would have to create new passwords.
+If the pepper is lost, password verification is no longer possible as the correct hash cannot be generated. All users would have to create new passwords.
 
 ## Node.js Implementation
 
@@ -150,7 +151,7 @@ If a salt is too short, an attacker may precompute a table of every possible sal
 
 The generally accepted best practise for salts is to produce a 128-bit random salt per user that is combined with the password before hashing. The username, salt and hash are stored in the database and the original password is discarded. An attacker then cannot predict the text to be hashed in order to create their rainbow table, thereby rendering rainbow table attacks ineffective.
 
-`Hash = SHA-256(salt + password)`
+`Hash = SHA-256(password + salt)`
 
 | Username | Salt | Hash |
 |-|-|-|
@@ -158,73 +159,6 @@ The generally accepted best practise for salts is to produce a 128-bit random sa
 | user2 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
 
 <figcaption>Application's Unencrypted User Table</figcaption>
-
-## Node.js Implementation
-
-```js
-import express from 'express'
-import betterSqlite3 from 'better-sqlite3'// install issues? try https://github.com/WiseLibs/better-sqlite3/issues/866#issuecomment-1457993288
-import argon2 from 'argon2'// install issues? try "npm i argon2; npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2"
-
-// Init express
-const app = express()
-app.use(express.urlencoded({extended:false}))
-
-// Init database
-const db = betterSqlite3('users.db')
-db.exec('CREATE TABLE IF NOT EXISTS users (username TEXT UNIQUE, password TEXT)')
-
-// Show login page
-app.get('/', (req, res) => {
-  res.send(`
-<h1>Login</h1>
-<form action="login" method="post">
-  <label>Username <input name="u" /></label>
-  <label>Password <input name="p" type="password" /></label>
-  <input type="submit" />
-</form>
-  `)
-})
-
-// Process login form
-app.post('/login', async (req, res) => {
-  const { u, p } = req.body
-  const savedPassword = db.prepare('SELECT password FROM users WHERE (username=?)').get(u).password
-  res.send('Login ' + await argon2.verify(savedPassword, p) ? 'Success' : 'Failure')
-})
-
-// Show registration page
-app.get('/register', (req, res) => {
-  res.send(`
-<h1>Register</h1>
-<form action="register" method="post">
-  <label>Username <input name="u" /></label>
-  <label>Password <input name="p" type="password" /></label>
-  <input type="submit" />
-</form>
-  `)
-})
-
-// Process registration form
-app.post('/register', async (req, res) => {
-  const { u, p } = req.body
-  console.log(await argon2.hash(p))
-  try {
-    db.prepare('INSERT INTO users (username, password) VALUES (?, ?)').run(u, await argon2.hash(p))
-    res.send('Registration successful')
-  } catch {
-    res.send('Username already exists')
-  }
-})
-
-app.listen(3000)
-```
-
-### Note
-
-The hash return by the argon2 npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC](https://www.password-hashing.net/)'s standardised hash result format. It includes the salt, the hash, and the parameters the Argon2 algorithm used. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the password column.
-
-It's also good to store the Argon2 parameters also in case we want to change these at a later point. We won't have to upgrade all the accounts at once.
 
 ### Collisions
 
@@ -356,52 +290,92 @@ From the below table we can see that 2<sup>64</sup> will be just enough if we're
 
 <figcaption>Random Collision Probabilities<br />(from <a href="https://en.wikipedia.org/wiki/Birthday_attack">Birthday attack - Wikipedia</a>)</figcaption>
 
-# Hashing Algorithms
-
-Some hashing algorithms are designed to the fast e.g. BLAKE3 and SHA-256. Some are designed to be slow e.g. Argon2, scrypt and bcrypt. Both have their own use cases, but for password hashing a slow algorithm is required. A slow algorithm makes it much more costly to generate rainbow tables and to perform brute force attacks. Let's take a look at brute force attacks now.
-
 # Brute Force Attacks
-
-These days hashes can be computed very quickly. This is mainly due to the rise of cryptocurrencies and the advent of specialised mining hardware. Because of this, if the correct hashing algorithm and parameters are not used then user tables can be vulnerable to brute force attacks.
-
-Consumer grade hardware these days can compute over 100 000 000 000 000 SHA-256 hashes per second. So weak passwords hashed with a known salt using SHA-256 can be cracked in sub second time. This can be prevented by ensuring you are using a sufficiently slow hashing algorithm. Note that consumer grade hardware can compute 10 000 000 000 000 scrypt hashes per second and scrypt is considered a slow hash - so check the algorithm and its parameters.
-
-We recommend using **Argon2**. Argon2 can only be hashed at about 1 000 hashes per second on consumer grade hardware. Even still you will need to **tune the parameters** for your application’s needs - making it fast enough that the user experience is not compromised, and slow enough that it remains secure.
-
-We used these Argon2 settings using the WebAssembly implementation at https://antelle.net/argon2-browser:
-
-Argon2 settings:
-* Memory: see table below
-* Iterations: 1
-* Hash Length: 32 bytes
-* Parallelism: 2
-* Type: Argon2d
-
-| Memory | Macbook Pro 16<br />Hash Time |
-|:-:|:-:|
-| 512 KB (64 MB) | 1 ms (.001s) 
-| 65536 KB (64 MB) | 70 ms (.07s) |
-| 262144 KB (256 MB) | 210 ms (.21s) |
-| 1048576 KB (1 GB) | 770 ms (.77s) |
-
-<figcaption>Memory vs Hash Time for Argon2 Rust Reference Implementation on Different Devices<br />(<a href="https://github.com/p-h-c/phc-winner-argon2">https://github.com/p-h-c/phc-winner-argon2</a>)</figcaption>
-
-| Memory | Macbook Pro 16<br />Hash Time | iPhone SE<br />Hash Time |
-|:-:|:-:|:-:|
-| 512 KB (64 MB) | 5 ms (.005s) | 5ms (.005s) |
-| 65536 KB (64 MB) | 120 ms (.12s) | 330ms (.33s) |
-| 262144 KB (256 MB) | 410 ms (.41s) | 1300ms (1.3s) |
-| 1048576 KB (1 GB) | 3900 ms (3.9s) | Out of memory error |
-
-<figcaption>Memory vs Hash Time for Argon2 Browser Implementation on Different Devices<br />(<a href="https://antelle.net/argon2-browser">https://antelle.net/argon2-browser</a>)</figcaption>
 
 Brute force attacks can also be prevented by using a **long random pepper**. This is secure even if the database has been compromised but the pepper is still hidden at some other location. By adding the pepper the attacker cannot compute any reasonable range of known hashes, even when the salt is known. With Argon2, the slowest algorithm we have considered, hashes can be created in the order of hundreds per second with today's consumer grade hardware. This means that common passwords with know salts could still be cracked, so the use of a pepper is still recommended.
 
 The other option is forcing users to choose **strong passwords**. This will make it difficult or impossible for them to be cracked but also opens other security issues as strong passwords cannot be easily memorized by users. So the user needs to store them in a password manager, on paper or electronically. This comes with its own problems and if we can solve the problem without resorting to strong passwords it will be better for the users and will also result in less customer support requests for us.
 
+# Node.js Implementation
+
+Here is an implementation that uses Express.js and SQLite. It implements salts and peppers as recommended.
+
+```js
+import express from 'express'
+import betterSqlite3 from 'better-sqlite3'// install issues? try https://github.com/WiseLibs/better-sqlite3/issues/866#issuecomment-1457993288
+import argon2 from 'argon2'// install issues? try "npm i argon2; npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2"
+import dotenv from 'dotenv';dotenv.config()
+
+// Init express
+const app = express()
+app.use(express.urlencoded({extended:false}))
+
+// Init database
+const db = betterSqlite3('users.db')
+db.exec('CREATE TABLE IF NOT EXISTS users (username TEXT UNIQUE, password TEXT)')
+
+// Show login page
+app.get('/', (req, res) => {
+  res.send(`
+<h1>Login</h1>
+<form action="login" method="post">
+  <label>Username <input name="u" /></label>
+  <label>Password <input name="p" type="password" /></label>
+  <input type="submit" />
+</form>
+  `)
+})
+
+// Process login form
+app.post('/login', async (req, res) => {
+  const { u, p } = req.body
+  const savedPassword = db.prepare(
+    'SELECT password FROM users WHERE (username=?)'
+  ).get(u)?.password
+  if (savedPassword && await argon2.verify(savedPassword, p + process.env.PEPPER)) {
+    res.send('Login Success')
+  } else {
+    res.status(401).send('Login Failure')
+  }
+})
+
+// Show registration page
+app.get('/register', (req, res) => {
+  res.send(`
+<h1>Register</h1>
+<form action="register" method="post">
+  <label>Username <input name="u" /></label>
+  <label>Password <input name="p" type="password" /></label>
+  <input type="submit" />
+</form>
+  `)
+})
+
+// Process registration form
+app.post('/register', async (req, res) => {
+  const { u, p } = req.body
+  try {
+    db.prepare(
+      'INSERT INTO users (username, password) VALUES (?, ?)'
+    ).run(
+      u, await argon2.hash(p + process.env.PEPPER)
+    )
+    res.send('Registration successful')
+  } catch {
+    res.send('Username already exists')
+  }
+})
+
+app.listen(3000)
+```
+
+**Note:** The hash returned by the argon2 npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC](https://www.password-hashing.net/)'s standardised hash result format. It includes the salt, the hash, and the parameters the Argon2 algorithm used. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the password column. It's also good to store the Argon2 parameters also in case we want to change these at a later point. We won't have to upgrade all the accounts at once.
+
 # Conclusion
 
-Hashing the user's password with a correctly configured **Argon2** algorithm and using a random 128-bit **salt** and random 128-bit **pepper** provides very strong password protection, even in the case of a database breach. If the pepper is discovered it stills offers good protection against brute force and rainbow table attacks.
+Hashing the user's password with a correctly configured **Argon2** algorithm and using a long random **salt** and long random **pepper** provides very strong password protection, even in the case of a database breach. If the pepper is discovered it stills offers good protection against brute force and rainbow table attacks.
+
+Two more aspects that should be delved into in more depth are the lengths of the salts and peppers and the parameters for tuning the Argon2 hashing algorithm.
 
 # Further Reading
 
