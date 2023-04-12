@@ -298,7 +298,7 @@ The other option is forcing users to choose **strong passwords**. This will make
 
 # Node.js Implementation
 
-Here is an implementation that uses Express.js and SQLite. It implements salts and peppers as recommended.
+Here is an implementation of a web based authentication system that uses Express.js and SQLite. It implements salts and peppers as recommended.
 
 ```js
 import express from 'express'
