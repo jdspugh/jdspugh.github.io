@@ -27,7 +27,7 @@ If the database is compromised (e.g. through direct access or SQL injection atta
 
 ```js
 import express from 'express'
-import betterSqlite3 from 'better-sqlite3'
+import betterSqlite3 from 'better-sqlite3'// install issues? try https://github.com/WiseLibs/better-sqlite3/issues/866#issuecomment-1457993288
 
 const app = express()
 app.use(express.urlencoded({extended:false}))
@@ -74,47 +74,6 @@ A better strategy is to store the hash of the password. In this case we are usin
 | user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
 
 <figcaption>Application's Password Hashed User Table</figcaption>
-
-## Node.js Implementation
-
-Here is a simple Node.js implementation of password hashing using Express, SQLite and Argon2:
-
-```js
-import express from 'express'
-import sqlite3 from 'sqlite3'
-import argon2 from 'argon2'
-
-// init express
-const app = express()
-app.use(express.json())
-
-// init db
-const { Database } = sqlite3
-sqlite3.verbose()
-const db = new Database('users.db')
-await db.run('CREATE TABLE IF NOT EXISTS users (username TEXT UNIQUE, hash TEXT)')
-
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body
-  const hashedPassword = await argon2.hash(password)
-  db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], () => {
-    res.status(201).send({ message: 'User registered.' })
-  })
-})
-
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body
-  db.get('SELECT * FROM users WHERE username = ?', [username], async (err, row) => {
-    if (await argon2.verify(row.password, password)) {
-      res.send({ message: 'Login successful.' })
-    } else {
-      res.status(401).send({ message: 'Incorrect username or password.' })
-    }
-  })
-})
-
-app.listen(3000, () => console.log('Server running on port 3000'))
-```
 
 # Rainbow Tables
 
@@ -204,57 +163,68 @@ The generally accepted best practise for salts is to produce a 128-bit random sa
 
 ```js
 import express from 'express'
-import sqlite3 from 'sqlite3'
-import argon2 from 'argon2'
+import betterSqlite3 from 'better-sqlite3'// install issues? try https://github.com/WiseLibs/better-sqlite3/issues/866#issuecomment-1457993288
+import argon2 from 'argon2'// install issues? try "npm i argon2; npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2"
 
-// init express
+// Init express
 const app = express()
-app.use(express.json())
+app.use(express.urlencoded({extended:false}))
 
-// init db
-const { Database } = sqlite3
-sqlite3.verbose()
-const db = new Database('users.db')
-await db.run('CREATE TABLE IF NOT EXISTS users (username TEXT UNIQUE, hash TEXT, salt TEXT)')
+// Init database
+const db = betterSqlite3('users.db')
+db.exec('CREATE TABLE IF NOT EXISTS users (username TEXT UNIQUE, password TEXT)')
 
-async function hashPassword(password) {
-  const salt = await argon2.generateSalt()
-  const hash = await argon2.hash(password, salt)
-  return { salt, hash }
-}
-
-async function verifyPassword(hash, password) {
-  return argon2.verify(hash, password)
-}
-
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body
-  const { salt, hash } = await hashPassword(password)
-  try {
-    await db.run('INSERT INTO users VALUES (?, ?, ?)', username, hash, salt)
-    res.send('User registered')
-  } catch (e) {
-    res.status(400).send('Username already taken')
-  }
+// Show login page
+app.get('/', (req, res) => {
+  res.send(`
+<h1>Login</h1>
+<form action="login" method="post">
+  <label>Username <input name="u" /></label>
+  <label>Password <input name="p" type="password" /></label>
+  <input type="submit" />
+</form>
+  `)
 })
 
+// Process login form
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body
-  const user = await db.get('SELECT * FROM users WHERE username = ?', username)
-  if (user) {
-    const validPassword = await verifyPassword(user.hash, password)
-    if (validPassword) {
-      res.send('Login successful')
-    } else {
-      res.status(400).send('Invalid password')
-    }
-  } else {
-    res.status(400).send('User not found')
+  const { u, p } = req.body
+  const savedPassword = db.prepare('SELECT password FROM users WHERE (username=?)').get(u).password
+  res.send('Login ' + await argon2.verify(savedPassword, p) ? 'Success' : 'Failure')
+})
+
+// Show registration page
+app.get('/register', (req, res) => {
+  res.send(`
+<h1>Register</h1>
+<form action="register" method="post">
+  <label>Username <input name="u" /></label>
+  <label>Password <input name="p" type="password" /></label>
+  <input type="submit" />
+</form>
+  `)
+})
+
+// Process registration form
+app.post('/register', async (req, res) => {
+  const { u, p } = req.body
+  console.log(await argon2.hash(p))
+  try {
+    db.prepare('INSERT INTO users (username, password) VALUES (?, ?)').run(u, await argon2.hash(p))
+    res.send('Registration successful')
+  } catch {
+    res.send('Username already exists')
   }
 })
 
-app.listen(3000, () => console.log('Server running on port 3000'))
+app.listen(3000)
 ```
+
+### Note
+
+The hash return by the argon2 npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC](https://www.password-hashing.net/)'s standardised hash result format. It includes the salt, the hash, and the parameters the Argon2 algorithm used. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the password column.
+
+It's also good to store the Argon2 parameters also in case we want to change these at a later point. We won't have to upgrade all the accounts at once.
 
 ### Collisions
 
