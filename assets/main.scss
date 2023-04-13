@@ -89,6 +89,12 @@ table {
   overflow-x: scroll;
   display: block;
   border: none !important;
+
+  /* center table */
+  width: max-content;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
 }
 /* table::-webkit-scrollbar {
   width: 5px;
