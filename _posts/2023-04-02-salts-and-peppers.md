@@ -30,47 +30,6 @@ Consider a typical application that stores usernames and passwords. The naive st
 
 If the database is compromised (e.g. through direct access or SQL injection attacks) the usernames and password are directly exposed and can be used to login to any user's account.
 
-## Node.js Implementation
-
-Here is a sample Node.js web application for you to try that stores usernames and password as plain text.
-
-```js
-import express from 'express'
-import betterSqlite3 from 'better-sqlite3'// install issues? try https://github.com/WiseLibs/better-sqlite3/issues/866#issuecomment-1457993288
-
-const app = express()
-app.use(express.urlencoded({extended:false}))
-
-// Initialize database
-const db = betterSqlite3('users.db')
-db.exec('CREATE TABLE IF NOT EXISTS users (username TEXT UNIQUE, password TEXT)')
-
-// Show registration page
-app.get('/', (req, res) => {
-  res.send(`
-<h1>Register</h1>
-<form action="register" method="post">
-  <label>Username <input name="u" /></label>
-  <label>Password <input name="p" type="password" /></label>
-  <input type="submit" />
-</form>
-  `)
-})
-
-// Process registration form
-app.post('/register', async (req, res) => {
-  const { u, p } = req.body
-  try {
-    db.prepare('INSERT INTO users (username, password) VALUES (?, ?)').run(u, p)
-    res.send('Registration successful')
-  } catch {
-    res.send('Username already exists')
-  }
-})
-
-app.listen(3000)
-```
-
 # Password Hashing
 
 A better strategy is to store the hash of the password. In this case we are using the SHA256 hash function for simplicity. Do not use SHA256 in a production environment because it is a fast hash and will be easy to crack using dictionary or brute force attacks as we will discuss later. Use Argon2 or a similar slow hash function instead (see my post about [One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)).
