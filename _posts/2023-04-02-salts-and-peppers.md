@@ -4,7 +4,7 @@ title: Salts and Peppers
 ---
 # Goal
 
-We are going to take a deep dive into salts and peppers and their use for safely storing passwords in a username/password login system.
+We are going to take a deep dive into salts and peppers and, specifically, their use for safely storing passwords in a username/password login system.
 
 # What are Salts & Peppers?
 
@@ -32,7 +32,11 @@ If the database is compromised (e.g. through direct access or SQL injection atta
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. In this case we are using the SHA256 hash function for simplicity. Do not use SHA256 in a production environment because it is a fast hash and will be easy to crack weaker passwords using reverse hash lookups (e.g. rainbow tables) and/or brute force attacks as we will discuss later. Use Argon2 or a similar slow hash function instead (see my post about [One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)).
+A better strategy is to store the hash of the password.
+
+In this case we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using reverse hash lookups (e.g. rainbow tables) on unsalted hashed passwords, and dictionary or brute force attacks on salted passwords with known peppers, as we will discuss later on.
+
+**Use Argon2** or a similar _slow_ hash function instead which will provide resistance against attacks even when both the database and the pepper have been compromised. See my post about [One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html) for more detals.
 
 `HashedPassword = SHA256(Password)`
 
@@ -47,7 +51,7 @@ A better strategy is to store the hash of the password. In this case we are usin
 
 Since cryptographic hash functions, including SHA256, are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where **strong** (e.g. **10+ random mixed case alphanumeric characters**) this would be the case. The reality is that users often choose very weak passwords (such as the ones I chose: `qwerty` and `12345678`). What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table.
 
-Reverse hash lookup tables trade storage space for computation time. They are most effective against slow hashing algorithms since the computational time to storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be much less.
+Reverse hash lookup tables precompute complex password hashes and store them in a table for easy access. They are most effective against slow hashing algorithms since the computational time to storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be much less.
 
 | HashedPassword | Password |
 |-|-|
@@ -61,7 +65,7 @@ By adding a large number of passwords and their hashes to the table the attacker
 
 # Rainbow Tables
 
-The reverse hash lookup process can be highly optimised by using a technique widely known as **rainbow tables**. It can often make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
+The reverse hash lookup process can be highly optimised by using a technique widely known as **rainbow tables**. It can make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
 
 * _Making a Faster Cryptanalytic Time-Memory
 Trade-Of_, Philippe Oechslin, 2003, https://lasecwww.epfl.ch/pub/lasec/doc/Oech03.pdf
@@ -70,7 +74,9 @@ Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-w
 
 # Password Strength
 
-If all users' passwords where strong (long and random) then reverse hash lookups would be ineffective. Strong passwords can introduce usability issues as it's difficult to remember long random passwords. It may introduce new security issues also as users may potentially store them electronically, or forget them, introducing more customer support requests. For now we will allow the users to use any length of password and rely on implementing strong security instead to protect them.
+Using a well tuned slow hashing algorithm like **Argon2** with **unique salts per user** and a **pepper**, all users' password will be safe under normal operating circumstances. In the case when the system comes under attack, if the database is breached all users' passwords will still be safe. If the database is breached and the pepper is also found out then the attacker will be able to execute dictionary and brute force attacks on users' hashed passwords. Since we are hashing passwords with Argon2 this process will be slow for the attacker and only weak passwords will be discovered.
+
+Enforcing strong passwords can introduce usability issues as it's difficult to remember long random passwords. It may introduce new security issues also as users may potentially store them electronically, or forget them, introducing more customer support requests. For now we will allow the users to use any length of password and rely on implementing strong security instead to protect them.
 
 # Pepper
 
@@ -168,7 +174,7 @@ The other option is forcing users to choose **strong passwords**. This will make
 
 # Node.js Implementation
 
-Here is an implementation of a web based authentication system that uses Express.js and SQLite. It implements salts and peppers as recommended.
+Here is an implementation of a web based authentication system that uses Express.js and SQLite. It implements **Argon2** hashing with **unique salts per user** and a **pepper** as recommended.
 
 ```js
 import express from 'express'
@@ -239,7 +245,7 @@ app.post('/register', async (req, res) => {
 app.listen(3000)
 ```
 
-**Note:** The hash returned by the argon2 npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC](https://www.password-hashing.net/)'s standardised hash result format. It includes the salt, the hash, and the parameters the Argon2 algorithm used. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the password column. It's also good to store the Argon2 parameters also in case we want to change these at a later point. We won't have to upgrade all the accounts at once.
+**Note:** The hash returned by the `argon2` npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC](https://www.password-hashing.net/)'s standardised hash result format. It includes the salt, the hash, and the parameters the Argon2 algorithm used. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the `password` column. It's also good to store the Argon2 parameters also in case we want to change these at a later point: we won't have to upgrade all the accounts at once. We can even potentially fine tune and algorithmically increase the memory and computational complexity to account for increases in attackers' computational power and memory resources over time.
 
 # Conclusion
 
