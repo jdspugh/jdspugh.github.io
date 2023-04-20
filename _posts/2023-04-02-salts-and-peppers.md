@@ -32,7 +32,7 @@ If the database is compromised (e.g. through direct access or SQL injection atta
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. In this case we are using the SHA256 hash function for simplicity. Do not use SHA256 in a production environment because it is a fast hash and will be easy to crack using dictionary or brute force attacks as we will discuss later. Use Argon2 or a similar slow hash function instead (see my post about [One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)).
+A better strategy is to store the hash of the password. In this case we are using the SHA256 hash function for simplicity. Do not use SHA256 in a production environment because it is a fast hash and will be easy to crack weaker passwords using reverse hash lookups (e.g. rainbow tables) and/or brute force attacks as we will discuss later. Use Argon2 or a similar slow hash function instead (see my post about [One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)).
 
 `Password = SHA256(Password)`
 
@@ -45,19 +45,32 @@ A better strategy is to store the hash of the password. In this case we are usin
 
 # Reverse Hash Lookups
 
-Since cryptographic hash functions, including SHA256, are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where strong (long and random) this would be the case. The reality is that users often choose very weak passwords (such as the ones I chose: `qwerty` and `12345678`). What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table.
+Since cryptographic hash functions, including SHA256, are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where **strong** (e.g. **10+ random mixed case alphanumeric characters**) this would be the case. The reality is that users often choose very weak passwords (such as the ones I chose: `qwerty` and `12345678`). What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table.
 
 Reverse hash lookup tables trade storage space for computation time. They are most effective against slow hashing algorithms since the computational time to storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be much less.
 
-| Password | Hash |
+| Hash | Password |
 |-|-|
-| qwerty | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
-| 12345678 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
+| 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 | qwerty |
+| ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f | 12345678 |
 | ... | ... |
 
 <figcaption>Reverse Hash Lookup Table</figcaption>
 
-By adding a large number of passwords and their hashes to the table the attacker can then rapidly search the table for the corresponding `Hash` in the user table and, if found, retrieve the corresponding `Password` from the reverse hash lookup table. Note that if user passwords where strong (long and random) then reverse hash lookups would be ineffective.
+By adding a large number of passwords and their hashes to the table the attacker can then rapidly search the table for the corresponding `Hash` in the user table and, if found, retrieve the corresponding `Password` from the reverse hash lookup table.
+
+# Password Length
+
+If all users' passwords where strong then reverse hash lookups would be ineffective. If this was the case it would introduce usability issues as it's difficult to remember long random passwords. It may introduce new security issues also as users may potentially store them electronically, or forget them, introducing more customer support requests. For now we will allow the users to use any length of password.
+
+# Rainbow Tables
+
+The reverse hash lookup process can be highly optimised by using a technique widely known as **rainbow tables**. It can often make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
+
+* _Making a Faster Cryptanalytic Time-Memory
+Trade-Of_, Philippe Oechslin, 2003, https://lasecwww.epfl.ch/pub/lasec/doc/Oech03.pdf
+* _Rainbow Tables (probably) aren’t what you think — Part 1: Precomputed Hash Chains_,
+Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-what-you-think-30f8a61ba6a5>
 
 # Pepper
 
@@ -78,6 +91,8 @@ Password = SHA256(Password + Pepper)
 Now we see that the reverse hash lookup table we created before will no longer be applicable to our newly peppered passwords as the SHA256 values don't match any more.
 
 This method is secure if the pepper is kept secret. But if the pepper is discovered the attacker can easily make a new reverse hash lookup table with the pepper in appended to each password and use this to attack the peppered user table.
+
+## Risks
 
 If the pepper is lost, password verification is no longer possible as the correct hash cannot be generated. All users would have to create new passwords.
 
@@ -108,11 +123,7 @@ console.log(process.env.PEPPER)
 
 # Salt
 
-Salts, like peppers, are combined with passwords before hashing for added security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables.
-
-`<reverse hash lookup table storage space>` `=` `<hashed password length>` `*` `<number of unique salt values>` `+` `<attack dictionary size>`
-
-There are ways to optimise reverse hash lookup tables and one of the most well know and effective ways is by using rainbow tables.
+Salts, like peppers, are combined with passwords before hashing for added security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables exponentially. Long enough salts render reverse hash lookup tables useless.
 
 ## Username/Email as Salt
 
@@ -120,33 +131,21 @@ One might think that you could use the username or email address of a user as th
 
 ## Sequential Salts
 
-We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts combined with likely passwords. This vulnerability can be mitigated by using pepper in combination with a sequence number. If the pepper is sufficiently large and random the attacker would not know which sequence numbers to use. And even if they did find the range of sequence numbers, their reverse hash lookup could not be reused on other applications / deployments with different peppers making the reverse hash lookups pointless to create.
+We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that short salts have.
+
+This vulnerability can be mitigated by using pepper in combination with a sequence number. If the pepper is sufficiently large and random the attacker would not know which sequence numbers to use. And even if they did find the range of sequence numbers by discovering the pepper, their reverse hash lookup table could not be reused on other applications / deployments with different peppers making the reverse hash lookups virtually useless to create. This solution is less secure than large random salts as there is a chance the pepper value could be found.
 
 ## Short Salts
 
-If a salt is too short, an attacker may precompute a table of every possible salt combined with every likely password. Using a long salt ensures such a table would be prohibitively large. Another solution is to use a pepper in combination with short salts as also suggested with sequential salts.
+If a salt is too short, an attacker may precompute a table of every possible salt combined with every likely password. Using a long salt ensures such a table would be impossibly large.
+
+Another solution is to use a pepper in combination with short salts as also suggested with sequential salts.
 
 ## Salt Bits
 
-The generally accepted best practise for salts is to produce a 128-bit random salt per user that is combined with the password before hashing. 128-bits is chosen to avoid the chances of hash collisions. Collisions create duplicate salts, reducing the security of the application as duplicate salts mean one cracked salt affects all accounts with that salt.
+The generally accepted best practise for salts is to produce a 128-bit random salt per user that is combined with the password before hashing. 128-bits is chosen as it sufficiently raises reverse hash lookup table storage space requirements to currently impossible values.
 
-Depending on your requirements you may be able to use a shorter salt, which will make your application more efficient, particularly in terms of reducing the database size. 
-
-Max Users = 8 billion
-
-Load Factor = Max Users / Possible Salt Values
-
-| Salt Bits | Load Factor | Brute Force Time |
-|-|-|-|
-| 16 | 122 070 | T / 122070 |
-| 32 | 1.86 | T / 2 |
-| 64 | 0.000 000 434 | T |
-| 128 | 0.000 000 000 000 000 000 000 000 000 023 5 | T |
-| Infinite | 0 | T |
-
-<figcaption>Salt Bits vs Load Factor</figcaption>
-
-From the table we can see that if we used a 16-bit salt a single successful brute force attack would crack 122 070 accounts. A 32-bit salt would crack almost 2 accounts on average. With a 64-bit or 128-bit salt the collisions are so few a brute force would be barely faster than with no collisions. Thus we can recommend a **32-bit salt for those who wish to save storage space**, and **64 or 128-bits for those for whom storage space is not a factor**.
+Depending on your requirements you may be able to use a shorter salt, which will make your application more efficient, particularly in terms of reducing the database size.
 
 The username, salt and hash are stored in the database. An attacker then cannot predict the text to be hashed in order to create their reverse hash lookup, thereby rendering reverse hash lookup attacks ineffective.
 
@@ -158,14 +157,6 @@ The username, salt and hash are stored in the database. An attacker then cannot 
 | user2 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
 
 <figcaption>Unencrypted User Table</figcaption>
-
-### Collisions
-
-Considering a perfect random number generator, you will get the same number chosen more than once if your range is not large. For instance, if you are rolling a six-sided die, there is a 1 in 6 chance of rolling the same number twice in a row. In hashing this is considered a collision. Hashing algorithms are designed to avoid collisions, but the chance of collision also depends largely on the range of numbers allowed.
-
-If you wish to optimise the length of your salt to save on storage space you can choose the bit size of your random salt based on the table below. The bit size determines the hash range. If you have a lot of users and only a few salts (due to choosing a small salt bit size) then reverse hash lookups can be made that attack all the users with that same salt, making it more efficient for the attacker.
-
-From the below table we can see that 2<sup>64</sup> will be just enough if we're expecting ≈8 000 000 000 users i.e. one account for everyone in the world. You'll be getting on average 2 collisions per salt, which is acceptable. So we can optimise our salt to be 64-bit. Bear in mind, as mentioned before, the generally accepted best practise is 128-bits.
 
 # Dictionary & Brute Force Attacks
 
