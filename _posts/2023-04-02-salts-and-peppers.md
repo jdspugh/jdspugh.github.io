@@ -67,6 +67,8 @@ By adding a large number of passwords and their hashes to the table the attacker
 
 The reverse hash lookup process can be highly optimised by using a technique widely known as **rainbow tables**. It can make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
 
+Further reading:
+
 * _Making a Faster Cryptanalytic Time-Memory
 Trade-Of_, Philippe Oechslin, 2003, https://lasecwww.epfl.ch/pub/lasec/doc/Oech03.pdf
 * _Rainbow Tables (probably) aren’t what you think — Part 1: Precomputed Hash Chains_,
@@ -85,8 +87,8 @@ A pepper is a fixed value stored separately from the database (preferably in som
 The pepper is combined with the password to produce different hash values compared with the previous table. The pepper is randomly chosen and doesn't change throughout the lifetime of the application:
 
 ```
-Pepper = wtWy8vb3Ov4FFiFF
-HashedPassword = SHA256(Password + Pepper)
+PEPPER = wtWy8vb3Ov4FFiFF
+HashedPassword = SHA256(Password + PEPPER)
 ```
 
 | Username | HashedPassword |
@@ -204,7 +206,7 @@ app.get('/', (req, res) => {
 
 // Process login form
 app.post('/login', async (req, res) => {
-  const { u, p } = req.body
+  const { u, p } = req.body // username, password
   const savedPassword = db.prepare(
     'SELECT password FROM users WHERE (username=?)'
   ).get(u)?.password
@@ -229,7 +231,7 @@ app.get('/register', (req, res) => {
 
 // Process registration form
 app.post('/register', async (req, res) => {
-  const { u, p } = req.body
+  const { u, p } = req.body // username, password
   try {
     db.prepare(
       'INSERT INTO users (username, password) VALUES (?, ?)'
