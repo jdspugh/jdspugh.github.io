@@ -4,7 +4,7 @@ title: Salts and Peppers
 ---
 # Goal
 
-We are going to take a deep dive into salts and peppers and their use for safely storing passwords.
+We are going to take a deep dive into salts and peppers and their use for safely storing passwords in a username/password login system.
 
 # What are Salts & Peppers?
 
@@ -34,9 +34,9 @@ If the database is compromised (e.g. through direct access or SQL injection atta
 
 A better strategy is to store the hash of the password. In this case we are using the SHA256 hash function for simplicity. Do not use SHA256 in a production environment because it is a fast hash and will be easy to crack weaker passwords using reverse hash lookups (e.g. rainbow tables) and/or brute force attacks as we will discuss later. Use Argon2 or a similar slow hash function instead (see my post about [One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)).
 
-`Password = SHA256(Password)`
+`HashedPassword = SHA256(Password)`
 
-| Username | Password |
+| Username | HashedPassword |
 |-|-|
 | user1 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
 | user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
@@ -49,7 +49,7 @@ Since cryptographic hash functions, including SHA256, are designed to be irrever
 
 Reverse hash lookup tables trade storage space for computation time. They are most effective against slow hashing algorithms since the computational time to storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be much less.
 
-| Hash | Password |
+| HashedPassword | Password |
 |-|-|
 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 | qwerty |
 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f | 12345678 |
@@ -58,10 +58,6 @@ Reverse hash lookup tables trade storage space for computation time. They are mo
 <figcaption>Reverse Hash Lookup Table</figcaption>
 
 By adding a large number of passwords and their hashes to the table the attacker can then rapidly search the table for the corresponding `Hash` in the user table and, if found, retrieve the corresponding `Password` from the reverse hash lookup table.
-
-# Password Length
-
-If all users' passwords where strong then reverse hash lookups would be ineffective. If this was the case it would introduce usability issues as it's difficult to remember long random passwords. It may introduce new security issues also as users may potentially store them electronically, or forget them, introducing more customer support requests. For now we will allow the users to use any length of password.
 
 # Rainbow Tables
 
@@ -72,29 +68,35 @@ Trade-Of_, Philippe Oechslin, 2003, https://lasecwww.epfl.ch/pub/lasec/doc/Oech0
 * _Rainbow Tables (probably) aren’t what you think — Part 1: Precomputed Hash Chains_,
 Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-what-you-think-30f8a61ba6a5>
 
+# Password Strength
+
+If all users' passwords where strong (long and random) then reverse hash lookups would be ineffective. Strong passwords can introduce usability issues as it's difficult to remember long random passwords. It may introduce new security issues also as users may potentially store them electronically, or forget them, introducing more customer support requests. For now we will allow the users to use any length of password and rely on implementing strong security instead to protect them.
+
 # Pepper
 
-A pepper (or secret salt) is a fixed value stored separately from the database (preferably in some form of secure storage). It is combined with the password to produce different hash values compared with the previous table. The pepper is randomly chosen and doesn't change throughout the lifetime of the application:
+A pepper is a fixed value stored separately from the database (preferably in some form of secure storage). An attacker may compromise the database and steal the data there, but without the pepper they will have trouble decoding the hashed passwords. If the pepper is sufficiently strong (e.g. 128-bits) then it will be impossible.
+
+The pepper is combined with the password to produce different hash values compared with the previous table. The pepper is randomly chosen and doesn't change throughout the lifetime of the application:
 
 ```
 Pepper = wtWy8vb3Ov4FFiFF
-Password = SHA256(Password + Pepper)
+HashedPassword = SHA256(Password + Pepper)
 ```
 
-| Username | Password |
+| Username | HashedPassword |
 |-|-|
 | user1 | 2583015da33f1fd72efc0b6384412a9d5443a55f52284fa1f7e0f9b5ebe3f38d |
 | user2 | 51d437a138ac402cba22c12349b874259eecd38087728f961e10260308d4ead7 |
 
-<figcaption>Password Hashed and Peppered User Table</figcaption>
+<figcaption>User Table with Hashed & Peppered Passwords</figcaption>
 
 Now we see that the reverse hash lookup table we created before will no longer be applicable to our newly peppered passwords as the SHA256 values don't match any more.
 
-This method is secure if the pepper is kept secret. But if the pepper is discovered the attacker can easily make a new reverse hash lookup table with the pepper in appended to each password and use this to attack the peppered user table.
-
 ## Risks
 
-If the pepper is lost, password verification is no longer possible as the correct hash cannot be generated. All users would have to create new passwords.
+This method is secure if the pepper is kept secret. But if the pepper is discovered the attacker can easily make a new reverse hash lookup table with the pepper in appended to each password and use this to attack the peppered user table.
+
+If the pepper is lost (or is changed), password verification is no longer possible as the correct hash cannot be generated. All users would have to create new passwords.
 
 ## Node.js Implementation
 
@@ -125,6 +127,17 @@ console.log(process.env.PEPPER)
 
 Salts, like peppers, are combined with passwords before hashing for added security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables exponentially. Long enough salts render reverse hash lookup tables useless.
 
+The username, salt and hash are stored in the database. An attacker then cannot predict the text to be hashed in order to create their reverse hash lookup, thereby rendering reverse hash lookup attacks ineffective.
+
+`HashedPassword = SHA256(Password + Salt)`
+
+| Username | Salt | HashedPassword |
+|-|-|-|
+| user1 | 3299942662eb7925245e6b16a1fb8db4 | 5f9eb7a905e2159f2bcde6414020e03815dc7fd4655841d36d34be091a009d30 |
+| user2 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
+
+<figcaption>Unencrypted User Table</figcaption>
+
 ## Username/Email as Salt
 
 One might think that you could use the username or email address of a user as the salt to ensure uniqueness. While this initially seems a great idea you would not be able to change the username or email address without also creating a new password. Let's look at some other strategies then.
@@ -147,20 +160,9 @@ The generally accepted best practise for salts is to produce a 128-bit random sa
 
 Depending on your requirements you may be able to use a shorter salt, which will make your application more efficient, particularly in terms of reducing the database size.
 
-The username, salt and hash are stored in the database. An attacker then cannot predict the text to be hashed in order to create their reverse hash lookup, thereby rendering reverse hash lookup attacks ineffective.
-
-`Hash = SHA256(password + salt)`
-
-| Username | Salt | Hash |
-|-|-|-|
-| user1 | 3299942662eb7925245e6b16a1fb8db4 | 5f9eb7a905e2159f2bcde6414020e03815dc7fd4655841d36d34be091a009d30 |
-| user2 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
-
-<figcaption>Unencrypted User Table</figcaption>
-
 # Dictionary & Brute Force Attacks
 
-Dictionary and Brute force attacks can also be prevented by using a **long random pepper**. This is secure even if the database has been compromised but the pepper is still hidden at some other location. By adding the pepper the attacker cannot compute any reasonable range of known hashes, even when the salt is known. With Argon2, the slowest algorithm we have considered, hashes can be created in the order of hundreds per second with today's consumer grade hardware. This means that common passwords with know salts could still be cracked, so the use of a pepper is still recommended.
+With Argon2, the slowest algorithm we have considered, hashes can be created in the order of thousands per second with today's consumer grade hardware. This means that common passwords could still be cracked, so the use of a pepper is recommended. Dictionary and Brute force attacks can be prevented by using a **long random pepper**. This is secure even when the database has been compromised but the pepper is still hidden at another location. 
 
 The other option is forcing users to choose **strong passwords**. This will make it difficult or impossible for them to be cracked but also opens other security issues as strong passwords cannot be easily memorized by users. So the user needs to store them in a password manager, on paper or electronically. This comes with its own problems and if we can solve the problem without resorting to strong passwords it will be better for the users and will also result in less customer support requests for us.
 
@@ -241,9 +243,9 @@ app.listen(3000)
 
 # Conclusion
 
-Hashing the user's password with a correctly configured **Argon2** algorithm and using a long random **salt** and long random **pepper** provides very strong password protection, even in the case of a database breach. If the pepper is discovered it stills offers good protection against dictionary, brute force and reverse hash lookup attacks.
+Hashing the user's password with a correctly configured **Argon2** algorithm and a long, random, unique **salt** and a long random **pepper** provides very strong password protection, even in the case of a database breach. If the pepper is discovered and the database is breached Argon2 stills offers protection against dictionary and brute force attacks. In this case strong passwords are recommended.
 
-Two more aspects that should be delved into in more depth are the lengths of the salts and peppers and the parameters for tuning the Argon2 hashing algorithm.
+Two more aspects that should be delved into in more depth are the lengths of the passwords, salts, pepper and the parameters for tuning the Argon2 hashing algorithm.
 
 # Further Reading
 
