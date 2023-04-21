@@ -8,7 +8,9 @@ We are going to take a deep dive into salts and peppers and, specifically, their
 
 # What are Salts & Peppers?
 
-A salt or pepper is a random value added as additional input to a password hash function to **protect** the resulting hash **from reverse hash lookups** (and optimised versions of reverse hash lookups such as rainbow tables).
+A salt is a random value added as additional input to a password hash function to protect the resulting hash from reverse hash lookups (and optimised versions of reverse hash lookups such as rainbow tables).
+
+A pepper is a random value added as additional input to a password hash function to protect the resulting hash from dictionary or brute force attacks.
 
 Salts are stored in the user table in the database, one random salt per user, whereas a pepper is a single random value specific to an application and is stored outside of the database (preferably in some form of secure storage). This way if the system is attacked and the database is breached (e.g. through direct access or SQL injection attacks) the pepper would need to be compromised separately since both live in their own security enclaves.
 
@@ -17,7 +19,7 @@ Salts are stored in the user table in the database, one random salt per user, wh
   <figcaption>Salts and Pepper Locations</figcaption>
 </figure>
 
-In the following sections we will explain in detail the use of salts and peppers and what reverse hash lookups are.
+In the following sections we will explain in detail the use of salts and peppers and what reverse hash table lookups are.
 
 # Storing Passwords
 
