@@ -10,7 +10,7 @@ We are going to take a deep dive into salts and peppers and, specifically, their
 
 A salt or pepper is a random value added as additional input to a password hash function to **protect** the resulting hash **from reverse hash lookups** (and optimised versions of reverse hash lookups such as rainbow tables).
 
-Salts are stored in the user table in the database, one random salt per user, whereas a pepper is a single random value specific to an application and is stored outside of the database (preferably in some form of secure storage). This way if the system is attacked and the database is breached (e.g. through direct access or SQL injection attacks) the pepper would need to be compromised separately since both have their own security enclaves.
+Salts are stored in the user table in the database, one random salt per user, whereas a pepper is a single random value specific to an application and is stored outside of the database (preferably in some form of secure storage). This way if the system is attacked and the database is breached (e.g. through direct access or SQL injection attacks) the pepper would need to be compromised separately since both live in their own security enclaves.
 
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/salt-and-pepper-locations.svg" alt="Salts and Pepper Locations"/>
@@ -38,9 +38,9 @@ A better strategy is to store the hash of the password. A hash is a one-way cryp
 
 Note that the passwords are not encrypted. Encryption functions are two-way cryptographic functions. This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery is not needed for password storage and just adds another attack vector.
 
-In this post we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using reverse hash lookups (e.g. rainbow tables) on unsalted hashed passwords, and dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
+In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
 
-**Use Argon2** or a similar _slow_ hash function instead which will provide resistance against attacks even when both the database and the pepper have been compromised. See my post _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions.
+**Use Argon2** or a similar _slow_ hash function instead which will provide resistance against attacks even when both the database and the pepper have been compromised. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions.
 
 `HashedPassword = SHA256(Password)`
 
@@ -53,7 +53,7 @@ In this post we are using the SHA256 hash function for simplicity. **Do not use 
 
 # Reverse Hash Lookups
 
-Since cryptographic hash functions, including SHA256, are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where **strong** (e.g. **10+ random mixed case alphanumeric characters**) this would be the case. The reality is that users often choose very weak passwords (such as the ones I chose: `qwerty` and `12345678`). What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table.
+Since cryptographic hash functions, including SHA256, are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where strong (e.g. 10+ random characters) and a slow hash function such as a well configured Argon2 was used this would be the case. The reality is that users often choose very weak passwords (such as the ones I chose: `qwerty` and `12345678`). What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table.
 
 Reverse hash lookup tables precompute complex password hashes and store them in a table for easy access. They are most effective against slow hashing algorithms since the computational time to storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be much less.
 
@@ -77,6 +77,43 @@ Further reading:
 Trade-Of_, Philippe Oechslin, 2003, https://lasecwww.epfl.ch/pub/lasec/doc/Oech03.pdf
 * _Rainbow Tables (probably) aren’t what you think — Part 1: Precomputed Hash Chains_,
 Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-what-you-think-30f8a61ba6a5>
+
+# Salt
+
+Salts, like peppers, are combined with passwords before hashing for added security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables exponentially. Long enough salts render reverse hash lookup tables useless.
+
+The username, salt and hash are stored in the database. An attacker then cannot predict the text to be hashed in order to create their reverse hash lookup, thereby rendering reverse hash lookup attacks ineffective.
+
+`HashedPassword = SHA256(Password + Salt)`
+
+| Username | Salt | HashedPassword |
+|-|-|-|
+| user1 | 3299942662eb7925245e6b16a1fb8db4 | 5f9eb7a905e2159f2bcde6414020e03815dc7fd4655841d36d34be091a009d30 |
+| user2 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
+
+<figcaption>Unencrypted User Table</figcaption>
+
+## Username/Email as Salt
+
+One might think that you could use the username or email address of a user as the salt to ensure uniqueness. While this initially seems a great idea you would not be able to change the username or email address without also creating a new password. Let's look at some other strategies then.
+
+## Sequential Salts
+
+We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that short salts have.
+
+This vulnerability can be mitigated by using pepper in combination with a sequence number. If the pepper is sufficiently large and random the attacker would not know which sequence numbers to use. And even if they did find the range of sequence numbers by discovering the pepper, their reverse hash lookup table could not be reused on other applications / deployments with different peppers making the reverse hash lookups virtually useless to create. This solution is less secure than large random salts as there is a chance the pepper value could be found.
+
+## Short Salts
+
+If a salt is too short, an attacker may precompute a table of every possible salt combined with every likely password. Using a long salt ensures such a table would be impossibly large.
+
+Another solution is to use a pepper in combination with short salts as also suggested with sequential salts.
+
+## Salt Bits
+
+The generally accepted best practise for salts is to produce a 128-bit random salt per user that is combined with the password before hashing. 128-bits is chosen as it sufficiently raises reverse hash lookup table storage space requirements to currently impossible values.
+
+Depending on your requirements you may be able to use a shorter salt, which will make your application more efficient, particularly in terms of reducing the database size.
 
 # Pepper
 
@@ -128,43 +165,6 @@ import dotenv from 'dotenv'
 dotenv.config()
 console.log(process.env.PEPPER)
 ```
-
-# Salt
-
-Salts, like peppers, are combined with passwords before hashing for added security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables exponentially. Long enough salts render reverse hash lookup tables useless.
-
-The username, salt and hash are stored in the database. An attacker then cannot predict the text to be hashed in order to create their reverse hash lookup, thereby rendering reverse hash lookup attacks ineffective.
-
-`HashedPassword = SHA256(Password + Salt)`
-
-| Username | Salt | HashedPassword |
-|-|-|-|
-| user1 | 3299942662eb7925245e6b16a1fb8db4 | 5f9eb7a905e2159f2bcde6414020e03815dc7fd4655841d36d34be091a009d30 |
-| user2 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
-
-<figcaption>Unencrypted User Table</figcaption>
-
-## Username/Email as Salt
-
-One might think that you could use the username or email address of a user as the salt to ensure uniqueness. While this initially seems a great idea you would not be able to change the username or email address without also creating a new password. Let's look at some other strategies then.
-
-## Sequential Salts
-
-We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that short salts have.
-
-This vulnerability can be mitigated by using pepper in combination with a sequence number. If the pepper is sufficiently large and random the attacker would not know which sequence numbers to use. And even if they did find the range of sequence numbers by discovering the pepper, their reverse hash lookup table could not be reused on other applications / deployments with different peppers making the reverse hash lookups virtually useless to create. This solution is less secure than large random salts as there is a chance the pepper value could be found.
-
-## Short Salts
-
-If a salt is too short, an attacker may precompute a table of every possible salt combined with every likely password. Using a long salt ensures such a table would be impossibly large.
-
-Another solution is to use a pepper in combination with short salts as also suggested with sequential salts.
-
-## Salt Bits
-
-The generally accepted best practise for salts is to produce a 128-bit random salt per user that is combined with the password before hashing. 128-bits is chosen as it sufficiently raises reverse hash lookup table storage space requirements to currently impossible values.
-
-Depending on your requirements you may be able to use a shorter salt, which will make your application more efficient, particularly in terms of reducing the database size.
 
 # Dictionary & Brute Force Attacks
 
