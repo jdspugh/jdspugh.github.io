@@ -10,12 +10,14 @@ We are going to take a deep dive into salts and peppers and, specifically, their
 
 A salt or pepper is a random value added as additional input to a password hash function to **protect** the resulting hash **from reverse hash lookups** (and optimised versions of reverse hash lookups such as rainbow tables).
 
-Salts are stored in the user table in the database, one random salt per user, whereas a pepper is a single random value specific to an application and is stored outside of the database (preferably in some form of secure storage). In subsequent sections we will explain in detail the use of salts and peppers and what reverse hash lookups are.
+Salts are stored in the user table in the database, one random salt per user, whereas a pepper is a single random value specific to an application and is stored outside of the database (preferably in some form of secure storage). This way, if the authentication system is attacked, both the database and the pepper would need to be compromised in order for the passwords to even begin to be able to be attacked.
 
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/salt-and-pepper-locations.svg" alt="Salts and Pepper Locations"/>
   <figcaption>Salts and Pepper Locations</figcaption>
 </figure>
+
+In the following sections we will explain in detail the use of salts and peppers and what reverse hash lookups are.
 
 # Storing Passwords
 
@@ -28,15 +30,17 @@ Consider a typical application that stores usernames and passwords. The naive st
 
 <figcaption>Unencrypted User Table</figcaption>
 
-If the database is compromised (e.g. through direct access or SQL injection attacks) the usernames and password are directly exposed and can be used to login to any user's account.
+If the database is compromised (e.g. through direct access or SQL injection attacks) the usernames and passwords are directly exposed and can be used to login to any user's account.
 
 # Password Hashing
 
-A better strategy is to store the hash of the password.
+A better strategy is to store the hash of the password. A hash is a one-way cryptographic function. It is ideal for use in storing passwords since we don't want the hashed passwords to be unhashed again to reveal the original password.
 
-In this case we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using reverse hash lookups (e.g. rainbow tables) on unsalted hashed passwords, and dictionary or brute force attacks on salted passwords with known peppers, as we will discuss later on.
+Note that the passwords are not encrypted. Encryption functions are two-way cryptographic functions. This means the original password can be recovered from the encrypted password if the encryption key is know. This is not needed for password storage and just adds another attack vector.
 
-**Use Argon2** or a similar _slow_ hash function instead which will provide resistance against attacks even when both the database and the pepper have been compromised. See my post about [One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html) for more detals.
+In this post we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using reverse hash lookups (e.g. rainbow tables) on unsalted hashed passwords, and dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
+
+**Use Argon2** or a similar _slow_ hash function instead which will provide resistance against attacks even when both the database and the pepper have been compromised. See my post _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions.
 
 `HashedPassword = SHA256(Password)`
 
@@ -45,7 +49,7 @@ In this case we are using the SHA256 hash function for simplicity. **Do not use 
 | user1 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
 | user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
 
-<figcaption>Password Hashed User Table</figcaption>
+<figcaption>Hashed Passwords in a User Table</figcaption>
 
 # Reverse Hash Lookups
 
@@ -253,7 +257,7 @@ app.listen(3000)
 
 Hashing the user's password with a correctly configured **Argon2** algorithm and a long, random, unique **salt** and a long random **pepper** provides very strong password protection, even in the case of a database breach. If the pepper is discovered and the database is breached Argon2 stills offers protection against dictionary and brute force attacks. In this case strong passwords are recommended.
 
-Two more aspects that should be delved into in more depth are the lengths of the passwords, salts, pepper and the parameters for tuning the Argon2 hashing algorithm.
+Further aspects that should be delved into in-depth are the lengths of the passwords, salts, pepper and the parameters for tuning the Argon2 hashing algorithm.
 
 # Further Reading
 
