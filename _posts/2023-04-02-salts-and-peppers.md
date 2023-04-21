@@ -80,11 +80,9 @@ Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-w
 
 # Password Strength
 
-Using a well tuned slow hashing algorithm like **Argon2** with **unique salts per user** and a **pepper**, all users' password will be safe. In the case when the system comes under attack, if the database is breached all users' passwords will still be safe. If the database is breached and the pepper is also found out then the attacker will be able to execute dictionary and brute force attacks on users' hashed passwords. Since we are hashing passwords with Argon2 this process will be slow for the attacker and only weak passwords will be discovered.
+Using salts and a pepper any length password is safe. If the salts and pepper are found out the password hashes will be vulnerable to dictionary and brute force attacks. Even with Argon2 slow hashing weak passwords could be discovered, so we recommend 8+ ASCII characters to thwart brute force attacks and a filter to filter out dictionary words or combinations of them. Ideally this filter would cover all the potential words and combinations an attacker would use. If this is the case even in the case of a database breach and discovered pepper the user passwords would be safe.
 
 Enforcing strong passwords can introduce usability issues as it's difficult to remember long random passwords. It may introduce new security issues. Users may potentially store them electronically or write them down which adds further attack vectors. They will also be more likely to forget them, introducing more customer support requests.
-
-Using salts and a pepper any length password is safe. If the salts and pepper are found out the password hashes will be vulnerable to dictionary and brute force attacks. Even with Argon2 slow hashing weak passwords could be discovered, so we recommend 8+ ASCII characters to thwart brute force attacks and a filter to filter out dictionary words or combinations of them. Ideally this filter would cover all the potential words and combinations an attacker would use. If this is the case even in the case of a database breach and discovered pepper the user passwords would be safe.
 
 # Pepper
 
