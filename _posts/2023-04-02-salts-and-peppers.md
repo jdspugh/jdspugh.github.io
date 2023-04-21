@@ -36,7 +36,7 @@ If the database is compromised the usernames and passwords are directly exposed 
 
 A better strategy is to store the hash of the password. A hash is a one-way cryptographic function. It is ideal for use in storing passwords since we don't want the hashed passwords to be unhashed again to reveal the original password.
 
-Note that the passwords are not encrypted. Encryption functions are two-way cryptographic functions. This means the original password can be recovered from the encrypted password if the encryption key is know. This is not needed for password storage and just adds another attack vector.
+Note that the passwords are not encrypted. Encryption functions are two-way cryptographic functions. This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery is not needed for password storage and just adds another attack vector.
 
 In this post we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using reverse hash lookups (e.g. rainbow tables) on unsalted hashed passwords, and dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
 
@@ -80,9 +80,11 @@ Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-w
 
 # Password Strength
 
-Using a well tuned slow hashing algorithm like **Argon2** with **unique salts per user** and a **pepper**, all users' password will be safe under normal operating circumstances. In the case when the system comes under attack, if the database is breached all users' passwords will still be safe. If the database is breached and the pepper is also found out then the attacker will be able to execute dictionary and brute force attacks on users' hashed passwords. Since we are hashing passwords with Argon2 this process will be slow for the attacker and only weak passwords will be discovered.
+Using a well tuned slow hashing algorithm like **Argon2** with **unique salts per user** and a **pepper**, all users' password will be safe. In the case when the system comes under attack, if the database is breached all users' passwords will still be safe. If the database is breached and the pepper is also found out then the attacker will be able to execute dictionary and brute force attacks on users' hashed passwords. Since we are hashing passwords with Argon2 this process will be slow for the attacker and only weak passwords will be discovered.
 
-Enforcing strong passwords can introduce usability issues as it's difficult to remember long random passwords. It may introduce new security issues also as users may potentially store them electronically, or forget them, introducing more customer support requests. For now we will allow the users to use any length of password and rely on implementing strong security instead to protect them.
+Enforcing strong passwords can introduce usability issues as it's difficult to remember long random passwords. It may introduce new security issues. Users may potentially store them electronically or write them down which adds further attack vectors. They will also be more likely to forget them, introducing more customer support requests.
+
+Using salts and a pepper any length password is safe. If the salts and pepper are found out the password hashes will be vulnerable to dictionary and brute force attacks. Even with Argon2 slow hashing weak passwords could be discovered, so we recommend 8+ ASCII characters to thwart brute force attacks and a filter to filter out dictionary words or combinations of them. Ideally this filter would cover all the potential words and combinations an attacker would use. If this is the case even in the case of a database breach and discovered pepper the user passwords would be safe.
 
 # Pepper
 
