@@ -78,12 +78,6 @@ Trade-Of_, Philippe Oechslin, 2003, https://lasecwww.epfl.ch/pub/lasec/doc/Oech0
 * _Rainbow Tables (probably) aren’t what you think — Part 1: Precomputed Hash Chains_,
 Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-what-you-think-30f8a61ba6a5>
 
-# Password Strength
-
-Using salts and a pepper any length password is safe. If the salts and pepper are found out the password hashes will be vulnerable to dictionary and brute force attacks. Even with Argon2 slow hashing weak passwords could be discovered, so we recommend 8+ ASCII characters to thwart brute force attacks and a filter to filter out dictionary words or combinations of them. Ideally this filter would cover all the potential words and combinations an attacker would use. If this is the case even in the case of a database breach and discovered pepper the user passwords would be safe.
-
-Enforcing strong passwords can introduce usability issues as it's difficult to remember long random passwords. It may introduce new security issues. Users may potentially store them electronically or write them down which adds further attack vectors. They will also be more likely to forget them, introducing more customer support requests.
-
 # Pepper
 
 A pepper is a fixed value stored separately from the database (preferably in some form of secure storage). An attacker may compromise the database and steal the data there, but without the pepper they will have trouble decoding the hashed passwords. If the pepper is sufficiently strong (e.g. 128-bits) then it will be impossible.
@@ -252,6 +246,12 @@ app.listen(3000)
 ```
 
 **Note:** The hash returned by the `argon2` npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC](https://www.password-hashing.net/)'s standardised hash result format. It includes the salt, the hash, and the parameters the Argon2 algorithm used. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the `password` column. It's also good to store the Argon2 parameters also in case we want to change these at a later point: we won't have to upgrade all the accounts at once. We can even potentially fine tune and algorithmically increase the memory and computational complexity to account for increases in attackers' computational power and memory resources over time.
+
+# Password Strength
+
+Using salts and a pepper any length password is safe. If the salts and pepper are found out the password hashes will be vulnerable to dictionary and brute force attacks. Even with Argon2 slow hashing weak passwords could be discovered, so we recommend 8+ ASCII characters to thwart brute force attacks and a filter to filter out dictionary words or combinations of them. Ideally this filter would cover all the potential words and combinations an attacker would use. If this is the case even in the case of a database breach and discovered pepper the user passwords would be safe.
+
+Enforcing strong passwords can introduce usability issues as it's difficult to remember long random passwords. It may introduce new security issues. Users may potentially store them electronically or write them down which adds further attack vectors. They will also be more likely to forget them, introducing more customer support requests.
 
 # Conclusion
 
