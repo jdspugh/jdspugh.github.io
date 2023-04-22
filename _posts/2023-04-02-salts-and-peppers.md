@@ -10,7 +10,7 @@ We are going to take a deep dive into salts and peppers and, specifically, their
 
 A **salt** is a random value added as additional input to a password hash function to protect the resulting hash from reverse hash table lookups (and optimised versions of reverse hash table lookups such as rainbow tables).
 
-A **pepper** is a random value added as additional input to a password hash function to protect the resulting hash from dictionary or brute force attacks.
+A **pepper** is a random value added as additional input to a password hash function to protect the resulting hash from dictionary and brute force attacks.
 
 Salts are stored in the user table in the database, one random salt per user, whereas a pepper is a single random value specific to an application and is stored outside of the database (preferably in some form of secure storage). This way if the system is attacked and the database is breached (e.g. through direct access or SQL injection attacks) the pepper would need to be compromised separately since both live in their own security enclaves.
 
@@ -29,6 +29,7 @@ Consider a typical application that stores usernames and passwords. The naive st
 |-|-|
 | user1 | qwerty |
 | user2 | 12345678 |
+| ... | ... |
 
 <figcaption>Unencrypted User Table</figcaption>
 
@@ -36,9 +37,9 @@ If the database is compromised the usernames and passwords are directly exposed 
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. A hash is a one-way cryptographic function. It is ideal for use in storing passwords since we don't want the hashed passwords to be unhashed again to reveal the original password.
+A better strategy is to store the hash of the password. A hash is a one-way cryptographic function. Once hashed, the password cannot be unhashed. Thus it is ideal for use in storing passwords.
 
-Note that the passwords are not encrypted. Encryption functions are two-way cryptographic functions. This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery is not needed for password storage and just adds another attack vector.
+Note that the passwords are not encrypted. Encryption functions are two-way cryptographic functions. This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector.
 
 In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
 
