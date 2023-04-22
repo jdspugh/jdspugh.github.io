@@ -23,7 +23,7 @@ In the following sections we will explain in detail the use of salts and peppers
 
 # Storing Passwords
 
-Consider a typical application that stores usernames and passwords. The naive strategy would be to store the usernames and password in a database without encryption:
+Consider a typical application that stores usernames and passwords. The naive strategy would be to store the usernames and passwords in a database without encryption:
 
 | Username | Password |
 |-|-|
@@ -37,9 +37,9 @@ If the database is compromised the usernames and passwords are directly exposed 
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. A hash is a one-way cryptographic function. Once hashed, the password cannot be unhashed. Thus it is ideal for use in storing passwords.
+A better strategy is to store the hash of the password. A hash is a one-way cryptographic function. Once hashed, the password cannot be unhashed. Thus a hash is ideal for use in storing passwords.
 
-Note that the passwords are not encrypted. Encryption functions are two-way cryptographic functions. This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector.
+Note that the passwords are not encrypted. Encryption is a two-way cryptographic function. This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector.
 
 In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
 
@@ -78,7 +78,7 @@ The reverse hash lookup process can be highly optimised by using a technique wid
 Further reading:
 
 * _Making a Faster Cryptanalytic Time-Memory
-Trade-Of_, Philippe Oechslin, 2003, https://lasecwww.epfl.ch/pub/lasec/doc/Oech03.pdf
+Trade-Of_, Philippe Oechslin, 2003, <https://lasecwww.epfl.ch/pub/lasec/doc/Oech03.pdf>
 * _Rainbow Tables (probably) aren’t what you think — Part 1: Precomputed Hash Chains_,
 Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-what-you-think-30f8a61ba6a5>
 
@@ -254,6 +254,41 @@ app.listen(3000)
 # Conclusion
 
 Hashing the user's password with a correctly configured **Argon2** algorithm and a long, random, unique **salt** and a long random **pepper** provides very strong password protection, even in the case of a database breach. If the pepper is discovered and the database is breached Argon2 stills offers protection against dictionary and brute force attacks. In this case strong passwords are recommended.
+
+<table>
+<thead>
+<tr>
+<th colspan="2">Data</th>
+<th colspan="2">Attack</th>
+</tr>
+<tr>
+<th>User Table</th>
+<th>Pepper</th>
+<th>Dictionary</th>
+<th>Brute Force</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="background-color:#D4E7CE">Secure</td>
+<td style="background-color:#D4E7CE">Secure</td>
+<td style="background-color:#D4E7CE">Ineffective</td>
+<td style="background-color:#D4E7CE">Ineffective</td>
+</tr>
+<tr>
+<td style="background-color:#F2C5C6">Compromised</td>
+<td style="background-color:#D4E7CE">Secure</td>
+<td style="background-color:#D4E7CE">Ineffective</td>
+<td style="background-color:#D4E7CE">Ineffective</td>
+</tr>
+<tr>
+<td style="background-color:#F2C5C6">Compromised</td>
+<td style="background-color:#F2C5C6">Compromised</td>
+<td style="background-color:#F2C5C6">Effective on weak passwords</td>
+<td style="background-color:#F2C5C6">Effective on short passwords</td>
+</tr>
+</tbody>
+</table>
 
 Further aspects that should be delved into in-depth are the lengths of the passwords, salts, pepper and the parameters for tuning the Argon2 hashing algorithm.
 
