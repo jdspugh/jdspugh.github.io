@@ -39,7 +39,7 @@ If the database is compromised the usernames and passwords are directly exposed 
 
 A better strategy is to store the hash of the password. A hash is a one-way cryptographic function. Once hashed, the password cannot be unhashed. Thus a hash is ideal for use in storing passwords.
 
-Note that the passwords are not encrypted. Encryption is a two-way cryptographic function. This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector.
+Note that technically the passwords are not encrypted. Encryption is a two-way cryptographic function. This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector.
 
 In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
 
@@ -92,6 +92,7 @@ Salts, like peppers, are combined with passwords before hashing, effectively inc
 |-|-|-|
 | user1 | 3299942662eb7925245e6b16a1fb8db4 | 5f9eb7a905e2159f2bcde6414020e03815dc7fd4655841d36d34be091a009d30 |
 | user2 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
+| ... | ... | ... |
 
 <figcaption>Unencrypted User Table</figcaption>
 
@@ -119,7 +120,7 @@ Depending on your requirements you may be able to use a shorter salt, which will
 
 # Pepper
 
-A pepper is a fixed value stored separately from the database (preferably in some form of secure storage). The pepper is randomly chosen and doesn't change throughout the lifetime of the application. An attacker may compromise the database and steal the data there, but without the pepper they will have to spend a lot of effort to decode the hashed passwords. If the pepper is sufficiently strong (e.g. 128 random bits) then it will be impossible.
+A pepper is a fixed value stored separately from the database (preferably in some form of secure storage). The pepper is randomly chosen and doesn't change throughout the lifetime of the application. An attacker may compromise the database and steal the data there, but without the pepper they will have to spend a lot of brute force effort to find a password and obtain the pepper's value. If the pepper is sufficiently strong (e.g. 128 random bits) then it will be impossible.
 
 The pepper is combined with the password to produce different hash values compared with the previous table:
 
@@ -175,9 +176,9 @@ console.log(process.env.PEPPER)
 
 With Argon2, the slowest algorithm we have considered, hashes can be created in the order of thousands per second with today's consumer grade hardware. This means that weak passwords could still be cracked, so the use of a pepper is recommended. Dictionary and Brute force attacks can be prevented by using a **long random pepper**. This is secure even when the database has been compromised but the pepper is still hidden. 
 
-The other option is forcing users to choose **strong passwords**. This will make it difficult or impossible for them to be cracked but also opens other security issues as strong passwords cannot be easily memorized by users. So the user needs to store them in a password manager, on paper or electronically. This comes with its own problems and if we can solve the problem without resorting to strong passwords it will be better for the users and will also result in less customer support requests for us.
+The other option is forcing users to choose **strong passwords**. This will make it difficult or impossible for them to be cracked but also opens other security issues as strong passwords cannot be easily memorized by users. So the user needs to store them in a password manager, on paper or electronically. This comes with its own risks and if we can solve the problem without resorting to strong passwords it will be better for the users and will also result in less customer support requests for us.
 
-Biometric data or QR codes can be used to overcome the problem of forgetting strong passwords but they incur their own sets of security risks. Biometric data needs to be stored securely since its value never changes and additionally needs to secure the user's privacy. With QR codes, a device could be hacked and the QR code stolen.
+Biometric data or QR codes can be used to overcome the problem of forgetting strong passwords but they incur their own sets of security risks. Biometric data needs to be stored securely since its value never changes and additionally it needs to secure the user's privacy. With QR codes, a device could be hacked and the QR code stolen.
 
 # Node.js Implementation
 
@@ -252,7 +253,7 @@ app.post('/register', async (req, res) => {
 app.listen(3000)
 ```
 
-**Note:** The hash returned by the `argon2` npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC](https://www.password-hashing.net/)'s standardised hash result format. It includes the salt, the hash, and the parameters the Argon2 algorithm used. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the `password` column. It's also good to store the Argon2 parameters also in case we want to change these at a later point: we won't have to upgrade all the accounts at once. We can even potentially fine tune and algorithmically increase the memory and computational complexity to account for increases in attackers' computational power and memory resources over time.
+**Note:** The hash returned by the `argon2` npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC](https://www.password-hashing.net/)'s standardised hash result format. It includes the algorithm, salt, hash, and the algorithm's parameters. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the `password` column. It's also good to store the algorithm and its parameters also in case we want to change these at a later point: we won't have to upgrade all the accounts at once. We can easily fine tune and increase the memory and computational complexity to account for increases in attackers' computational power and memory resources over time.
 
 # Conclusion
 
@@ -292,6 +293,8 @@ Hashing the user's password with a correctly configured **Argon2** algorithm and
 </tr>
 </tbody>
 </table>
+
+<figcaption>Data Compromised vs Attack Types</figcaption>
 
 Further aspects that should be delved into in-depth are the lengths of the passwords, salts, pepper and the parameters for tuning the Argon2 hashing algorithm.
 
