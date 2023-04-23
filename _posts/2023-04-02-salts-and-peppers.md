@@ -43,7 +43,7 @@ Note that the passwords are not encrypted. Encryption is a two-way cryptographic
 
 In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
 
-**Use Argon2** or a similar _slow_ hash function instead which will provide resistance against attacks even when both the database and the pepper have been compromised. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions.
+**Use Argon2** or a similar _slow_ hash function instead which will provide resistance against attacks even when both the database and the pepper have been compromised. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions and their characteristics.
 
 `HashedPassword = SHA256(Password)`
 
@@ -84,9 +84,7 @@ Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-w
 
 # Salt
 
-Salts, like peppers, are combined with passwords before hashing for added security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables exponentially. Long enough salts render reverse hash lookup tables useless.
-
-The username, salt and hash are stored in the database. An attacker then cannot predict the text to be hashed in order to create their reverse hash lookup, thereby rendering reverse hash lookup attacks ineffective.
+Salts, like peppers, are combined with passwords before hashing, effectively increasing the password's complexity, thus adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts that can be generated. Long enough salts render reverse hash lookup tables useless.
 
 `HashedPassword = SHA256(Password + Salt)`
 
@@ -121,9 +119,9 @@ Depending on your requirements you may be able to use a shorter salt, which will
 
 # Pepper
 
-A pepper is a fixed value stored separately from the database (preferably in some form of secure storage). An attacker may compromise the database and steal the data there, but without the pepper they will have trouble decoding the hashed passwords. If the pepper is sufficiently strong (e.g. 128-bits) then it will be impossible.
+A pepper is a fixed value stored separately from the database (preferably in some form of secure storage). The pepper is randomly chosen and doesn't change throughout the lifetime of the application. An attacker may compromise the database and steal the data there, but without the pepper they will have to spend a lot of effort to decode the hashed passwords. If the pepper is sufficiently strong (e.g. 128 random bits) then it will be impossible.
 
-The pepper is combined with the password to produce different hash values compared with the previous table. The pepper is randomly chosen and doesn't change throughout the lifetime of the application:
+The pepper is combined with the password to produce different hash values compared with the previous table:
 
 ```
 PEPPER = wtWy8vb3Ov4FFiFF
@@ -134,6 +132,7 @@ HashedPassword = SHA256(Password + PEPPER)
 |-|-|
 | user1 | 2583015da33f1fd72efc0b6384412a9d5443a55f52284fa1f7e0f9b5ebe3f38d |
 | user2 | 51d437a138ac402cba22c12349b874259eecd38087728f961e10260308d4ead7 |
+| ... | ... |
 
 <figcaption>User Table with Hashed & Peppered Passwords</figcaption>
 
@@ -141,9 +140,9 @@ Now we see that the reverse hash lookup table we created before will no longer b
 
 ## Risks
 
-This method is secure if the pepper is kept secret. But if the pepper is discovered the attacker can easily make a new reverse hash lookup table with the pepper in appended to each password and use this to attack the peppered user table.
+This method is secure if the pepper is kept secret. But if the pepper is discovered the attacker can easily make a reverse hash lookup table with the pepper in appended to each password and use this to attack the peppered user table.
 
-If the pepper is lost (or is changed), password verification is no longer possible as the correct hash cannot be generated. All users would have to create new passwords.
+If the pepper is lost (or is changed), password verification is no longer possible as different password hashes will be generated. All users would have to create new passwords.
 
 ## Node.js Implementation
 
@@ -166,15 +165,19 @@ Now you can read the pepper from your Node.js code:
 `app.mjs`
 ```js
 import dotenv from 'dotenv'
+
 dotenv.config()
+
 console.log(process.env.PEPPER)
 ```
 
 # Dictionary & Brute Force Attacks
 
-With Argon2, the slowest algorithm we have considered, hashes can be created in the order of thousands per second with today's consumer grade hardware. This means that common passwords could still be cracked, so the use of a pepper is recommended. Dictionary and Brute force attacks can be prevented by using a **long random pepper**. This is secure even when the database has been compromised but the pepper is still hidden at another location. 
+With Argon2, the slowest algorithm we have considered, hashes can be created in the order of thousands per second with today's consumer grade hardware. This means that weak passwords could still be cracked, so the use of a pepper is recommended. Dictionary and Brute force attacks can be prevented by using a **long random pepper**. This is secure even when the database has been compromised but the pepper is still hidden. 
 
 The other option is forcing users to choose **strong passwords**. This will make it difficult or impossible for them to be cracked but also opens other security issues as strong passwords cannot be easily memorized by users. So the user needs to store them in a password manager, on paper or electronically. This comes with its own problems and if we can solve the problem without resorting to strong passwords it will be better for the users and will also result in less customer support requests for us.
+
+Biometric data or QR codes can be used to overcome the problem of forgetting strong passwords but may incur their own sets of security risks.
 
 # Node.js Implementation
 
