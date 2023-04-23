@@ -177,7 +177,7 @@ With Argon2, the slowest algorithm we have considered, hashes can be created in 
 
 The other option is forcing users to choose **strong passwords**. This will make it difficult or impossible for them to be cracked but also opens other security issues as strong passwords cannot be easily memorized by users. So the user needs to store them in a password manager, on paper or electronically. This comes with its own problems and if we can solve the problem without resorting to strong passwords it will be better for the users and will also result in less customer support requests for us.
 
-Biometric data or QR codes can be used to overcome the problem of forgetting strong passwords but may incur their own sets of security risks.
+Biometric data or QR codes can be used to overcome the problem of forgetting strong passwords but they incur their own sets of security risks. Biometric data needs to be stored securely since its value never changes and additionally needs to secure the user's privacy. With QR codes, a device could be hacked and the QR code stolen.
 
 # Node.js Implementation
 
