@@ -104,13 +104,13 @@ One might think that you could use the username or email address of a user as th
 
 We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that short salts have.
 
-This vulnerability can be mitigated by using pepper in combination with a sequence number. If the pepper is sufficiently large and random the attacker would not know which sequence numbers to use. And even if they did find the range of sequence numbers by discovering the pepper, their reverse hash lookup table could not be reused on other applications / deployments with different peppers making the reverse hash lookups virtually useless to create. This solution is less secure than large random salts as there is a chance the pepper value could be found.
+The vulnerability can be mitigated by combining a long random pepper with the sequence number. The attacker now has to attack the server to discover the pepper, or brute force the pepper's value, before attempting to attack the password and sequence numbers. If they did discover the pepper, any reverse hash lookup tables could not be reused on other applications / deployments with different peppers making the reverse hash lookups virtually useless to create. This solution to overcome the limitations of sequential salts is ultimately less secure than using large random salts as there is a chance the pepper value could be discovered.
 
 ## Short Salts
 
-If a salt is too short, an attacker may precompute a table of every possible salt combined with every likely password. Using a long salt ensures such a table would be impossibly large.
+If a salt is too short an attacker may create reverse hash lookup tables containing of every possible salt combined with every likely password. Using a long salt ensures such a table would be impossibly large.
 
-Another solution is to use a pepper in combination with short salts as also suggested with sequential salts.
+Another solution is to use a pepper in combination with short salts as also suggested with sequential salts above.
 
 ## Salt Bits
 
