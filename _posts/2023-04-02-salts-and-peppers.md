@@ -37,9 +37,9 @@ If the database is compromised the usernames and passwords are directly exposed 
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. A hash is a one-way cryptographic function. Once hashed, the password cannot be unhashed. Thus a hash is ideal for use in storing passwords.
+A better strategy is to store the hash of the password. **A hash is a one-way cryptographic function.** Once hashed, the password cannot be unhashed. Thus a hash is ideal for use in storing passwords.
 
-Note that technically the passwords are not encrypted. Encryption is a two-way cryptographic function. This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector.
+Note that technically the passwords are not encrypted. **Encryption is a two-way cryptographic function.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector.
 
 In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
 
@@ -253,7 +253,7 @@ app.post('/register', async (req, res) => {
 app.listen(3000)
 ```
 
-**Note:** The hash returned by the `argon2` npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC](https://www.password-hashing.net/)'s standardised hash result format. It includes the algorithm, salt, hash, and the algorithm's parameters. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the `password` column. It's also good to store the algorithm and its parameters also in case we want to change these at a later point: we won't have to upgrade all the accounts at once. We can easily fine tune and increase the memory and computational complexity to account for increases in attackers' computational power and memory resources over time.
+**Note:** The hash returned by the `argon2` npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC's standardised hash result format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md). It includes the algorithm, salt, hash, and the algorithm's parameters. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the `password` column. It's also good to store the algorithm and its parameters also in case we want to change these at a later point: we won't have to upgrade all the accounts at once. We can easily fine tune and increase the memory and computational complexity to account for increases in attackers' computational power and memory resources over time.
 
 # Conclusion
 
