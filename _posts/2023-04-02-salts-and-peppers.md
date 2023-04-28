@@ -114,9 +114,69 @@ Another solution is to use a pepper in combination with short salts as also sugg
 
 ## Salt Bits
 
-The generally accepted best practise for salts is to produce a 128-bit random salt per user that is combined with the password before hashing. 128-bits is chosen as it sufficiently raises reverse hash lookup table storage space requirements to currently impossible values.
+It is the generally accepted best practise is for salts to be of 128-bits in length. In this section we will attempt some quantitative analysis to give this figure validity.
 
-Depending on your requirements you may be able to use a shorter salt, which will make your application more efficient, particularly in terms of reducing the database size.
+Depending on your requirements you may be able to use a shorter salt, which will make your application more efficient, particularly in terms of reducing your database size.
+
+For simplification let's assume 8 billion users (about the number of people on Earth currently).
+
+### Collisions
+
+If a rainbow table was created for a particular salt value it would be able to be used on all password hashes that have a salt collision. This means in the case of a 16-bit salt a single rainbow table would be able to crack 121 896 password hashes.
+
+Using the table below we should choose a salt of 32-bits or more. A collision rate of 1.86 means the generate rainbow table can only be used on less than 2 password hashes. This would only speed up the attack by 1.86 times.
+
+| Salt Size (bits) | Unique Salts | Average Collisions per Salt |
+|-|-|-|
+| 16 | 65 536 | 121 896 |
+| 32 | 4 294 967 296 | 1.86 |
+| 64 | 1.84 × 10^19 | 4.34 × 10<sup>-10</sup> |
+| 96 | 7.92 × 10^28 | 1.01 × 10<sup>-21</sup> |
+| 128 | 3.40 × 10^38 | 2.35 × 10<sup>-30</sup> |
+| 256 | 1.16 × 10^77 | 6.88 × 10<sup>-68</sup> |
+
+<figcaption>Salt Size vs Collisions (for 8 Billion Users)</figcaption>
+
+### Rainbow Tables
+
+Let's start with a table of SI units used for storage. This will make it easier to visualise the quantities we are about to discuss:
+
+| Unit | Bytes |
+|-|-|
+| Kilobyte | 1 000 |
+| Megabyte | 1 000 000 |
+| Gigabyte | 1 000 000 000 |
+| Terabyte | 1 000 000 000 000 |
+| Petabyte | 1 000 000 000 000 000 |
+| Exabyte | 1 000 000 000 000 000 000 |
+| Zettabyte | 1 000 000 000 000 000 000 000 |
+| Yottabyte | 1 000 000 000 000 000 000 000 000 |
+
+<figcaption>SI Units for Storage</figcaption>
+
+Global data storage is predicted to be 16 Zettabytes by 2025. To be safe we want to force our attackers' rainbow tables to be larger than this value so that there is no chance of a rainbow tables attack.
+
+<figure>
+  <img src="/image/blog/2023-04-02-salts-and-peppers/data-growth.png" alt="Global Data Storage Growth 2021-2025 (source: Redgate)"/>
+  <figcaption>Global Data Storage Growth 2021-2025 (source: <a href="https://www.red-gate.com/blog/database-development/whats-the-real-story-behind-the-explosive-growth-of-data">Redgate</a>)</figcaption>
+</figure>
+
+Readily available public rainbow tables commonly vary from Megabytes to Terabytes in size. Let's consider an extreme case where a rainbow tables is only 1 Megabyte in size. Salting forces the number of rainbow tables needed by an attacker to be equal to the number of unique salts:
+
+`Rainbow Tables Size = Unique Salts × 1 Megabyte`
+
+| Salt Size (bits) | Unique Salts | Rainbow Tables Size |
+|-|-|-|
+| 16 | 65 536 | 64 Gigabytes |
+| 32 | 4 294 967 296 | 4.29 Petabytes |
+| 64 | 1.84 × 10^19 | 18.4 Exabytes |
+| 96 | 7.92 × 10^28 | 7.92 Yottabytes |
+| 128 | 3.40 × 10^38 | ??? |
+| 256 | 1.16 × 10^77 | ??? |
+
+<figcaption>Minimum Size of Rainbow Tables</figcaption>
+
+From the table we can see that 64 bits of salt would be more than sufficient in most cases. 96 bits or more is far more than enough. **128 bits** will definitely **future proof** your authentication system against rainbow table attacks **for decades** or perhaps centuries to come.
 
 # Pepper
 
