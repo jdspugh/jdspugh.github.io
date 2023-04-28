@@ -114,17 +114,17 @@ Another solution is to use a pepper in combination with short salts as also sugg
 
 ## Salt Bits
 
-It is the generally accepted best practise is for salts to be of 128-bits in length. In this section we will attempt some quantitative analysis to give this figure validity.
+It is the **generally accepted** best practise is **for salts to be of 128-bits** in length. In this section we will attempt some quantitative analysis to give this figure validity.
 
-Depending on your requirements you may be able to use a shorter salt, which will make your application more efficient, particularly in terms of reducing your database size.
+Depending on your application's requirements, such as maximum number of users expected and database storage requirements, you may be able to use a shorter salt. This will make your application more efficient, mostly in terms of reducing your database size.
 
-For simplification let's assume 8 billion users (about the number of people on Earth currently).
+For simplification let's assume a maximum expected userbase of 8 billion users (about the number of people on planet Earth currently).
 
 ### Collisions
 
 If a rainbow table was created for a particular salt value it would be able to be used on all password hashes that have a salt collision. This means in the case of a 16-bit salt a single rainbow table would be able to crack 121 896 password hashes.
 
-Using the table below we should choose a salt of 32-bits or more. A collision rate of 1.86 means the generate rainbow table can only be used on less than 2 password hashes. This would only speed up the attack by 1.86 times.
+Using the table below we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generate rainbow table can only be used on less than 2 password hashes (1.86 on average to be precise). This would only speed up the attack by 1.86 times.
 
 | Salt Size (bits) | Unique Salts | Average Collisions per Salt |
 |-|-|-|
