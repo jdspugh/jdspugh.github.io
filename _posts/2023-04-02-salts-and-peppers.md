@@ -116,24 +116,24 @@ Another solution is to use a pepper in combination with short salts as also sugg
 
 It is the **generally accepted** best practise is **for salts to be of 128-bits** in length. In this section we will attempt some quantitative analysis to give this figure validity.
 
-Depending on your application's requirements, such as maximum number of users expected and database storage requirements, you may be able to use a shorter salt. This will make your application more efficient (mainly by reducing your database size).
+Depending on your application's requirements, such as the maximum number of users expected and database storage requirements, you may be able to use a shorter salt. This will make your application more efficient (mainly by reducing your database size).
 
-For simplification let's assume a maximum expected userbase of 8 billion users (about the number of people on planet Earth currently).
+For simplicity let's assume a maximum expected userbase of 8 billion users (about the number of people on planet Earth currently).
 
 ### Collisions
 
 If a rainbow table was created for a particular salt value it would be able to be used on all password hashes that have been hashed with the same salt. This means, in the case of a 16-bit salt, a single rainbow table would be able to crack 121 896 password hashes on average.
 
-Using the table below we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generated rainbow table can be used on 1.86 password hashes on average. This would only speed up the attack by 1.86 times.
+Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generated rainbow table can be used on 1.86 password hashes on average. This would only speed up the attack by 1.86 times.
 
 | Salt Size (bits) | Unique Salts | Average Collisions per Salt |
 |-|-|-|
 | 16 | 65 536 | 121 896 |
 | 32 | 4 294 967 296 | 1.86 |
-| 64 | 1.84 × 10^19 | 4.34 × 10<sup>-10</sup> |
-| 96 | 7.92 × 10^28 | 1.01 × 10<sup>-21</sup> |
-| 128 | 3.40 × 10^38 | 2.35 × 10<sup>-30</sup> |
-| 256 | 1.16 × 10^77 | 6.88 × 10<sup>-68</sup> |
+| 64 | 1.84 × 10<sup>19</sup> | 4.34 × 10<sup>-10</sup> |
+| 96 | 7.92 × 10<sup>28</sup> | 1.01 × 10<sup>-21</sup> |
+| 128 | 3.40 × 10<sup>38</sup> | 2.35 × 10<sup>-30</sup> |
+| 256 | 1.16 × 10<sup>77</sup> | 6.88 × 10<sup>-68</sup> |
 
 <figcaption>Salt Size vs Collisions (for 8 Billion Users)</figcaption>
 
@@ -169,14 +169,14 @@ Readily available public rainbow tables commonly vary from hundreds of Megabytes
 |-|-|-|
 | 16 | 65 536 | 64 Gigabytes |
 | 32 | 4 294 967 296 | 4.29 Petabytes |
-| 64 | 1.84 × 10^19 | 18.4 Exabytes |
-| 96 | 7.92 × 10^28 | 7.92 Yottabytes |
-| 128 | 3.40 × 10^38 | ??? |
-| 256 | 1.16 × 10^77 | ??? |
+| 64 | 1.84 × 10<sup>19</sup> | 18.4 Exabytes |
+| 96 | 7.92 × 10<sup>28</sup> | 7.92 Yottabytes |
+| 128 | 3.40 × 10<sup>38</sup> | ??? |
+| 256 | 1.16 × 10<sup>77</sup> | ??? |
 
 <figcaption>Minimum Size of Rainbow Tables</figcaption>
 
-From the table we can see that 64 bits of salt would be more than sufficient in most cases. 96 bits or more is far more than enough. **128 bits** will definitely **future proof** your authentication system against rainbow table attacks **for decades** or perhaps centuries to come.
+From the table we can see that 64-bits of salt would be more than sufficient in most cases. 96-bits or more is far more than enough. **128-bits** will definitely **future proof** your authentication system against rainbow table attacks **for decades** or perhaps centuries to come.
 
 # Pepper
 
