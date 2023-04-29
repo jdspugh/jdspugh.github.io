@@ -150,7 +150,6 @@ Let's start with a table of SI units used for storage. This will make it easier 
 | Petabyte | 1 000 000 000 000 000 |
 | Exabyte | 1 000 000 000 000 000 000 |
 | Zettabyte | 1 000 000 000 000 000 000 000 |
-| Yottabyte | 1 000 000 000 000 000 000 000 000 |
 
 <figcaption>SI Units for Storage</figcaption>
 
@@ -165,14 +164,14 @@ Readily available public rainbow tables commonly vary from hundreds of Megabytes
 
 `Rainbow Tables Size = Unique Salts × 1 Megabyte`
 
-| Salt Size (bits) | Unique Salts | Rainbow Tables Size |
-|-|-|-|
-| 16 | 65 536 | 64 Gigabytes |
-| 32 | 4 294 967 296 | 4.29 Petabytes |
-| 64 | 1.84 × 10<sup>19</sup> | 18.4 Exabytes |
-| 96 | 7.92 × 10<sup>28</sup> | 7.92 Yottabytes |
-| 128 | 3.40 × 10<sup>38</sup> | ??? |
-| 256 | 1.16 × 10<sup>77</sup> | ??? |
+| Salt Size (bits) | Rainbow Tables Size (Zettabytes) | Unique Salts |
+|-:|-:|-|
+| 16 | 0.000000000065536 | 65536 |
+| 32 | 0.00000429 | 4294967296 |
+| 64 | 18446 | 18446744073709551616 |
+| 96 | 79228162514264 | 79228162514264337593543950336 |
+| 128 | 340282366920938463463374 | 340282366920938463463374607431768211456 |
+| 256 | 115792089237316195423570985008687907853269984665640564039457584 | 115792089237316195423570985008687907853269984665640564039457584007913129639936 |
 
 <figcaption>Minimum Size of Rainbow Tables</figcaption>
 
