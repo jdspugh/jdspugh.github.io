@@ -127,7 +127,7 @@ If a rainbow table was created for a particular salt value it would be able to b
 Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generated rainbow table can be used on 1.86 password hashes on average. This would only speed up the attack by 1.86 times.
 
 | Salt Size (bits) | Unique Salts | Average Collisions per Salt |
-|-|-|-|
+|-:|-:|-|
 | 16 | 65 536 | 121 896 |
 | 32 | 4 294 967 296 | 1.86 |
 | 64 | 1.84 × 10<sup>19</sup> | 4.34 × 10<sup>-10</sup> |
@@ -142,7 +142,7 @@ Using the table below we can see that we should choose a **salt of 32-bits or mo
 Let's start with a table of SI units used for storage. This will make it easier to visualise the quantities we are about to discuss:
 
 | Unit | Bytes |
-|-|-|
+|-:|-|
 | Kilobyte | 1 000 |
 | Megabyte | 1 000 000 |
 | Gigabyte | 1 000 000 000 |
@@ -153,18 +153,18 @@ Let's start with a table of SI units used for storage. This will make it easier 
 
 <figcaption>SI Units for Storage</figcaption>
 
-Global data storage is predicted to be 16 Zettabytes by 2025 (source: [Redgate](https://www.red-gate.com/blog/database-development/whats-the-real-story-behind-the-explosive-growth-of-data)). To be safe we want to force our attackers' rainbow tables to be larger than this value so that there is no chance of a rainbow tables attack.
+From the figure below we can see that global data storage is predicted to be 16 Zettabytes by 2025 and is doubling every 4 years. A formula to predict the storage available at a given year is thus 16 × 2<sup>(year - 2025)/4</sup> Zettabytes. To be safe we want to force our attackers' rainbow tables to be larger this value for some years into the future so that there is no chance of a rainbow table attack.
 
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/data-growth.png" alt="Global Data Storage Growth 2021-2025 (source: Redgate)"/>
   <figcaption>Global Data Storage Growth 2021-2025 (source: <a href="https://www.red-gate.com/blog/database-development/whats-the-real-story-behind-the-explosive-growth-of-data">Redgate</a>)</figcaption>
 </figure>
 
-Readily available public rainbow tables commonly vary from hundreds of Megabytes to Terabytes in size. Let's consider an extreme case where a rainbow tables is only 1 Megabyte in size. Salting forces the number of rainbow tables needed by an attacker to be equal to the number of unique salts:
+Readily available public unsalted rainbow tables commonly vary from hundreds of Megabytes to Terabytes in size. Let's consider an extreme case where a rainbow tables is only 1 Megabyte in size. Salting forces the number of rainbow tables needed by an attacker to be equal to the number of unique salts:
 
-`Rainbow Tables Size = Unique Salts × 1 Megabyte`
+`Size of all Rainbow Tables = Unique Salts × 1 Megabyte`
 
-| Salt Size (bits) | Rainbow Tables Size (Zettabytes) | Unique Salts |
+| Salt Bits | Size of all Rainbow Tables (Zettabytes) | Unique Salts |
 |-:|-:|-|
 | 16 | 0.000000000065536 | 65536 |
 | 32 | 0.00000429 | 4294967296 |
@@ -173,9 +173,26 @@ Readily available public rainbow tables commonly vary from hundreds of Megabytes
 | 128 | 340282366920938463463374 | 340282366920938463463374607431768211456 |
 | 256 | 115792089237316195423570985008687907853269984665640564039457584 | 115792089237316195423570985008687907853269984665640564039457584007913129639936 |
 
-<figcaption>Minimum Size of Rainbow Tables</figcaption>
+<figcaption>Salt Bits vs Size of all Rainbow Tables</figcaption>
 
-From the table we can see that 64-bits of salt would be more than sufficient in most cases. 96-bits or more is far more than enough. **128-bits** will definitely **future proof** your authentication system against rainbow table attacks **for decades** or perhaps centuries to come.
+From the table above we can see that increases in the bits of salt used exponentially increases the storage required for the rainbow tables, and global storage increases at a relatively slower pace over time.
+
+From the table below we can see that 64-bits of salt would be more than sufficient in all present day cases and decades into the future at the current data storage growth rate:
+
+| Salt Bits | Estimated Minimum Years of Protection |
+|-:|-|
+| 64 | 41 |
+| 96 | 161 |
+| 128 | 296 |
+| 256 | 808 |
+
+<figcaption>Salt Bits vs Estimated Minimum Years of Protection</figcaption>
+
+For reference we show here a couple of other recommendations for salt lengths. We feel the recommendations are somewhat arbitrary since there is no indication how they were derived:
+
+* The[ National Institute of Standards and Technology (NIST)](https://www.nist.gov) recommends at least 32-bits in its [Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-3/sp800-63b.html).
+
+* The [Open Web Application Security Project (OWASP)](https://owasp.deteact.com/cheat/cheatsheets/Password_Storage_Cheat_Sheet.html) recommends using salts that are 256 to 512-bits long.
 
 # Pepper
 
