@@ -177,7 +177,7 @@ Readily available public unsalted rainbow tables commonly vary from hundreds of 
 
 From the table above we can see that increases in the bits of salt used exponentially increases the storage required for the rainbow tables, and global storage increases at a relatively slower pace over time.
 
-From the table below we can see that 64-bits of salt would be more than sufficient in all present day cases and decades into the future at the current data storage growth rate:
+From the table below we can see that **64-bits of salt** would be more than **sufficient** in all present day cases and **decades into the future** at the current data storage growth rate. If you want to be extra safe then you can choose 96-bits:
 
 | Salt Bits | Estimated Minimum Years of Protection |
 |-:|-|
@@ -190,9 +190,9 @@ From the table below we can see that 64-bits of salt would be more than sufficie
 
 For reference we show here a couple of other recommendations for salt lengths. We feel the recommendations are somewhat arbitrary since there is no indication how they were derived:
 
-* The[ National Institute of Standards and Technology (NIST)](https://www.nist.gov) recommends at least 32-bits in its [Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-3/sp800-63b.html).
+* The[ National Institute of Standards and Technology (NIST)](https://www.nist.gov) recommends at least 32-bits in its [Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-3/sp800-63b.html)
 
-* The [Open Web Application Security Project (OWASP)](https://owasp.deteact.com/cheat/cheatsheets/Password_Storage_Cheat_Sheet.html) recommends using salts that are 256 to 512-bits long.
+* The [Open Web Application Security Project (OWASP)](https://owasp.deteact.com/cheat/cheatsheets/Password_Storage_Cheat_Sheet.html) recommends using salts that are 256 to 512-bits long
 
 # Pepper
 
@@ -335,35 +335,35 @@ app.listen(3000)
 
 Hashing the user's password with a correctly configured **Argon2** algorithm and a long, random, unique **salt** and a long random **pepper** provides very strong password protection, even in the case of a database breach. If the pepper is discovered and the database is breached Argon2 stills offers protection against dictionary and brute force attacks. In this case strong passwords are recommended.
 
-<table>
+<table style="border:1px solid black !important">
 <thead>
 <tr>
-<th colspan="2">Data</th>
-<th colspan="2">Attack</th>
+<th colspan="2" style="text-align:center;background-color:#F8E6D0;border-right:1px solid black !important">Data</th>
+<th colspan="2" style="text-align:center;background-color:#CCD9F5">Attack</th>
 </tr>
-<tr>
-<th>User Table</th>
-<th>Pepper</th>
-<th>Dictionary</th>
-<th>Brute Force</th>
+<tr style="border-bottom:1px solid black !important">
+<th style="background-color:#F8E6D0">User Table</th>
+<th style="background-color:#F8E6D0;border-right:1px solid black !important">Pepper</th>
+<th style="background-color:#CCD9F5">Dictionary</th>
+<th style="background-color:#CCD9F5">Brute Force</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="background-color:#D4E7CE">Secure</td>
-<td style="background-color:#D4E7CE">Secure</td>
+<td style="background-color:#D4E7CE;border-right:1px solid black !important">Secure</td>
 <td style="background-color:#D4E7CE">Ineffective</td>
 <td style="background-color:#D4E7CE">Ineffective</td>
 </tr>
 <tr>
 <td style="background-color:#F2C5C6">Compromised</td>
-<td style="background-color:#D4E7CE">Secure</td>
+<td style="background-color:#D4E7CE;border-right:1px solid black !important">Secure</td>
 <td style="background-color:#D4E7CE">Ineffective</td>
 <td style="background-color:#D4E7CE">Ineffective</td>
 </tr>
 <tr>
 <td style="background-color:#F2C5C6">Compromised</td>
-<td style="background-color:#F2C5C6">Compromised</td>
+<td style="background-color:#F2C5C6;border-right:1px solid black !important">Compromised</td>
 <td style="background-color:#F2C5C6">Effective on weak passwords</td>
 <td style="background-color:#F2C5C6">Effective on short passwords</td>
 </tr>
@@ -372,7 +372,7 @@ Hashing the user's password with a correctly configured **Argon2** algorithm and
 
 <figcaption>Data Compromised vs Attack Types</figcaption>
 
-Further aspects that should be delved into in-depth are the lengths of the passwords, salts, pepper and the parameters for tuning the Argon2 hashing algorithm.
+Further aspects that should be delved into in-depth are the minimum lengths of the passwords, pepper and the parameters for tuning the Argon2 hashing algorithm.
 
 # Further Reading
 
