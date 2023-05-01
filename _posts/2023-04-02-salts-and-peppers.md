@@ -196,9 +196,9 @@ For reference we show here a couple of other recommendations for salt lengths. W
 
 # Pepper
 
-A pepper is a fixed value stored separately from the database (preferably in some form of secure storage). The pepper is randomly chosen and doesn't change throughout the lifetime of the application. An attacker may compromise the database and steal the data there, but without the pepper they will have to spend a lot of brute force effort to find a password and obtain the pepper's value. If the pepper is sufficiently strong (e.g. 128 random bits) then it will be impossible.
+A pepper is a single, fixed, random value stored separately from the database (preferably in some form of secure storage). An attacker may compromise the database and steal the data there, but without the pepper they will have to spend brute force effort to find a password and the pepper's value. If the pepper is sufficiently strong (e.g. 128 random bits) then it will be impossible. 
 
-The pepper is combined with the password to produce different hash values compared with the previous table:
+The pepper is combined with the password to produce different hash values compared with the previous user table. We see that the reverse hash lookup table we created before will no longer be applicable to our newly peppered passwords above as the SHA256 values don't match any more:
 
 ```
 PEPPER = wtWy8vb3Ov4FFiFF
@@ -213,7 +213,9 @@ HashedPassword = SHA256(Password + PEPPER)
 
 <figcaption>User Table with Hashed & Peppered Passwords</figcaption>
 
-Now we see that the reverse hash lookup table we created before will no longer be applicable to our newly peppered passwords as the SHA256 values don't match any more.
+
+
+Since a long pepper does not take any significant extra storage or computational power you can choose at least 128-bits.
 
 ## Risks
 
@@ -362,6 +364,12 @@ Hashing the user's password with a correctly configured **Argon2** algorithm and
 <td style="background-color:#D4E7CE">Ineffective</td>
 </tr>
 <tr>
+<td style="background-color:#D4E7CE">Secure</td>
+<td style="background-color:#F2C5C6;border-right:1px solid black !important">Compromised</td>
+<td style="background-color:#D4E7CE">Ineffective</td>
+<td style="background-color:#D4E7CE">Ineffective</td>
+</tr>
+<tr>
 <td style="background-color:#F2C5C6">Compromised</td>
 <td style="background-color:#F2C5C6;border-right:1px solid black !important">Compromised</td>
 <td style="background-color:#F2C5C6">Effective on weak passwords</td>
@@ -370,7 +378,7 @@ Hashing the user's password with a correctly configured **Argon2** algorithm and
 </tbody>
 </table>
 
-<figcaption>Data Compromised vs Attack Types</figcaption>
+<figcaption>Data Compromised vs Attack Possibilities</figcaption>
 
 Further aspects that should be delved into in-depth are the minimum lengths of the passwords, pepper and the parameters for tuning the Argon2 hashing algorithm.
 
