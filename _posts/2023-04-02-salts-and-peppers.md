@@ -143,17 +143,17 @@ Let's start with a table of SI units used for storage. This will make it easier 
 
 | Unit | Bytes |
 |-:|-|
-| Kilobyte | 1 000 |
-| Megabyte | 1 000 000 |
-| Gigabyte | 1 000 000 000 |
-| Terabyte | 1 000 000 000 000 |
-| Petabyte | 1 000 000 000 000 000 |
-| Exabyte | 1 000 000 000 000 000 000 |
-| Zettabyte | 1 000 000 000 000 000 000 000 |
+| Kilobyte (KB) | 1 000 |
+| Megabyte (MB) | 1 000 000 |
+| Gigabyte (GB) | 1 000 000 000 |
+| Terabyte (TB) | 1 000 000 000 000 |
+| Petabyte (PB) | 1 000 000 000 000 000 |
+| Exabyte (EX) | 1 000 000 000 000 000 000 |
+| Zettabyte (ZB) | 1 000 000 000 000 000 000 000 |
 
 <figcaption>SI Units for Storage</figcaption>
 
-From the figure below we can see that global data storage is predicted to be 16 Zettabytes by 2025 and is doubling every 4 years. A formula to predict the storage available at a given year is thus 16 × 2<sup>(year - 2025)/4</sup> Zettabytes. To be safe we want to force our attackers' rainbow tables to be larger this value for some years into the future so that there is no chance of a rainbow table attack.
+From the figure below we can see that global data storage is predicted to be 16 ZB by 2025 and is doubling every 4 years. A formula to predict the storage available at a given year is thus 16 × 2<sup>(year - 2025)/4</sup> ZB. To be safe we want to force our attackers' rainbow tables to be larger this value for some years into the future so that there is no chance of a rainbow table attack.
 
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/data-growth.png" alt="Global Data Storage Growth 2021-2025 (source: Redgate)"/>
@@ -164,7 +164,7 @@ Readily available public unsalted rainbow tables commonly vary from hundreds of 
 
 `Size of all Rainbow Tables = Unique Salts × 1 Megabyte`
 
-| Salt Bits | Size of all Rainbow Tables (Zettabytes) | Unique Salts |
+| Salt Bits | Size of all Rainbow Tables (ZB) | Unique Salts |
 |-:|-:|-|
 | 16 | 0.000000000065536 | 65536 |
 | 32 | 0.00000429 | 4294967296 |
@@ -196,7 +196,7 @@ For reference we show here a couple of other recommendations for salt lengths. W
 
 # Pepper
 
-A pepper is a single, fixed, random value stored separately from the database (preferably in some form of secure storage). An attacker may compromise the database and steal the data there, but without the pepper they will have to spend brute force effort to find a password and the pepper's value. If the pepper is sufficiently strong (e.g. 128 random bits) then it will be impossible. 
+A pepper is a single, fixed, random value stored separately from the database (preferably in some form of secure storage). An attacker may compromise the database and steal the data there, but without the pepper they will have to spend brute force effort to find a password and the pepper's value. If the pepper is sufficiently strong then it will be impossible. 
 
 The pepper is combined with the password to produce different hash values compared with the previous user table. We see that the reverse hash lookup table we created before will no longer be applicable to our newly peppered passwords above as the SHA256 values don't match any more:
 
@@ -213,9 +213,27 @@ HashedPassword = SHA256(Password + PEPPER)
 
 <figcaption>User Table with Hashed & Peppered Passwords</figcaption>
 
+## Pepper Bits
 
+For simplicity let's first look at SHA256 password hashes and how much effort would be required to crack them. As of April 2023 the highest global Bitcoin hash rate has been 440 EH/s. Since Bitcoin has by far the dominant SHA256 hash rate, the next being Litecoin at 920 TH/s, we can use this as a basis for our calculations.
 
-Since a long pepper does not take any significant extra storage or computational power you can choose at least 128-bits.
+| Hashrate | Hashes per Second |
+|-:|-|
+| KiloHashes/s (KH/s) | 1 000 |
+| MegaHashes/s (MH/s) | 1 000 000 |
+| GigaHashes/s (GH/s) | 1 000 000 000 |
+| TeraHashes/s (TH/s) | 1 000 000 000 000 |
+| PetaHashes/s (PH/s) | 1 000 000 000 000 000 |
+| ExaHashes/s (EH/s) | 1 000 000 000 000 000 000 |
+
+Let's assume one password hash and salt are known. We just need to brute force the salted and peppered password hash in order to retrieve the pepper. We will need to try, on average, half of all the possible pepper values in order to obtain the pepper's value.
+
+<figure>
+  <img src="/image/blog/2023-04-02-salts-and-peppers/sha256-brute-force-time.svg" alt="Pepper Bits vs Years to Brute Force (SHA256)"/>
+  <figcaption>Pepper Bits vs Years to Brute Force (SHA256)</figcaption>
+</figure>
+
+If we are using all the Bitcoin hash power to crack a peppered password, we can see from the chart that from 94-bits onwards the brute force will take more than a year to complete. Since a long pepper does not take any significant extra storage or computational power you can choose at least 128-bits which will take over 20 000 000 000 years to crack.
 
 ## Risks
 
