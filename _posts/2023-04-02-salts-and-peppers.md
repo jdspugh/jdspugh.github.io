@@ -33,13 +33,13 @@ Consider a typical application that stores usernames and passwords. The naive st
 
 <figcaption>Unencrypted User Table</figcaption>
 
-If the database is compromised the usernames and passwords are directly exposed and can be used to login to any user's account.
+If the database is compromised the usernames and passwords are directly exposed and can be used to login to any user's account through the application's login user interface.
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. **A hash is a one-way cryptographic function.** Once hashed, the password cannot be unhashed. Thus a hash is ideal for use in storing passwords.
+A better strategy is to store the hash of the password. A hash is the output of a hash function. **A hash function is**, by design, **a one-way cryptographic function.** Once hashed, the password cannot be unhashed. Thus a hash is ideal for use in storing passwords.
 
-Note that technically the passwords are not encrypted. **Encryption is a two-way cryptographic function.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector.
+Note that technically the passwords are not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector to an authentication system.
 
 In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
 
@@ -57,9 +57,7 @@ In this article we are using the SHA256 hash function for simplicity. **Do not u
 
 # Reverse Hash Lookups
 
-Since cryptographic hash functions, including SHA256, are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where strong (e.g. 10+ random characters) and a slow hash function, such as a well configured Argon2, was used this would be the case. The reality is that users often choose very weak passwords such as the ones I chose: `qwerty` and `12345678`. What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table.
-
-Reverse hash lookup tables precompute complex password hashes and store them in a table for easy access. They are most effective against slow hashing algorithms since the computational time to storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be much less.
+Since cryptographic hash functions, including SHA256, are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where strong (e.g. 10+ random characters) and a slow hash function, such as a well configured Argon2, was used this would be the case. The reality is that users often choose very weak passwords such as the ones I chose: `qwerty` and `12345678`. What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table. A specific password hash can be rapidly searched for in the table and the corresponding unhashed password extracted.
 
 | HashedPassword | Password |
 |-|-|
@@ -69,11 +67,11 @@ Reverse hash lookup tables precompute complex password hashes and store them in 
 
 <figcaption>Reverse Hash Lookup Table</figcaption>
 
-By adding a large number of passwords and their hashes to the table the attacker can then rapidly search the table for the corresponding `Hash` in the user table and, if found, retrieve the corresponding `Password` from the reverse hash lookup table.
+Reverse hash lookup tables are most effective against slow hashing algorithms since the computational time to storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be much less.
 
 # Rainbow Tables
 
-The reverse hash lookup process can be highly optimised by using a technique widely known as **rainbow tables**. It can make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
+The reverse hash lookup process can be optimised by using a technique widely known as **rainbow tables**. It can make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
 
 Further reading:
 
@@ -84,7 +82,7 @@ Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-w
 
 # Salt
 
-Salts, like peppers, are combined with passwords before hashing, effectively increasing the password's complexity, thus adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts that can be generated. Long enough salts render reverse hash lookup tables useless.
+Salts, like peppers, are combined with passwords before hashing, effectively increasing the password's complexity, thus adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts used. This effectively renders reverse hash lookup tables useless since a new table needs to be created for each unique salt. Without being able to reuse the tables they only add overhead to the password cracking attempts.
 
 `HashedPassword = SHA256(Password + Salt)`
 
@@ -114,17 +112,15 @@ Another solution is to use a pepper in combination with short salts as also sugg
 
 ## Salt Bits
 
-It is the **generally accepted** best practise is **for salts to be of 128-bits** in length. In this section we will attempt some quantitative analysis to give this figure validity.
-
-Depending on your application's requirements, such as the maximum number of users expected and database storage requirements, you may be able to use a shorter salt. This will make your application more efficient (mainly by reducing your database size).
+In this section we will attempt to quantitatively analyse what bit length salts should have. Salt length depends on your application's requirements, such as the **maximum number of users** expected and **database storage capacity**.
 
 For simplicity let's assume a maximum expected userbase of 8 billion users (about the number of people on planet Earth currently).
 
 ### Collisions
 
-If a rainbow table was created for a particular salt value it would be able to be used on all password hashes that have been hashed with the same salt. This means, in the case of a 16-bit salt, a single rainbow table would be able to crack 121 896 password hashes on average.
+If a rainbow table was created for a particular salt value it would be able to be used on all password hashes that have been hashed with the same salt. This means, in the case of a 16-bit salt, a single rainbow table would be able to crack 121 896 password hashes on average given 8 billions users.
 
-Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generated rainbow table can be used on 1.86 password hashes on average. This would only speed up the attack by 1.86 times.
+Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generated rainbow table can be used to crack 1.86 password hashes on average. This would only speed up the attack by 1.86 times.
 
 | Salt Size (bits) | Unique Salts | Average Collisions per Salt |
 |-:|-:|-|
@@ -166,12 +162,12 @@ Readily available public unsalted rainbow tables commonly vary from hundreds of 
 
 | Salt Bits | Size of all Rainbow Tables (ZB) | Unique Salts |
 |-:|-:|-|
-| 16 | 0.000000000065536 | 65536 |
-| 32 | 0.00000429 | 4294967296 |
-| 64 | 18446 | 18446744073709551616 |
-| 96 | 79228162514264 | 79228162514264337593543950336 |
-| 128 | 340282366920938463463374 | 340282366920938463463374607431768211456 |
-| 256 | 115792089237316195423570985008687907853269984665640564039457584 | 115792089237316195423570985008687907853269984665640564039457584007913129639936 |
+| 16 | 0.000000000065536 | 65 536 |
+| 32 | 0.00000429 | 4 294 967 296 |
+| 64 | 18 446 | 18 446 744 073 709 551 616 |
+| 96 | 79 228 162 514 264 | 79 228 162 514 264 337 593 543 950 336 |
+| 128 | 340 282 366 920 938 463 463 374 | 340 282 366 920 938 463 463 374 607 431 768 211 456 |
+| 256 | 115 792 089 237 316 195 423 570 985 008 687 907 853 269 984 665 640 564 039 457 584 | 115 792 089 237 316 195 423 570 985 008 687 907 853 269 984 665 640 564 039 457 584 007 913 129 639 936 |
 
 <figcaption>Salt Bits vs Size of all Rainbow Tables</figcaption>
 
@@ -217,23 +213,60 @@ HashedPassword = SHA256(Password + PEPPER)
 
 For simplicity let's first look at SHA256 password hashes and how much effort would be required to crack them. As of April 2023 the highest global Bitcoin hash rate has been 440 EH/s. Since Bitcoin has by far the dominant SHA256 hash rate, the next being Litecoin at 920 TH/s, we can use this as a basis for our calculations.
 
-| Hashrate | Hashes per Second |
+| Units | Hashes per Second |
 |-:|-|
-| KiloHashes/s (KH/s) | 1 000 |
-| MegaHashes/s (MH/s) | 1 000 000 |
-| GigaHashes/s (GH/s) | 1 000 000 000 |
-| TeraHashes/s (TH/s) | 1 000 000 000 000 |
-| PetaHashes/s (PH/s) | 1 000 000 000 000 000 |
-| ExaHashes/s (EH/s) | 1 000 000 000 000 000 000 |
+| KiloHashes/s (KH/s) | 1 000 H/s |
+| MegaHashes/s (MH/s) | 1 000 000 H/s |
+| GigaHashes/s (GH/s) | 1 000 000 000 H/s |
+| TeraHashes/s (TH/s) | 1 000 000 000 000 H/s |
+| PetaHashes/s (PH/s) | 1 000 000 000 000 000 H/s |
+| ExaHashes/s (EH/s) | 1 000 000 000 000 000 000 H/s |
 
-Let's assume one password hash and salt are known. We just need to brute force the salted and peppered password hash in order to retrieve the pepper. We will need to try, on average, half of all the possible pepper values in order to obtain the pepper's value.
+Let's assume one password hash and salt are known. We just need to brute force one salted and peppered password hash in order to retrieve the pepper's value. We will need to try, on average, half of all the possible pepper values in order to obtain the value.
 
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/sha256-brute-force-time.svg" alt="Pepper Bits vs Years to Brute Force (SHA256)"/>
   <figcaption>Pepper Bits vs Years to Brute Force (SHA256)</figcaption>
 </figure>
 
-If we are using all the Bitcoin hash power to crack a peppered password, we can see from the chart that from 94-bits onwards the brute force will take more than a year to complete. Since a long pepper does not take any significant extra storage or computational power you can choose at least 128-bits which will take over 20 000 000 000 years to crack.
+|Date|Bitcoin Hash Rate (EH/s)|Days until Doubling|
+|-:|-:|-:|
+|May 2023|380| |
+|Jan 2022|190|490|
+|Sep 2019|93|850|
+|Apr 2019|46|150|
+|Feb 2018|23|420|
+|Dec 2017|11|62|
+|Aug 2017|5.8|120|
+|Jan 2017|2.9|210|
+|Jun 2016|1.4|210|
+|Dec 2015|0.73|180|
+|Aug 2015|0.37|120|
+|Aug 2014|0.18|370|
+|Jun 2014|0.09|61|
+
+<figcaption>Bitcoin Hash Rate Doubling Time</figcaption>
+
+Let's take the worst case of the time of most acceleration of the Bitcoin hash rate: doubling every 60 days. Then we can set a maximum hash rate using the formula:
+
+`<Bitcoin hash rate maximum> = 380 * 2 ^ (<days past May 2023> / 60) EH/s`
+
+`<hashes> = 2 ^ <pepper bits>`
+
+|Time|Bitcoin Hash Rate Upper Limit|
+|-|-|
+|0 Years|380 EH/s|
+|1 Year|26 000 EH/s|
+|10 Years|780 000 000 000 000 000 000 EH/s|
+|100 Years|5.0 x 10^185 EH/s|
+|1 000 Years|
+|10 000 Years|
+|100 000 Years|
+|1 000 000 Years|
+
+
+
+If we are using all the world's Bitcoin hash power to crack a peppered password, we can see from the chart that from 94-bits onwards the brute force will take more than a year to complete. Since a long pepper does not take any significant extra storage or computational power you can choose at least 128-bits which will take over 20 000 000 000 years to crack.
 
 ## Risks
 
@@ -270,11 +303,349 @@ console.log(process.env.PEPPER)
 
 # Dictionary & Brute Force Attacks
 
+A brute force attack will discover any password whereas a dictionary attack will only discover a portion of passwords that is determined by the match between the users' password and the attack dictionary entries. A brute force attack is thus more likely to be used to target an individual user whereas a dictionary attack will obtain a large number of passwords quickly but will only reveal a certain percentage of them (the weaker ones).
+
+If the user table that contains the password hashes and salts is obtained and the pepper is discovered, then an attacker can start using dictionary and brute force attacks on the password hashes. The time it takes to crack them will depend on the password hash length, the hashing algorithm and the hashing algorithm's parameters. By analysing the two types of attack we can quantitatively determine the number of bits needed for the password hashes.
+
 With Argon2, the slowest algorithm we have considered, hashes can be created in the order of thousands per second with today's consumer grade hardware. This means that weak passwords could still be cracked, so the use of a pepper is recommended. Dictionary and Brute force attacks can be prevented by using a **long random pepper**. This is secure even when the database has been compromised but the pepper is still hidden. 
 
 The other option is forcing users to choose **strong passwords**. This will make it difficult or impossible for them to be cracked but also opens other security issues as strong passwords cannot be easily memorized by users. So the user needs to store them in a password manager, on paper or electronically. This comes with its own risks and if we can solve the problem without resorting to strong passwords it will be better for the users and will also result in less customer support requests for us.
 
 Biometric data or QR codes can be used to overcome the problem of forgetting strong passwords but they incur their own sets of security risks. Biometric data needs to be stored securely since its value never changes and additionally it needs to secure the user's privacy. With QR codes, a device could be hacked and the QR code stolen.
+
+## Dictionary Attacks
+
+Dictionary attacks attack weak passwords. Weak passwords are passwords that are short and/or easy-to-guess passwords. The attacker will use a dictionary of common passwords and hash each of them along with the known salt for that user and the application's pepper. Each resulting hash will be compared to the user's password hash from the user table. If a match is found then the attacker has just found the user's unhashed password.
+
+The attack success rate and number of attacks required to find the password will depend on the quality of the attacker's dictionary and its match with the set of passwords being attacked. Password attack dictionaries can contain complex passwords that contain words from various languages that are mixed with combinations of numbers and symbols. These dictionaries can crack up to around 20% of an average users' passwords from a list of over a trillion passwords. It is recommended that your application checks new passwords against such a dictionary and warn the user that they are using a weak password if it is in the list.
+
+In terms of the speed of the attack a dictionary attack may be successful with a fast hashing algorithm like SHA256. A single dedicated consumer SHA256 ASIC cryptocurrency mining rig can, as of May 2023, do more than 100 TH/s. This means that more than 100 passwords could be attacked per second (with up to 20% success rate). Thus it's recommended to use a slow, configurable, hashing algorithm like Argon2 that is orders of magnitude slower when computing a password's hash. It is unlikely that your application will have lots of simultaneous sign ups or password changes which means that you should configure your Argon2 parameters so that the hashes take around a second to complete. This is short enough that the user will not be too disturbed by the delay computing it, but long enough to provide good brute force resistance. Set the memory complexity as high as your computer can handle since this will provide maximum GPU resistance, making it harder for attackers. Your attacker may have a faster computer than you, so let's say your Argon2 hash takes 1 second, the attacker may be able to perform the same hash 10x faster. So each brute force attack will take around `.1s x 1 000 000 000 / 2 = 50 000 000s = 578 days` to complete (with up to 20% success rate). This is very good security considering your system has been completely compromised.
+
+## Brute Force Attacks
+
+Brute force attacks attack short passwords by trying every combination of characters for the password, starting from the shortest and moving up to longer ones. The **number of attempts required to crack a password via brute force** is directly proportional to the **number of unhashed password character combinations**.
+
+The number of unhashed password character combinations will be set by the application's UI and the user will be notified of this when creating their password e.g. "8 characters minimum with at least one capital letter, one lowercase letter, one number and one special character". The application developer needs to balance the password length and complexity requirements with the user's ability to memorise the password. Longer, more complex passwords are more secure against brute force attacks but are difficult to memorise. If the password requirements are too complex the user will be incentivised to write down the password or store it electronically which makes the password less secure again.
+
+The unhashed password complexity dictates the number of brute force attempts required to crack the password.
+
+# Password Strength
+
+, but will be costly if a slow hashing algorithm like Argon2 is used.
+
+# Password Length
+
+It is best to use this set of 96 easily typeable characters for passwords `??? list of 96 password chars`. It includes upper and lower case alphabet characters along with numerals and special characters. It will allow users to create passwords that are stronger and more memorable without being too long.
+
+The user should be required to create passwords with a length of at least 8-10 characters using the 96 characters above.
+
+## SHA256
+
+## Argon2
+
+Number of attempts via brute force. Short passwords.
+
+Number of attempts via dictionary. Weak passwords.
+
+# Password Hash Bits
+
+The number of bits in a password hash determines the number of significant characters a password possesses. Any characters beyond that number will not increase the security of the password.
+
+The usual set of characters used for passwords is the set of characters that are both visible and typeable on a standard keyboard. This includes both the upper and lower case alphabet letters (26x2) and the numerals (10) and special characters (33). This gives a total of 52 + 10 + 33 = 95.
+
+|Count|ASCII Code (Decimal)|ASCII Character|
+|-|-|-|
+1|32|space
+2|33|!
+3|34|"
+4|35|#
+5|36|$
+6|37|%
+7|38|&
+8|39|"
+9|40|(
+10|41|)
+11|42|*
+12|43|+
+13|44|,
+14|45|-
+15|46|.
+16|47|/
+17|58|:
+18|59|;
+19|60|<
+20|61|=
+21|62|>
+22|63|?
+23|64|@
+24|91|[
+25|92|\
+26|93|]
+27|94|^
+28|95|_
+29|96|`
+30|123|{
+31|124|\|
+32|125|}
+33|126|~
+
+This doesn't preclude that users may want to use international characters or emojis in their passwords which could further increase security and resistance to brute force attacks in particular. The caveat being that they may have difficulty typing their password on different devices to those they usually use.
+
+<table>
+<thead>
+<tr>
+<th>Password Hash Bits</th>
+<th>Password Hash Bytes</th>
+<th>Unique Possible Values</th>
+</tr>
+</thead>
+<tbody><tr>
+<td style="background-color:#FDF3D0">32</td>
+<td style="background-color:#FDF3D0">4</td>
+<td style="background-color:#FDF3D0">4.29E+09</td>
+</tr>
+<tr>
+<td style="background-color:#D8D3E7">64</td>
+<td style="background-color:#D8D3E7">8</td>
+<td style="background-color:#D8D3E7">1.84E+19</td>
+</tr>
+<tr>
+<td style="background-color:#D3DFE2">96</td>
+<td style="background-color:#D3DFE2">12</td>
+<td style="background-color:#D3DFE2">7.92E+28</td>
+</tr>
+<tr>
+<td style="background-color:#DCE9D5">128</td>
+<td style="background-color:#DCE9D5">16</td>
+<td style="background-color:#DCE9D5">3.40E+38</td>
+</tr>
+<tr>
+<td style="background-color:#F8E6D0">256</td>
+<td style="background-color:#F8E6D0">32</td>
+<td style="background-color:#F8E6D0">1.16E+77</td>
+</tr>
+</tbody></table>
+
+<table>
+<thead>
+<tr>
+<th>Significant Password Characters (96 chars)</th>
+<th>Unique Possible Values</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>9.60E+01</td>
+</tr>
+<tr>
+<td>2</td>
+<td>9.22E+03</td>
+</tr>
+<tr>
+<td>3</td>
+<td>8.85E+05</td>
+</tr>
+<tr>
+<td style="background-color:#FDF3D0">4</td>
+<td style="background-color:#FDF3D0">8.49E+07</td>
+</tr>
+<tr>
+<td>5</td>
+<td>8.15E+09</td>
+</tr>
+<tr>
+<td>6</td>
+<td>7.83E+11</td>
+</tr>
+<tr>
+<td>7</td>
+<td>7.51E+13</td>
+</tr>
+<tr>
+<td>8</td>
+<td>7.21E+15</td>
+</tr>
+<tr>
+<td style="background-color:#D8D3E7">9</td>
+<td style="background-color:#D8D3E7">6.93E+17</td>
+</tr>
+<tr>
+<td>10</td>
+<td>6.65E+19</td>
+</tr>
+<tr>
+<td>11</td>
+<td>6.38E+21</td>
+</tr>
+<tr>
+<td>12</td>
+<td>6.13E+23</td>
+</tr>
+<tr>
+<td>13</td>
+<td>5.88E+25</td>
+</tr>
+<tr>
+<td style="background-color:#D3DFE2">14</td>
+<td style="background-color:#D3DFE2">5.65E+27</td>
+</tr>
+<tr>
+<td>15</td>
+<td>5.42E+29</td>
+</tr>
+<tr>
+<td>16</td>
+<td>5.20E+31</td>
+</tr>
+<tr>
+<td>17</td>
+<td>5.00E+33</td>
+</tr>
+<tr>
+<td>18</td>
+<td>4.80E+35</td>
+</tr>
+<tr>
+<td style="background-color:#DCE9D5">19</td>
+<td style="background-color:#DCE9D5">4.60E+37</td>
+</tr>
+<tr>
+<td>20</td>
+<td>4.42E+39</td>
+</tr>
+<tr>
+<td>21</td>
+<td>4.24E+41</td>
+</tr>
+<tr>
+<td>22</td>
+<td>4.07E+43</td>
+</tr>
+<tr>
+<td>23</td>
+<td>3.91E+45</td>
+</tr>
+<tr>
+<td>24</td>
+<td>3.75E+47</td>
+</tr>
+<tr>
+<td>25</td>
+<td>3.60E+49</td>
+</tr>
+<tr>
+<td>26</td>
+<td>3.46E+51</td>
+</tr>
+<tr>
+<td>27</td>
+<td>3.32E+53</td>
+</tr>
+<tr>
+<td>28</td>
+<td>3.19E+55</td>
+</tr>
+<tr>
+<td>29</td>
+<td>3.06E+57</td>
+</tr>
+<tr>
+<td>30</td>
+<td>2.94E+59</td>
+</tr>
+<tr>
+<td>31</td>
+<td>2.82E+61</td>
+</tr>
+<tr>
+<td>32</td>
+<td>2.71E+63</td>
+</tr>
+<tr>
+<td>33</td>
+<td>2.60E+65</td>
+</tr>
+<tr>
+<td>34</td>
+<td>2.50E+67</td>
+</tr>
+<tr>
+<td>35</td>
+<td>2.40E+69</td>
+</tr>
+<tr>
+<td>36</td>
+<td>2.30E+71</td>
+</tr>
+<tr>
+<td>37</td>
+<td>2.21E+73</td>
+</tr>
+<tr>
+<td style="background-color:#F8E6D0">38</td>
+<td style="background-color:#F8E6D0">2.12E+75</td>
+</tr>
+<tr>
+<td>39</td>
+<td>2.04E+77</td>
+</tr>
+<tr>
+<td>40</td>
+<td>1.95E+79</td>
+</tr>
+</tbody></table>
+
+
+
+The number of bits in password hash alters the number of password hash collisions that will be experienced. The number of password hash collisions will be given by `<number of unique passwords> / (2 ^ <password hash bits>)`.
+
+Minimum password length is given by the password hash bits.
+
+Maximum password length is given by the password hash bits. A password hash of 32-bits would effectively mean everything over 
+
+<!-- ```
+96 possible character values
+
+8 character long password
+
+96^8 = 7 213 895 789 838 336 unique possible password values
+
+2^32 = 4 294 967 296 unique possible password hash values
+```
+
+```
+96 possible character values
+
+12 character long password
+
+96^12 = 6.1e+23 unique possible password values
+
+2^32 = 4 294 967 296 unique possible password hash values
+``` -->
+
+We want passwords from 8 to 16 characters in length.
+
+<!-- |Bits|Unique Values|Average Number of Collisions|
+|-|-|-|
+|32|4 294 967 296|1.86|
+|64|18 446 744 073 709 552 000|0.000000000433681
+|96|79 228 162 514 264 337 593 543 950 336|
+|128|340 282 366 920 938 463 463 374 607 431 768 211 456|
+|256|115 792 089 237 316 195 423 570 985 008 687 907 853 269 984 665 640 564 039 457 584 007 913 129 639 936| -->
+
+<!-- Using a 32-bit password hash will mean you will find 1.86 (i.e. almost 2) passwords that generate the same hash on average. This will almost double the speed of the brute force attack. -->
+
+<!-- |Bits|Unique Values|Average Number of Collisions|
+|-|-|-|
+|32|4 294 967 296|1.86|
+|64|18 446 744 073 709 552 000|0.000000000433681
+|96|79 228 162 514 264 337 593 543 950 336|
+|128|340 282 366 920 938 463 463 374 607 431 768 211 456|
+|256|115 792 089 237 316 195 423 570 985 008 687 907 853 269 984 665 640 564 039 457 584 007 913 129 639 936| -->
+
+<!-- Slow hashes such as Argon2 will take orders of magnitude longer to crack.
+
+Avoid collisions. Force many attempts. -->
 
 # Node.js Implementation
 
