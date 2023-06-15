@@ -26,6 +26,10 @@ main {
   display: block
 }
 
+p {
+  color: #444;
+}
+
 img {
   max-width: 100%;
   vertical-align: middle
