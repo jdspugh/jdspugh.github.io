@@ -2,6 +2,11 @@
 ---
 @import "{{site.theme}}";
 
+/* lighten paragraph text */
+p {
+  color: #444;
+}
+
 /* START numbered headings */
 .post-content {
   counter-reset: a;
