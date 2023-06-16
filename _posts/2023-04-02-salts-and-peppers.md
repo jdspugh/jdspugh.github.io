@@ -100,9 +100,9 @@ One might think that you could use the username or email address of a user as th
 
 ## Sequential Salts
 
-We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that short salts have.
+We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that short salts have (see [below](#short-salts)).
 
-The vulnerability can be mitigated by combining a long random pepper with the sequence number. The attacker now has to attack the server to discover the pepper, or brute force the pepper's value, before attempting to attack the password and sequence numbers. If they did discover the pepper, any reverse hash lookup tables could not be reused on other applications / deployments with different peppers making the reverse hash lookups virtually useless to create. This solution to overcome the limitations of sequential salts is ultimately less secure than using large random salts as there is a chance the pepper value could be discovered.
+The vulnerability can be mitigated by combining a long random pepper <!-- how long? --> with the sequence number. Any reverse hash lookup tables now cannot be reused on other applications / deployments since different peppers make the reverse hash lookups useless to create.
 
 ## Short Salts
 
