@@ -100,15 +100,15 @@ One might think that you could use the username or email address of a user as th
 
 ## Sequential Salts
 
-We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that short salts have (see [below](#short-salts)).
+We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that [short salts](#short-salts) have.
 
-The vulnerability can be mitigated by combining a long random pepper <!-- how long? --> with the sequence number. Any reverse hash lookup tables now cannot be reused on other applications / deployments since different peppers make the reverse hash lookups useless to create.
+The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the sequence number. Any reverse hash lookup tables now cannot be reused on other applications / deployments since different peppers make the reverse hash lookups useless to create.
 
 ## Short Salts
 
-If a salt is too short an attacker may create reverse hash lookup tables containing of every possible salt combined with every likely password. Using a long salt ensures such a table would be impossibly large.
+If a salt is too short an attacker may create reverse hash lookup tables containing every possible salt combined with every likely password. Using a long salt ([64 or more bits](#salt-bits)) ensures such a table would be impossibly large.
 
-Another solution is to use a pepper in combination with short salts as also suggested with sequential salts above.
+Another solution is to use a long pepper ([64 or more bits](#salt-bits)) in combination with short salts as also suggested with sequential salts above.
 
 ## Salt Bits
 
