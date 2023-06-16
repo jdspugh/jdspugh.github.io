@@ -329,7 +329,7 @@ The number of unhashed password character combinations will be set by the applic
 
 The unhashed password complexity dictates the number of brute force attempts required to crack the password.
 
-# Password Strength
+<!-- # Password Strength
 
 , but will be costly if a slow hashing algorithm like Argon2 is used.
 
@@ -345,13 +345,13 @@ The user should be required to create passwords with a length of at least 8-10 c
 
 Number of attempts via brute force. Short passwords.
 
-Number of attempts via dictionary. Weak passwords.
+Number of attempts via dictionary. Weak passwords. -->
 
 # Password Hash Bits
 
 The number of bits in a password hash determines the number of significant characters a password possesses. Any characters beyond that number will not increase the security of the password.
 
-The usual set of characters used for passwords is the set of characters that are both visible and typeable on a standard keyboard. This includes both the upper and lower case alphabet letters (26x2) and the numerals (10) and special characters (33). This gives a total of 52 + 10 + 33 = 95.
+The usual set of characters used for passwords is the set of characters that are both visible and typeable on a standard keyboard. This includes both the upper and lower case alphabet letters (26x2) and the numerals (10) and special characters (33). This gives a total of 26x2 + 10 + 33 = 95.
 
 |Count|ASCII Code (Decimal)|ASCII Character|
 |-|-|-|
@@ -389,14 +389,19 @@ The usual set of characters used for passwords is the set of characters that are
 32|125|}
 33|126|~
 
-This doesn't preclude that users may want to use international characters or emojis in their passwords which could further increase security and resistance to brute force attacks in particular. The caveat being that they may have difficulty typing their password on different devices to those they usually use.
+<figcaption>ASCII Visible, Typeable Special Characters</figcaption>
+
+This does not preclude that users may want to use international characters or emojis in their passwords. Their use will further increase security, resistance to brute force attacks in particular. The caveat being that users may have difficulty typing their password on different devices to those that they usually use.
 
 <table>
 <thead>
 <tr>
-<th>Password Hash Bits</th>
-<th>Password Hash Bytes</th>
-<th>Unique Possible Values</th>
+<th colspan="2">Password Hash Length</th>
+<th rowspan="2">Unique Possible Values</th>
+</tr>
+<tr>
+<th>Bits</th>
+<th>Bytes</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -425,6 +430,8 @@ This doesn't preclude that users may want to use international characters or emo
 <td style="background-color:#F8E6D0">1.16E+77</td>
 </tr>
 </tbody></table>
+
+<figcaption>Password Hash Length vs Entropy</figcaption>
 
 <table>
 <thead>
@@ -595,7 +602,7 @@ This doesn't preclude that users may want to use international characters or emo
 </tr>
 </tbody></table>
 
-
+<figcaption>Significant Password Characters vs Entropy</figcaption>
 
 The number of bits in password hash alters the number of password hash collisions that will be experienced. The number of password hash collisions will be given by `<number of unique passwords> / (2 ^ <password hash bits>)`.
 
