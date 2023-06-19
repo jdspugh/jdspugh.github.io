@@ -8,7 +8,7 @@ We are going to take a deep dive into salts and peppers and, specifically, their
 
 # What are Salts & Peppers?
 
-A **salt** is a random value added as additional input to a password hash function to protect the resulting hash from reverse hash table lookups (and optimised versions of reverse hash table lookups such as rainbow tables).
+A **salt** is a random value added as additional input to a password hash function to protect the resulting hash from [reverse hash lookups](#reverse-hash-lookups) (and optimised versions of [reverse hash lookups](#reverse-hash-lookups) such as [rainbow tables](#rainbow-tables)).
 
 A **pepper** is a random value added as additional input to a password hash function to protect the resulting hash from dictionary and brute force attacks.
 
@@ -19,7 +19,7 @@ Salts are stored in the user table in the database, one random salt per user, wh
   <figcaption>Salts and Pepper Locations</figcaption>
 </figure>
 
-In the following sections we will explain in detail the use of salts and peppers and what reverse hash table lookups are.
+In the following sections we will explain in detail the use of salts and peppers and what [reverse hash lookups](#reverse-hash-lookups) are.
 
 # Storing Passwords
 
@@ -71,7 +71,7 @@ Reverse hash lookup tables are most effective against slow hashing algorithms si
 
 # Rainbow Tables
 
-The reverse hash lookup process can be optimised by using a technique widely known as **rainbow tables**. It can make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
+The reverse hash lookup process can be optimised by using a technique widely known as **[rainbow tables](#rainbow-tables)**. It can make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
 
 Further reading:
 
@@ -102,7 +102,7 @@ One might think that you could use the username or email address of a user as th
 
 We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that [short salts](#short-salts) have.
 
-The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the sequence number. Any reverse hash lookup tables now cannot be reused on other applications / deployments since different peppers make the reverse hash lookups useless to create.
+The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the sequence number. Any reverse hash lookup tables now cannot be reused on other applications / deployments since different peppers make the [reverse hash lookups](#reverse-hash-lookups) useless to create.
 
 ## Short Salts
 
@@ -149,14 +149,14 @@ Let's start with a table of SI units used for storage. This will make it easier 
 
 <figcaption>SI Units for Storage</figcaption>
 
-From the figure below we can see that global data storage is predicted to be 16 ZB by 2025 and is doubling every 4 years. A formula to predict the storage available at a given year is thus 16 × 2<sup>(year - 2025)/4</sup> ZB. To be safe we want to force our attackers' rainbow tables to be larger this value for some years into the future so that there is no chance of a rainbow table attack.
+From the figure below we can see that global data storage is predicted to be 16 ZB by 2025 and is doubling every 4 years. A formula to predict the storage available at a given year is thus 16 × 2<sup>(year - 2025)/4</sup> ZB. To be safe we want to force our attackers' [rainbow tables](#rainbow-tables) to be larger this value for some years into the future so that there is no chance of a rainbow table attack.
 
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/data-growth.png" alt="Global Data Storage Growth 2021-2025 (source: Redgate)"/>
   <figcaption>Global Data Storage Growth 2021-2025 (source: <a href="https://www.red-gate.com/blog/database-development/whats-the-real-story-behind-the-explosive-growth-of-data">Redgate</a>)</figcaption>
 </figure>
 
-Readily available public unsalted rainbow tables commonly vary from hundreds of Megabytes to Terabytes in size. Let's consider an extreme case where a rainbow tables is only 1 Megabyte in size. Salting forces the number of rainbow tables needed by an attacker to be equal to the number of unique salts:
+Readily available public unsalted [rainbow tables](#rainbow-tables) commonly vary from hundreds of Megabytes to Terabytes in size. Let's consider an extreme case where a [rainbow tables](#rainbow-tables) is only 1 Megabyte in size. Salting forces the number of [rainbow tables](#rainbow-tables) needed by an attacker to be equal to the number of unique salts:
 
 `Size of all Rainbow Tables = Unique Salts × 1 Megabyte`
 
@@ -171,7 +171,7 @@ Readily available public unsalted rainbow tables commonly vary from hundreds of 
 
 <figcaption>Salt Bits vs Size of all Rainbow Tables</figcaption>
 
-From the table above we can see that increases in the bits of salt used exponentially increases the storage required for the rainbow tables, and global storage increases at a relatively slower pace over time.
+From the table above we can see that increases in the bits of salt used exponentially increases the storage required for the [rainbow tables](#rainbow-tables), and global storage increases at a relatively slower pace over time.
 
 From the table below we can see that **64-bits of salt** would be more than **sufficient** in all present day cases and **decades into the future** at the current data storage growth rate. If you want to be extra safe then you can choose 96-bits:
 
