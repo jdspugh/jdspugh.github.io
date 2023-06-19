@@ -19,7 +19,7 @@ Salts are stored in the user table in the database, one random salt per user, wh
   <figcaption>Salts and Pepper Locations</figcaption>
 </figure>
 
-In the following sections we will explain in detail the use of salts and peppers and what [reverse hash lookups](#reverse-hash-lookups) are.
+In the following sections we will explain in detail the use of salts and peppers and what reverse hash lookups are.
 
 # Storing Passwords
 
