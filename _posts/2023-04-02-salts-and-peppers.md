@@ -8,7 +8,7 @@ We are going to take a deep dive into salts and peppers and, specifically, their
 
 # What are Salts & Peppers?
 
-A **salt** is a random value added as additional input to a password hash function to protect the resulting hash from [reverse hash lookups](#reverse-hash-lookups) (and optimised versions of [reverse hash lookups](#reverse-hash-lookups) such as [rainbow tables](#rainbow-tables)).
+A **salt** is a random value added as additional input to a password hash function to protect the resulting hash from [reverse hash lookups](#reverse-hash-lookups) (and optimised versions of reverse hash lookups such as [rainbow tables](#rainbow-tables)).
 
 A **pepper** is a random value added as additional input to a password hash function to protect the resulting hash from dictionary and brute force attacks.
 
