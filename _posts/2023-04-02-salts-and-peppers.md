@@ -329,24 +329,6 @@ The number of unhashed password character combinations will be set by the applic
 
 The unhashed password complexity dictates the number of brute force attempts required to crack the password.
 
-<!-- # Password Strength
-
-, but will be costly if a slow hashing algorithm like Argon2 is used.
-
-# Password Length
-
-It is best to use this set of 96 easily typeable characters for passwords `??? list of 96 password chars`. It includes upper and lower case alphabet characters along with numerals and special characters. It will allow users to create passwords that are stronger and more memorable without being too long.
-
-The user should be required to create passwords with a length of at least 8-10 characters using the 96 characters above.
-
-## SHA256
-
-## Argon2
-
-Number of attempts via brute force. Short passwords.
-
-Number of attempts via dictionary. Weak passwords. -->
-
 # Password Hash Bits
 
 The number of bits in a password hash determines the number of significant characters a password possesses. Any characters beyond that number will not increase the security of the password.
@@ -610,49 +592,7 @@ Minimum password length is given by the password hash bits.
 
 Maximum password length is given by the password hash bits. A password hash of 32-bits would effectively mean everything over 
 
-<!-- ```
-96 possible character values
-
-8 character long password
-
-96^8 = 7 213 895 789 838 336 unique possible password values
-
-2^32 = 4 294 967 296 unique possible password hash values
-```
-
-```
-96 possible character values
-
-12 character long password
-
-96^12 = 6.1e+23 unique possible password values
-
-2^32 = 4 294 967 296 unique possible password hash values
-``` -->
-
 We want passwords from 8 to 16 characters in length.
-
-<!-- |Bits|Unique Values|Average Number of Collisions|
-|-|-|-|
-|32|4 294 967 296|1.86|
-|64|18 446 744 073 709 552 000|0.000000000433681
-|96|79 228 162 514 264 337 593 543 950 336|
-|128|340 282 366 920 938 463 463 374 607 431 768 211 456|
-|256|115 792 089 237 316 195 423 570 985 008 687 907 853 269 984 665 640 564 039 457 584 007 913 129 639 936| -->
-
-<!-- Using a 32-bit password hash will mean you will find 1.86 (i.e. almost 2) passwords that generate the same hash on average. This will almost double the speed of the brute force attack. -->
-
-<!-- |Bits|Unique Values|Average Number of Collisions|
-|-|-|-|
-|32|4 294 967 296|1.86|
-|64|18 446 744 073 709 552 000|0.000000000433681
-|96|79 228 162 514 264 337 593 543 950 336|
-|128|340 282 366 920 938 463 463 374 607 431 768 211 456|
-|256|115 792 089 237 316 195 423 570 985 008 687 907 853 269 984 665 640 564 039 457 584 007 913 129 639 936| -->
-
-<!-- Slow hashes such as Argon2 will take orders of magnitude longer to crack.
-
-Avoid collisions. Force many attempts. -->
 
 # Node.js Implementation
 
@@ -731,7 +671,9 @@ app.listen(3000)
 
 # Conclusion
 
-Hashing the user's password with a correctly configured **Argon2** algorithm and a long, random, unique **salt** and a long random **pepper** provides very strong password protection, even in the case of a database breach. If the pepper is discovered and the database is breached Argon2 stills offers protection against dictionary and brute force attacks. In this case strong passwords are recommended.
+Hashing the user's password with a correctly configured **Argon2** algorithm and a long, random, unique **salt** and a long random **pepper** provides very strong password protection, even in the case of a database breach.
+
+If the **pepper is discovered and the database is breached** Argon2 stills offers protection for users using strong passwords. Weak passwords will vulnerable to discovery by dictionary or brute force attacks.
 
 <table style="border:1px solid black !important">
 <thead>
