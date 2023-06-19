@@ -37,13 +37,13 @@ If the database is compromised the usernames and passwords are directly exposed 
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. A hash is the output of a hash function. **A hash function is**, by design, **a one-way cryptographic function.** Once hashed, the password cannot be unhashed. Thus a hash is ideal for use in storing passwords.
+A better strategy is to store the hash of the password. A hash is the output of a hash function. **A hash function is a one-way cryptographic function.** Once hashed, the password cannot be unhashed. Thus a hash function is ideal for use in storing passwords.
 
 Note that technically the passwords are not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector to an authentication system.
 
-In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because it is a _fast_ hashing algorithm and it will be easy to crack weaker passwords it has hashed by using dictionary or brute force attacks on salted passwords with a known pepper, as we will discuss later on.
+In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because if the database and the pepper have been compromised, weaker passwords will be easy to crack through dictionary or brute force attacks. SHA256 is a _fast_ hashing algorithm so these attacks will be particularly effective on salted passwords with the known pepper.
 
-**Use Argon2** or a similar _slow_ hash function instead which will provide resistance against attacks even when both the database and the pepper have been compromised. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions and their characteristics.
+**Use Argon2** or a similar _slow_ hash function instead which will provide effective resistance against these attacks. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions and their characteristics.
 
 `HashedPassword = SHA256(Password)`
 
@@ -67,7 +67,7 @@ Since cryptographic hash functions, including SHA256, are designed to be irrever
 
 <figcaption>Reverse Hash Lookup Table</figcaption>
 
-Reverse hash lookup tables are most effective against slow hashing algorithms since the computational time to storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be much less.
+Reverse hash lookup tables are most useful against slow hashing algorithms since the computational time to storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be much less.
 
 # Rainbow Tables
 
@@ -80,7 +80,7 @@ Trade-Of_, Philippe Oechslin, 2003, <https://lasecwww.epfl.ch/pub/lasec/doc/Oech
 * _Rainbow Tables (probably) aren’t what you think — Part 1: Precomputed Hash Chains_,
 Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-what-you-think-30f8a61ba6a5>
 
-# Salt
+# Salts
 
 Salts, like peppers, are combined with passwords before hashing, effectively increasing the password's complexity, thus adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts used. This effectively renders reverse hash lookup tables useless since a new table needs to be created for each unique salt. Without being able to reuse the tables they only add overhead to the password cracking attempts.
 
@@ -102,13 +102,13 @@ One might think that you could use the username or email address of a user as th
 
 We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that [short salts](#short-salts) have.
 
-The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the sequence number. Any reverse hash lookup tables now cannot be reused on other applications / deployments since different peppers make the [reverse hash lookups](#reverse-hash-lookups) useless to create.
+The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the sequence number. Any reverse hash lookup tables now cannot be reused on other deployments. Different peppers make the reverse hash lookups span a different range of salts.
 
 ## Short Salts
 
 If a salt is too short an attacker may create reverse hash lookup tables containing every possible salt combined with every likely password. Using a long salt ([64 or more bits](#salt-bits)) ensures such a table would be impossibly large.
 
-Another solution is to use a long pepper ([64 or more bits](#salt-bits)) in combination with short salts as also suggested with sequential salts above.
+The solution is to use a long pepper ([64 or more bits](#salt-bits)) in combination the salt. This is the same solution as with sequential salts above.
 
 ## Salt Bits
 
@@ -389,27 +389,27 @@ This does not preclude that users may want to use international characters or em
 <tbody><tr>
 <td style="background-color:#FDF3D0">32</td>
 <td style="background-color:#FDF3D0">4</td>
-<td style="background-color:#FDF3D0">4.29E+09</td>
+<td style="background-color:#FDF3D0">2<sup>32</sup> ≈ 4.29E+09</td>
 </tr>
 <tr>
 <td style="background-color:#D8D3E7">64</td>
 <td style="background-color:#D8D3E7">8</td>
-<td style="background-color:#D8D3E7">1.84E+19</td>
+<td style="background-color:#D8D3E7">2<sup>64</sup> ≈ 1.84E+19</td>
 </tr>
 <tr>
 <td style="background-color:#D3DFE2">96</td>
 <td style="background-color:#D3DFE2">12</td>
-<td style="background-color:#D3DFE2">7.92E+28</td>
+<td style="background-color:#D3DFE2">2<sup>96</sup> ≈ 7.92E+28</td>
 </tr>
 <tr>
 <td style="background-color:#DCE9D5">128</td>
 <td style="background-color:#DCE9D5">16</td>
-<td style="background-color:#DCE9D5">3.40E+38</td>
+<td style="background-color:#DCE9D5">2<sup>128</sup> ≈ 3.40E+38</td>
 </tr>
 <tr>
 <td style="background-color:#F8E6D0">256</td>
 <td style="background-color:#F8E6D0">32</td>
-<td style="background-color:#F8E6D0">1.16E+77</td>
+<td style="background-color:#F8E6D0">2<sup>256</sup> ≈ 1.16E+77</td>
 </tr>
 </tbody></table>
 
@@ -418,169 +418,170 @@ This does not preclude that users may want to use international characters or em
 <table>
 <thead>
 <tr>
-<th>Significant Password Characters (96 chars)</th>
+<th>Significant Password Characters (95 chars)</th>
 <th>Unique Possible Values</th>
 </tr>
 </thead>
-<tbody><tr>
-<td>1</td>
-<td>9.60E+01</td>
+<tbody>
+<tr>
+  <td>1</td>
+  <td>95^1 ≈ 9.50E+01</td>
 </tr>
 <tr>
-<td>2</td>
-<td>9.22E+03</td>
+  <td>2</td>
+  <td>95^2 ≈ 9.03E+03</td>
 </tr>
 <tr>
-<td>3</td>
-<td>8.85E+05</td>
+  <td>3</td>
+  <td>95^3 ≈ 8.57E+05</td>
+</tr>
+<tr style="background-color:#FDF3D0">
+  <td>4</td>
+  <td>95^4 ≈ 8.15E+07</td>
 </tr>
 <tr>
-<td style="background-color:#FDF3D0">4</td>
-<td style="background-color:#FDF3D0">8.49E+07</td>
+  <td>5</td>
+  <td>95^5 ≈ 7.74E+09</td>
 </tr>
 <tr>
-<td>5</td>
-<td>8.15E+09</td>
+  <td>6</td>
+  <td>95^6 ≈ 7.35E+11</td>
 </tr>
 <tr>
-<td>6</td>
-<td>7.83E+11</td>
+  <td>7</td>
+  <td>95^7 ≈ 6.98E+13</td>
 </tr>
 <tr>
-<td>7</td>
-<td>7.51E+13</td>
+  <td>8</td>
+  <td>95^8 ≈ 6.63E+15</td>
+</tr>
+<tr style="background-color:#D8D3E7">
+  <td>9</td>
+  <td>95^9 ≈ 6.30E+17</td>
 </tr>
 <tr>
-<td>8</td>
-<td>7.21E+15</td>
+  <td>10</td>
+  <td>95^10 ≈ 5.99E+19</td>
 </tr>
 <tr>
-<td style="background-color:#D8D3E7">9</td>
-<td style="background-color:#D8D3E7">6.93E+17</td>
+  <td>11</td>
+  <td>95^11 ≈ 5.69E+21</td>
 </tr>
 <tr>
-<td>10</td>
-<td>6.65E+19</td>
+  <td>12</td>
+  <td>95^12 ≈ 5.40E+23</td>
 </tr>
 <tr>
-<td>11</td>
-<td>6.38E+21</td>
+  <td>13</td>
+  <td>95^13 ≈ 5.13E+25</td>
+</tr>
+<tr style="background-color:#D3DFE2">
+  <td>14</td>
+  <td>95^14 ≈ 4.88E+27</td>
 </tr>
 <tr>
-<td>12</td>
-<td>6.13E+23</td>
+  <td>15</td>
+  <td>95^15 ≈ 4.63E+29</td>
 </tr>
 <tr>
-<td>13</td>
-<td>5.88E+25</td>
+  <td>16</td>
+  <td>95^16 ≈ 4.40E+31</td>
 </tr>
 <tr>
-<td style="background-color:#D3DFE2">14</td>
-<td style="background-color:#D3DFE2">5.65E+27</td>
+  <td>17</td>
+  <td>95^17 ≈ 4.18E+33</td>
+</tr>
+<tr style="background-color:#DCE9D5">
+  <td>18</td>
+  <td>95^18 ≈ 3.97E+35</td>
 </tr>
 <tr>
-<td>15</td>
-<td>5.42E+29</td>
+  <td>19</td>
+  <td>95^19 ≈ 3.77E+37</td>
 </tr>
 <tr>
-<td>16</td>
-<td>5.20E+31</td>
+  <td>20</td>
+  <td>95^20 ≈ 3.58E+39</td>
 </tr>
 <tr>
-<td>17</td>
-<td>5.00E+33</td>
+  <td>21</td>
+  <td>95^21 ≈ 3.41E+41</td>
 </tr>
 <tr>
-<td>18</td>
-<td>4.80E+35</td>
+  <td>22</td>
+  <td>95^22 ≈ 3.24E+43</td>
 </tr>
 <tr>
-<td style="background-color:#DCE9D5">19</td>
-<td style="background-color:#DCE9D5">4.60E+37</td>
+  <td>23</td>
+  <td>95^23 ≈ 3.07E+45</td>
 </tr>
 <tr>
-<td>20</td>
-<td>4.42E+39</td>
+  <td>24</td>
+  <td>95^24 ≈ 2.92E+47</td>
 </tr>
 <tr>
-<td>21</td>
-<td>4.24E+41</td>
+  <td>25</td>
+  <td>95^25 ≈ 2.77E+49</td>
 </tr>
 <tr>
-<td>22</td>
-<td>4.07E+43</td>
+  <td>26</td>
+  <td>95^26 ≈ 2.64E+51</td>
 </tr>
 <tr>
-<td>23</td>
-<td>3.91E+45</td>
+  <td>27</td>
+  <td>95^27 ≈ 2.50E+53</td>
 </tr>
 <tr>
-<td>24</td>
-<td>3.75E+47</td>
+  <td>28</td>
+  <td>95^28 ≈ 2.38E+55</td>
 </tr>
 <tr>
-<td>25</td>
-<td>3.60E+49</td>
+  <td>29</td>
+  <td>95^29 ≈ 2.26E+57</td>
 </tr>
 <tr>
-<td>26</td>
-<td>3.46E+51</td>
+  <td>30</td>
+  <td>95^30 ≈ 2.15E+59</td>
 </tr>
 <tr>
-<td>27</td>
-<td>3.32E+53</td>
+  <td>31</td>
+  <td>95^31 ≈ 2.04E+61</td>
 </tr>
 <tr>
-<td>28</td>
-<td>3.19E+55</td>
+  <td>32</td>
+  <td>95^32 ≈ 1.94E+63</td>
 </tr>
 <tr>
-<td>29</td>
-<td>3.06E+57</td>
+  <td>33</td>
+  <td>95^33 ≈ 1.84E+65</td>
 </tr>
 <tr>
-<td>30</td>
-<td>2.94E+59</td>
+  <td>34</td>
+  <td>95^34 ≈ 1.75E+67</td>
 </tr>
 <tr>
-<td>31</td>
-<td>2.82E+61</td>
+  <td>35</td>
+  <td>95^35 ≈ 1.66E+69</td>
 </tr>
 <tr>
-<td>32</td>
-<td>2.71E+63</td>
+  <td>36</td>
+  <td>95^36 ≈ 1.58E+71</td>
 </tr>
 <tr>
-<td>33</td>
-<td>2.60E+65</td>
+  <td>37</td>
+  <td>95^37 ≈ 1.50E+73</td>
+</tr>
+<tr style="background-color:#F8E6D0">
+  <td>38</td>
+  <td>95^38 ≈ 1.42E+75</td>
 </tr>
 <tr>
-<td>34</td>
-<td>2.50E+67</td>
+  <td>39</td>
+  <td>95^39 ≈ 1.35E+77</td>
 </tr>
 <tr>
-<td>35</td>
-<td>2.40E+69</td>
-</tr>
-<tr>
-<td>36</td>
-<td>2.30E+71</td>
-</tr>
-<tr>
-<td>37</td>
-<td>2.21E+73</td>
-</tr>
-<tr>
-<td style="background-color:#F8E6D0">38</td>
-<td style="background-color:#F8E6D0">2.12E+75</td>
-</tr>
-<tr>
-<td>39</td>
-<td>2.04E+77</td>
-</tr>
-<tr>
-<td>40</td>
-<td>1.95E+79</td>
+  <td>40</td>
+  <td>95^40 ≈ 1.29E+79</td>
 </tr>
 </tbody></table>
 
