@@ -136,7 +136,7 @@ Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-w
 
 # Salts
 
-Salts, like peppers, are combined with passwords before hashing, effectively increasing the password's complexity, thus adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts used. This effectively renders reverse hash lookup tables useless since a new table needs to be created for each unique salt. Without being able to reuse the tables they only add overhead to the password cracking attempts.
+Salts, like peppers, are combined with passwords before hashing, adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts used. This effectively renders reverse hash lookup tables useless since a new table needs to be created for each unique salt. Without being able to reuse reverse hash lookup tables they only add overhead to password cracking attempts.
 
 `HashedPassword = SHA256(Password + Salt)`
 
@@ -148,31 +148,29 @@ Salts, like peppers, are combined with passwords before hashing, effectively inc
 
 <figcaption>Unencrypted User Table</figcaption>
 
-## Username/Email as Salt
+## Username or Email as Salt
 
 One might think that you could use the username or email address of a user as the salt to ensure uniqueness. While this initially seems a great idea you would not be able to change the username or email address without also creating a new password. Let's look at some other strategies then.
 
 ## Sequential Salts
 
-We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that an attacker may create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This presents the same vulnerabilities that [short salts](#short-salts) have.
+We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that the attacker can predict the salts beforehand and create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This is the same vulnerabilities that [short salts](#short-salts) have.
 
-The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the sequence number. Any reverse hash lookup tables now cannot be reused on other deployments. Different peppers make the reverse hash lookups span a different range of salts.
+The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the salt sequence number. Any reverse hash lookup tables now cannot be reused on other deployments. Different peppers make the reverse hash lookups span a different range of salts.
 
 ## Short Salts
 
-If a salt is too short an attacker may create reverse hash lookup tables containing every possible salt combined with every likely password. Using a long salt ([64 or more bits](#salt-bits)) ensures such a table would be impossibly large.
+If a salt is too short an attacker may create reverse hash lookup tables containing every possible salt combined with likely passwords. Using a long salt ([64 or more bits](#salt-bits)) ensures these tables would be impossibly large. This is the same solution as with [sequential salts](#sequential-salts) above.
 
-The solution is to use a long pepper ([64 or more bits](#salt-bits)) in combination the salt. This is the same solution as with sequential salts above.
+## Salt Length
 
-## Salt Bits
+There are two main factors we will consider for calculating the minimum salt length: salt collisions and rainbow table attack potential. Ultimately we will see that it is protection against rainbow table attacks that determines our minimum salt length.
 
-In this section we will attempt to quantitatively analyse what bit length salts should have. Salt length depends on your application's requirements, such as the **maximum number of users** expected and **database storage capacity**.
+For simplicity during these calculations let's assume a maximum expected userbase of **8 billion users** (about the number of people on planet Earth currently).
 
-For simplicity let's assume a maximum expected userbase of 8 billion users (about the number of people on planet Earth currently).
+### Salt Collisions
 
-### Collisions
-
-If a rainbow table was created for a particular salt value it would be able to be used on all password hashes that have been hashed with the same salt. This means, in the case of a 16-bit salt, a single rainbow table would be able to crack 121 896 password hashes on average given 8 billions users.
+If a rainbow table is created for a particular salt value it would be able to be used on all password hashes that have been hashed with the same salt. This means, in the case of a 16-bit salt, a single rainbow table would be able to crack 121 896 password hashes on average given 8 billions users.
 
 Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generated rainbow table can be used to crack 1.86 password hashes on average. This would only speed up the attack by 1.86 times.
 
@@ -187,7 +185,7 @@ Using the table below we can see that we should choose a **salt of 32-bits or mo
 
 <figcaption>Salt Size vs Collisions (for 8 Billion Users)</figcaption>
 
-### Rainbow Tables
+### Rainbow Table Attack Potential
 
 Let's start with a table of SI units used for storage. This will make it easier to visualise the quantities we are about to discuss:
 
