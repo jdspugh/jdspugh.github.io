@@ -6,6 +6,60 @@ title: Salts and Peppers
 
 We are going to take a deep dive into salts and peppers and, specifically, their use for safely storing passwords in a username/password login system.
 
+# Human Factors
+
+Let's consider the human factors involved in username/password
+
+## Memory
+
+It is important to have a safe and secure storage of passwords in a username/password login system, especially in this day and age where users are likely members of dozens of websites and other digital services. Humans can remember at most 4-5 unrelated passwords yet have dozens of digital services they are likely members of. For this reason they are likely to use the same passwords more than once, or variations of them, on different services. This means if a password stolen it potentially has a larger security effect than for just one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be cracked.
+
+## Typeability
+
+People must be able to type their passwords on their own devices and also other people's devices in the case that they are away from their own devices or have lost one of more of their devices. For this reason we will focus on the 95 ASCII visible, typeable characters for passwords. This includes both the upper and lower case alphabet letters (26x2) and the numerals (10) and special characters (33) including the space character.
+
+Count|ASCII Code (Decimal)|ASCII Character
+-|-|-
+1|32|space
+2|33|!
+3|34|"
+4|35|#
+5|36|$
+6|37|%
+7|38|&
+8|39|"
+9|40|(
+10|41|)
+11|42|*
+12|43|+
+13|44|,
+14|45|-
+15|46|.
+16|47|/
+17|58|:
+18|59|;
+19|60|<
+20|61|=
+21|62|>
+22|63|?
+23|64|@
+24|91|[
+25|92|\
+26|93|]
+27|94|^
+28|95|_
+29|96|`
+30|123|{
+31|124|\|
+32|125|}
+33|126|~
+
+<figcaption>ASCII Visible, Typeable Special Characters</figcaption>
+
+This gives a total of 26x2 + 10 + 33 = 95 characters.
+
+Users who want to use international characters or emojis in their passwords can but must remember that they may have difficulty typing the passwords on devices other than their own. International character and emoji use will likely increase password ensecurity in that an attacker will need to include them in their attack dictionary.
+
 # What are Salts & Peppers?
 
 A **salt** is a random value added as additional input to a password hash function to protect the resulting hash from [reverse hash lookups](#reverse-hash-lookups) (and optimised versions of reverse hash lookups such as [rainbow tables](#rainbow-tables)).
@@ -39,12 +93,6 @@ If the database is compromised the usernames and passwords are directly exposed 
 
 A better strategy is to store the hash of the password. A hash is the output of a hash function. **A hash function is a one-way cryptographic function.** Once hashed, the password cannot be unhashed. Thus a hash function is ideal for use in storing passwords.
 
-Note that technically the passwords are not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector to an authentication system.
-
-In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because if the database and the pepper have been compromised, weaker passwords will be easy to crack through dictionary or brute force attacks. SHA256 is a _fast_ hashing algorithm so these attacks will be particularly effective on salted passwords with the known pepper.
-
-**Use Argon2** or a similar _slow_ hash function instead which will provide effective resistance against these attacks. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions and their characteristics.
-
 `HashedPassword = SHA256(Password)`
 
 | Username | HashedPassword |
@@ -55,9 +103,15 @@ In this article we are using the SHA256 hash function for simplicity. **Do not u
 
 <figcaption>Hashed Passwords in a User Table</figcaption>
 
+In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because if the database and the pepper have been compromised, weaker passwords will be easy to crack through dictionary or brute force attacks. SHA256 is a _fast_ hashing algorithm that is designed to generate hashes very quickly. This aids dictionary and brute force attacks which need to perform hash calculations as fast as possible.
+
+**Use Argon2** or a similar _slow_ hash function instead which will provide effective resistance against these attacks. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions and their characteristics.
+
+Note that technically the passwords hashed, not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector to an authentication system.
+
 # Reverse Hash Lookups
 
-Since cryptographic hash functions, including SHA256, are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where strong (e.g. 10+ random characters) and a slow hash function, such as a well configured Argon2, was used this would be the case. The reality is that users often choose very weak passwords such as the ones I chose: `qwerty` and `12345678`. What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table. A specific password hash can be rapidly searched for in the table and the corresponding unhashed password extracted.
+Since cryptographic hash functions are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where strong (e.g. 10+ random characters) and a slow hash function, such as a well configured Argon2, was used this would be the case. The reality is that users often choose very weak passwords such as the ones I chose: `qwerty` and `12345678`. What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table. A specific password hash can be rapidly searched for in the table and the corresponding unhashed password extracted.
 
 | HashedPassword | Password |
 |-|-|
@@ -67,7 +121,7 @@ Since cryptographic hash functions, including SHA256, are designed to be irrever
 
 <figcaption>Reverse Hash Lookup Table</figcaption>
 
-Reverse hash lookup tables are most useful against slow hashing algorithms since the computational time to storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be much less.
+Reverse hash lookup tables are most useful against slow hashing algorithms since the hash computation time vs storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be significantly less.
 
 # Rainbow Tables
 
@@ -329,51 +383,29 @@ The number of unhashed password character combinations will be set by the applic
 
 The unhashed password complexity dictates the number of brute force attempts required to crack the password.
 
-# Password Hash Bits
+# Human Factors
 
-The number of bits in a password hash determines the number of significant characters a password possesses. Any characters beyond that number will not increase the security of the password.
+When designing 
 
-The usual set of characters used for passwords is the set of characters that are both visible and typeable on a standard keyboard. This includes both the upper and lower case alphabet letters (26x2) and the numerals (10) and special characters (33). This gives a total of 26x2 + 10 + 33 = 95.
+e are considering the best way to store passwords considering human factors:
 
-|Count|ASCII Code (Decimal)|ASCII Character|
-|-|-|-|
-1|32|space
-2|33|!
-3|34|"
-4|35|#
-5|36|$
-6|37|%
-7|38|&
-8|39|"
-9|40|(
-10|41|)
-11|42|*
-12|43|+
-13|44|,
-14|45|-
-15|46|.
-16|47|/
-17|58|:
-18|59|;
-19|60|<
-20|61|=
-21|62|>
-22|63|?
-23|64|@
-24|91|[
-25|92|\
-26|93|]
-27|94|^
-28|95|_
-29|96|`
-30|123|{
-31|124|\|
-32|125|}
-33|126|~
+## Memory
 
-<figcaption>ASCII Visible, Typeable Special Characters</figcaption>
+Users frequently reuse passwords across digital services. Users can remember at most 4-5 unrelated passwords. When users are forced to change passwords frequently they write them down, opening up other attack vectors (see [_Users are not the Enemy_, 1999](https://dl.acm.org/doi/pdf/10.1145/322796.322806)).
 
-This does not preclude that users may want to use international characters or emojis in their passwords. Their use will further increase security, resistance to brute force attacks in particular. The caveat being that users may have difficulty typing their password on different devices to those that they usually use.
+## Typeability
+
+
+
+# Password Hash Length
+
+Password hashes are generally stored in databases and are of constant length. The entropy of a single password hash determines the maximum entropy of a user's unhashed password.
+
+Increasing unhashed password entropy makes passwords more difficult for users to remember, so there is a general maximum limit for memorised passwords. When passwords become longer than this limit users will need tend to write them down, store them electronically, or use password managers, which open up another set of attack vectors.
+
+The maximum number of bits a user's password hash can contain determines the maximum number of significant characters a user's unhashed password will have. Any characters beyond that number will not increase the security of the password.
+
+Attackers, in order to not waste attacks, need to copy the general form of the users' passwords e.g. which characters are allowed, the probabilities of specific characters being used, which dictionary words and languages used.
 
 <table>
 <thead>
