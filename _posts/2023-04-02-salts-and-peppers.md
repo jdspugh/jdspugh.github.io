@@ -136,7 +136,7 @@ Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-w
 
 # Salts
 
-Salts, like peppers, are combined with passwords before hashing, adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts used. This effectively renders reverse hash lookup tables useless since a new table needs to be created for each unique salt. Without being able to reuse reverse hash lookup tables they only add overhead to password cracking attempts.
+Salts, like peppers, are combined with passwords before hashing, adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts used. They effectively render reverse hash lookup tables useless since a new table needs to be created for each unique salt. Without being able to reuse the tables they only add overhead to password cracking attempts.
 
 `HashedPassword = SHA256(Password + Salt)`
 
@@ -146,7 +146,7 @@ Salts, like peppers, are combined with passwords before hashing, adding to the p
 | user2 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
 | ... | ... | ... |
 
-<figcaption>Unencrypted User Table</figcaption>
+<figcaption>Salts in the User Table</figcaption>
 
 ## Username or Email as Salt
 
@@ -156,7 +156,7 @@ One might think that you could use the username or email address of a user as th
 
 We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that the attacker can predict the salts beforehand and create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This is the same vulnerabilities that [short salts](#short-salts) have.
 
-The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the salt sequence number. Any reverse hash lookup tables now cannot be reused on other deployments. Different peppers make the reverse hash lookups span a different range of salts.
+The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the salt sequence number. Any reverse hash lookup tables now cannot be reused on other deployments: different peppers make the reverse hash lookups span a different range of salts.
 
 ## Short Salts
 
@@ -164,7 +164,7 @@ If a salt is too short an attacker may create reverse hash lookup tables contain
 
 ## Salt Length
 
-There are two main factors we will consider for calculating the minimum salt length: salt collisions and rainbow table attack potential. Ultimately we will see that it is protection against rainbow table attacks that determines our minimum salt length.
+There are two main factors we will consider for calculating the minimum salt length: salt collisions and rainbow table attack potential. We will see that it is protection against rainbow table attacks that determines our minimum salt length.
 
 For simplicity during these calculations let's assume a maximum expected userbase of **8 billion users** (about the number of people on planet Earth currently).
 
