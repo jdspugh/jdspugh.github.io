@@ -8,11 +8,9 @@ We are going to take a deep dive into salts and peppers and, specifically, their
 
 # Human Factors
 
-Let's consider the human factors involved in username/password
-
 ## Memory
 
-It is important to have a safe and secure storage of passwords in a username/password login system, especially in this day and age where users are likely members of dozens of websites and other digital services. Humans can remember at most 4-5 unrelated passwords yet have dozens of digital services they are likely members of. For this reason they are likely to use the same passwords more than once, or variations of them, on different services. This means if a password stolen it potentially has a larger security effect than for just one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be cracked.
+Humans can remember at most 4-5 distinct passwords yet have dozens of digital services they are likely members of. For this reason they are likely to use the same passwords more than once, or variations of them, on different services. This means if a password stolen it potentially has larger security implications than for just one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through a data breach.
 
 ## Typeability
 
@@ -164,24 +162,26 @@ If a salt is too short an attacker may create reverse hash lookup tables contain
 
 ## Salt Length
 
-There are two main factors we will consider for calculating the minimum salt length: salt collisions and rainbow table attack potential. We will see that it is protection against rainbow table attacks that determines our minimum salt length.
+The salt needs to be long enough that it is not worth it for an attacker to undertake rainbow table attacks. For simplicity during these calculations let's assume a maximum expected userbase of **8 billion users** (about the number of people on planet Earth currently).
 
-For simplicity during these calculations let's assume a maximum expected userbase of **8 billion users** (about the number of people on planet Earth currently).
+If the salt length is short there will be salt collisions i.e. duplicate salts. The attacker can use their rainbow table on all password hashes that have the same salt. In the case of a 16-bit salt, a single rainbow table would be able to crack 121 896 password hashes on average.
 
-### Salt Collisions
+Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generated rainbow table can be used to crack 1.86 password hashes on average per rainbow table which would be barely worth it for the attacker.
 
-If a rainbow table is created for a particular salt value it would be able to be used on all password hashes that have been hashed with the same salt. This means, in the case of a 16-bit salt, a single rainbow table would be able to crack 121 896 password hashes on average given 8 billions users.
+Per row values for the following table can be calculated using these formulae:
 
-Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generated rainbow table can be used to crack 1.86 password hashes on average. This would only speed up the attack by 1.86 times.
+<code>Unique Salts = 2<sup>Salt Bits</sup></code>
 
-| Salt Size (bits) | Unique Salts | Average Collisions per Salt |
-|-:|-:|-|
-| 16 | 65 536 | 121 896 |
-| 32 | 4 294 967 296 | 1.86 |
-| 64 | 1.84 × 10<sup>19</sup> | 4.34 × 10<sup>-10</sup> |
-| 96 | 7.92 × 10<sup>28</sup> | 1.01 × 10<sup>-21</sup> |
-| 128 | 3.40 × 10<sup>38</sup> | 2.35 × 10<sup>-30</sup> |
-| 256 | 1.16 × 10<sup>77</sup> | 6.88 × 10<sup>-68</sup> |
+`Average Collisions per Salt = 8 billion / Unique Salts`
+
+Salt Bits | Unique Salts | Average Collisions per Salt
+-:|-:|-
+16 | 65 536 | 121 896
+32 | 4 294 967 296 | 1.86
+64 | 1.84 × 10<sup>19</sup> | 4.34 × 10<sup>-10</sup>
+96 | 7.92 × 10<sup>28</sup> | 1.01 × 10<sup>-21</sup>
+128 | 3.40 × 10<sup>38</sup> | 2.35 × 10<sup>-30</sup>
+256 | 1.16 × 10<sup>77</sup> | 6.88 × 10<sup>-68</sup>
 
 <figcaption>Salt Size vs Collisions (for 8 Billion Users)</figcaption>
 
@@ -244,9 +244,9 @@ For reference we show here a couple of other recommendations for salt lengths. W
 
 # Pepper
 
-A pepper is a single, fixed, random value stored separately from the database (preferably in some form of secure storage). An attacker may compromise the database and steal the data there, but without the pepper they will have to spend brute force effort to find a password and the pepper's value. If the pepper is sufficiently strong then it will be impossible. 
+A pepper is a single, fixed, random value stored separately from the database (preferably in some form of secure storage). An attacker may compromise the database and steal the data there, but without the pepper they will have to spend brute force effort to find a password and the pepper's value. If the pepper is sufficiently strong then it will be impossible to brute force. 
 
-The pepper is combined with the password to produce different hash values compared with the previous user table. We see that the reverse hash lookup table we created before will no longer be applicable to our newly peppered passwords above as the SHA256 values don't match any more:
+The pepper is combined with the password to produce different hash values compared with the an unpeppered user table. We see that the reverse hash lookup table we created before will no longer be applicable to our newly peppered passwords above as the SHA256 values do not match any more:
 
 ```
 PEPPER = wtWy8vb3Ov4FFiFF
@@ -299,18 +299,18 @@ Let's assume one password hash and salt are known. We just need to brute force o
 
 <figcaption>Bitcoin Hash Rate Doubling Time</figcaption>
 
-Let's take the worst case of the time of most acceleration of the Bitcoin hash rate: doubling every 60 days. Then we can set a maximum hash rate using the formula:
+Let's take the worst case of the most acceleration of the Bitcoin hash rate: doubling every 60 days. Then we can set a maximum hash rate using the formula:
 
-`<Bitcoin hash rate maximum> = 380 * 2 ^ (<days past May 2023> / 60) EH/s`
+<code>Bitcoin hash rate maximum = 380 × 2<sup>(days past May 2023 / 60)</sup> EH/s</code>
 
-`<hashes> = 2 ^ <pepper bits>`
+<code>hashes = 2<sup>pepper bits</sup></code>
 
 |Time|Bitcoin Hash Rate Upper Limit|
 |-|-|
 |0 Years|380 EH/s|
 |1 Year|26 000 EH/s|
 |10 Years|780 000 000 000 000 000 000 EH/s|
-|100 Years|5.0 x 10^185 EH/s|
+|100 Years|5.0 × 10<sup>185</sup> EH/s|
 |1 000 Years|
 |10 000 Years|
 |100 000 Years|
@@ -324,7 +324,7 @@ If we are using all the world's Bitcoin hash power to crack a peppered password,
 
 This method is secure if the pepper is kept secret. But if the pepper is discovered the attacker can easily make a reverse hash lookup table with the pepper in appended to each password and use this to attack the peppered user table.
 
-If the pepper is lost (or is changed), password verification is no longer possible as different password hashes will be generated. All users would have to create new passwords.
+If the pepper is lost (or is changed) users will have to create new passwords to create newly peppered password hashes.
 
 ## Node.js Implementation
 
@@ -371,7 +371,7 @@ Dictionary attacks attack weak passwords. Weak passwords are passwords that are 
 
 The attack success rate and number of attacks required to find the password will depend on the quality of the attacker's dictionary and its match with the set of passwords being attacked. Password attack dictionaries can contain complex passwords that contain words from various languages that are mixed with combinations of numbers and symbols. These dictionaries can crack up to around 20% of an average users' passwords from a list of over a trillion passwords. It is recommended that your application checks new passwords against such a dictionary and warn the user that they are using a weak password if it is in the list.
 
-In terms of the speed of the attack a dictionary attack may be successful with a fast hashing algorithm like SHA256. A single dedicated consumer SHA256 ASIC cryptocurrency mining rig can, as of May 2023, do more than 100 TH/s. This means that more than 100 passwords could be attacked per second (with up to 20% success rate). Thus it's recommended to use a slow, configurable, hashing algorithm like Argon2 that is orders of magnitude slower when computing a password's hash. It is unlikely that your application will have lots of simultaneous sign ups or password changes which means that you should configure your Argon2 parameters so that the hashes take around a second to complete. This is short enough that the user will not be too disturbed by the delay computing it, but long enough to provide good brute force resistance. Set the memory complexity as high as your computer can handle since this will provide maximum GPU resistance, making it harder for attackers. Your attacker may have a faster computer than you, so let's say your Argon2 hash takes 1 second, the attacker may be able to perform the same hash 10x faster. So each brute force attack will take around `.1s x 1 000 000 000 / 2 = 50 000 000s = 578 days` to complete (with up to 20% success rate). This is very good security considering your system has been completely compromised.
+In terms of the speed of the attack a dictionary attack may be successful with a fast hashing algorithm like SHA256. A single dedicated consumer SHA256 ASIC cryptocurrency mining rig can, as of May 2023, do more than 100 TH/s. This means that more than 100 passwords could be attacked per second (with up to 20% success rate). Thus it's recommended to use a slow, configurable, hashing algorithm like Argon2 that is orders of magnitude slower when computing a password's hash. It is unlikely that your application will have lots of simultaneous sign ups or password changes which means that you should configure your Argon2 parameters so that the hashes take around a second to complete. This is short enough that the user will not be too disturbed by the delay computing it, but long enough to provide good brute force resistance. Set the memory complexity as high as your computer can handle since this will provide maximum GPU resistance, making it harder for attackers. Your attacker may have a faster computer than you, so let's say your Argon2 hash takes 1 second, the attacker may be able to perform the same hash 10x faster. So each brute force attack will take around `.1s × 1 000 000 000 / 2 = 50 000 000s = 578 days` to complete (with up to 20% success rate). This is very good security considering your system has been completely compromised.
 
 ## Brute Force Attacks
 
@@ -382,10 +382,6 @@ The number of unhashed password character combinations will be set by the applic
 The unhashed password complexity dictates the number of brute force attempts required to crack the password.
 
 # Human Factors
-
-When designing 
-
-e are considering the best way to store passwords considering human factors:
 
 ## Memory
 
@@ -419,27 +415,27 @@ Attackers, in order to not waste attacks, need to copy the general form of the u
 <tbody><tr>
 <td style="background-color:#FDF3D0">32</td>
 <td style="background-color:#FDF3D0">4</td>
-<td style="background-color:#FDF3D0">2<sup>32</sup> ≈ 4.29E+09</td>
+<td style="background-color:#FDF3D0">2<sup>32</sup> ≈ 4.29 × 10<sup>09</sup></td>
 </tr>
 <tr>
 <td style="background-color:#D8D3E7">64</td>
 <td style="background-color:#D8D3E7">8</td>
-<td style="background-color:#D8D3E7">2<sup>64</sup> ≈ 1.84E+19</td>
+<td style="background-color:#D8D3E7">2<sup>64</sup> ≈ 1.84 × 10<sup>19</sup></td>
 </tr>
 <tr>
 <td style="background-color:#D3DFE2">96</td>
 <td style="background-color:#D3DFE2">12</td>
-<td style="background-color:#D3DFE2">2<sup>96</sup> ≈ 7.92E+28</td>
+<td style="background-color:#D3DFE2">2<sup>96</sup> ≈ 7.92 × 10<sup>28</sup></td>
 </tr>
 <tr>
 <td style="background-color:#DCE9D5">128</td>
 <td style="background-color:#DCE9D5">16</td>
-<td style="background-color:#DCE9D5">2<sup>128</sup> ≈ 3.40E+38</td>
+<td style="background-color:#DCE9D5">2<sup>128</sup> ≈ 3.40 × 10<sup>38</sup></td>
 </tr>
 <tr>
 <td style="background-color:#F8E6D0">256</td>
 <td style="background-color:#F8E6D0">32</td>
-<td style="background-color:#F8E6D0">2<sup>256</sup> ≈ 1.16E+77</td>
+<td style="background-color:#F8E6D0">2<sup>256</sup> ≈ 1.16 × 10<sup>77</sup></td>
 </tr>
 </tbody></table>
 
@@ -455,169 +451,169 @@ Attackers, in order to not waste attacks, need to copy the general form of the u
 <tbody>
 <tr>
   <td>1</td>
-  <td>95^1 ≈ 9.50E+01</td>
+  <td>95<sup>1</sup> ≈ 9.50 × 10<sup>1</sup></td>
 </tr>
 <tr>
   <td>2</td>
-  <td>95^2 ≈ 9.03E+03</td>
+  <td>95<sup>2</sup> ≈ 9.03 × 10<sup>3</sup></td>
 </tr>
 <tr>
   <td>3</td>
-  <td>95^3 ≈ 8.57E+05</td>
+  <td>95<sup>3</sup> ≈ 8.57 × 10<sup>5</sup></td>
 </tr>
 <tr style="background-color:#FDF3D0">
   <td>4</td>
-  <td>95^4 ≈ 8.15E+07</td>
+  <td>95<sup>4</sup> ≈ 8.15 × 10<sup>7</sup></td>
 </tr>
 <tr>
   <td>5</td>
-  <td>95^5 ≈ 7.74E+09</td>
+  <td>95<sup>5</sup> ≈ 7.74 × 10<sup>9</sup></td>
 </tr>
 <tr>
   <td>6</td>
-  <td>95^6 ≈ 7.35E+11</td>
+  <td>95<sup>6</sup> ≈ 7.35 × 10<sup>11</sup></td>
 </tr>
 <tr>
   <td>7</td>
-  <td>95^7 ≈ 6.98E+13</td>
+  <td>95<sup>7</sup> ≈ 6.98 × 10<sup>13</sup></td>
 </tr>
 <tr>
   <td>8</td>
-  <td>95^8 ≈ 6.63E+15</td>
+  <td>95<sup>8</sup> ≈ 6.63 × 10<sup>15</sup></td>
 </tr>
 <tr style="background-color:#D8D3E7">
   <td>9</td>
-  <td>95^9 ≈ 6.30E+17</td>
+  <td>95<sup>9</sup> ≈ 6.30 × 10<sup>17</sup></td>
 </tr>
 <tr>
   <td>10</td>
-  <td>95^10 ≈ 5.99E+19</td>
+  <td>95<sup>10</sup> ≈ 5.99 × 10<sup>19</sup></td>
 </tr>
 <tr>
   <td>11</td>
-  <td>95^11 ≈ 5.69E+21</td>
+  <td>95<sup>11</sup> ≈ 5.69 × 10<sup>21</sup></td>
 </tr>
 <tr>
   <td>12</td>
-  <td>95^12 ≈ 5.40E+23</td>
+  <td>95<sup>12</sup> ≈ 5.40 × 10<sup>23</sup></td>
 </tr>
 <tr>
   <td>13</td>
-  <td>95^13 ≈ 5.13E+25</td>
+  <td>95<sup>13</sup> ≈ 5.13 × 10<sup>25</sup></td>
 </tr>
 <tr style="background-color:#D3DFE2">
   <td>14</td>
-  <td>95^14 ≈ 4.88E+27</td>
+  <td>95<sup>14</sup> ≈ 4.88 × 10<sup>27</sup></td>
 </tr>
 <tr>
   <td>15</td>
-  <td>95^15 ≈ 4.63E+29</td>
+  <td>95<sup>15</sup> ≈ 4.63 × 10<sup>29</sup></td>
 </tr>
 <tr>
   <td>16</td>
-  <td>95^16 ≈ 4.40E+31</td>
+  <td>95<sup>16</sup> ≈ 4.40 × 10<sup>31</sup></td>
 </tr>
 <tr>
   <td>17</td>
-  <td>95^17 ≈ 4.18E+33</td>
+  <td>95<sup>17</sup> ≈ 4.18 × 10<sup>33</sup></td>
 </tr>
 <tr style="background-color:#DCE9D5">
   <td>18</td>
-  <td>95^18 ≈ 3.97E+35</td>
+  <td>95<sup>18</sup> ≈ 3.97 × 10<sup>35</sup></td>
 </tr>
 <tr>
   <td>19</td>
-  <td>95^19 ≈ 3.77E+37</td>
+  <td>95<sup>19</sup> ≈ 3.77 × 10<sup>37</sup></td>
 </tr>
 <tr>
   <td>20</td>
-  <td>95^20 ≈ 3.58E+39</td>
+  <td>95<sup>20</sup> ≈ 3.58 × 10<sup>39</sup></td>
 </tr>
 <tr>
   <td>21</td>
-  <td>95^21 ≈ 3.41E+41</td>
+  <td>95<sup>21</sup> ≈ 3.41 × 10<sup>41</sup></td>
 </tr>
 <tr>
   <td>22</td>
-  <td>95^22 ≈ 3.24E+43</td>
+  <td>95<sup>22</sup> ≈ 3.24 × 10<sup>43</sup></td>
 </tr>
 <tr>
   <td>23</td>
-  <td>95^23 ≈ 3.07E+45</td>
+  <td>95<sup>23</sup> ≈ 3.07 × 10<sup>45</sup></td>
 </tr>
 <tr>
   <td>24</td>
-  <td>95^24 ≈ 2.92E+47</td>
+  <td>95<sup>24</sup> ≈ 2.92 × 10<sup>47</sup></td>
 </tr>
 <tr>
   <td>25</td>
-  <td>95^25 ≈ 2.77E+49</td>
+  <td>95<sup>25</sup> ≈ 2.77 × 10<sup>49</sup></td>
 </tr>
 <tr>
   <td>26</td>
-  <td>95^26 ≈ 2.64E+51</td>
+  <td>95<sup>26</sup> ≈ 2.64 × 10<sup>51</sup></td>
 </tr>
 <tr>
   <td>27</td>
-  <td>95^27 ≈ 2.50E+53</td>
+  <td>95<sup>27</sup> ≈ 2.50 × 10<sup>53</sup></td>
 </tr>
 <tr>
   <td>28</td>
-  <td>95^28 ≈ 2.38E+55</td>
+  <td>95<sup>28</sup> ≈ 2.38 × 10<sup>55</sup></td>
 </tr>
 <tr>
   <td>29</td>
-  <td>95^29 ≈ 2.26E+57</td>
+  <td>95<sup>29</sup> ≈ 2.26 × 10<sup>57</sup></td>
 </tr>
 <tr>
   <td>30</td>
-  <td>95^30 ≈ 2.15E+59</td>
+  <td>95<sup>30</sup> ≈ 2.15 × 10<sup>59</sup></td>
 </tr>
 <tr>
   <td>31</td>
-  <td>95^31 ≈ 2.04E+61</td>
+  <td>95<sup>31</sup> ≈ 2.04 × 10<sup>61</sup></td>
 </tr>
 <tr>
   <td>32</td>
-  <td>95^32 ≈ 1.94E+63</td>
+  <td>95<sup>32</sup> ≈ 1.94 × 10<sup>63</sup></td>
 </tr>
 <tr>
   <td>33</td>
-  <td>95^33 ≈ 1.84E+65</td>
+  <td>95<sup>33</sup> ≈ 1.84 × 10<sup>65</sup></td>
 </tr>
 <tr>
   <td>34</td>
-  <td>95^34 ≈ 1.75E+67</td>
+  <td>95<sup>34</sup> ≈ 1.75 × 10<sup>67</sup></td>
 </tr>
 <tr>
   <td>35</td>
-  <td>95^35 ≈ 1.66E+69</td>
+  <td>95<sup>35</sup> ≈ 1.66 × 10<sup>69</sup></td>
 </tr>
 <tr>
   <td>36</td>
-  <td>95^36 ≈ 1.58E+71</td>
+  <td>95<sup>36</sup> ≈ 1.58 × 10<sup>71</sup></td>
 </tr>
 <tr>
   <td>37</td>
-  <td>95^37 ≈ 1.50E+73</td>
+  <td>95<sup>37</sup> ≈ 1.50 × 10<sup>73</sup></td>
 </tr>
 <tr style="background-color:#F8E6D0">
   <td>38</td>
-  <td>95^38 ≈ 1.42E+75</td>
+  <td>95<sup>38</sup> ≈ 1.42 × 10<sup>75</sup></td>
 </tr>
 <tr>
   <td>39</td>
-  <td>95^39 ≈ 1.35E+77</td>
+  <td>95<sup>39</sup> ≈ 1.35 × 10<sup>77</sup></td>
 </tr>
 <tr>
   <td>40</td>
-  <td>95^40 ≈ 1.29E+79</td>
+  <td>95<sup>40</sup> ≈ 1.29 × 10<sup>79</sup></td>
 </tr>
 </tbody></table>
 
 <figcaption>Significant Password Characters vs Entropy</figcaption>
 
-The number of bits in password hash alters the number of password hash collisions that will be experienced. The number of password hash collisions will be given by `<number of unique passwords> / (2 ^ <password hash bits>)`.
+The number of bits in password hash alters the number of password hash collisions that will be experienced. The number of password hash collisions will be given by <code>number of unique passwords / 2<sup>password hash bits</sup></code>.
 
 Minimum password length is given by the password hash bits.
 
@@ -748,6 +744,8 @@ If the **pepper is discovered and the database is breached** Argon2 stills offer
 </table>
 
 <figcaption>Data Compromised vs Attack Possibilities</figcaption>
+
+Even with the most secure username/password login system in place users should be aware there are other less technical ways for passwords to be stolen such as over-the-shoulder or phishing attacks. At least we can secure the technical aspects so users have one less problem to worry about.
 
 Further aspects that should be delved into in-depth are the minimum lengths of the passwords, pepper and the parameters for tuning the Argon2 hashing algorithm.
 
