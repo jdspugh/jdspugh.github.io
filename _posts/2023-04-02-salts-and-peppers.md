@@ -10,11 +10,11 @@ We are going to take a deep dive into salts and peppers and, specifically, their
 
 ## Memory
 
-Humans can remember at most 4-5 distinct passwords yet have dozens of digital services they are likely members of. For this reason they are likely to use the same passwords more than once, or variations of them, on different services. This means if a password stolen it potentially has larger security implications than for just one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through a data breach.
+Humans can remember at most 4-5 distinct passwords yet are likely members of dozens of digital services. For this reason they are likely to use the same passwords more than once, or variations of them, on different services. This means if a password stolen it potentially has larger security implications than for just one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through a data breach.
 
 ## Typeability
 
-People must be able to type their passwords on their own devices and also other people's devices in the case that they are away from their own devices or have lost one of more of their devices. For this reason we will focus on the 95 ASCII visible, typeable characters for passwords. This includes both the upper and lower case alphabet letters (26x2) and the numerals (10) and special characters (33) including the space character.
+People must be able to type their passwords on their own devices and also other people's devices in the case that they are away from their own devices or have lost one of more of their devices. For this reason we will focus on the 95 ASCII visible, typeable characters for passwords for any calculations. This includes both the upper and lower case alphabet letters (26x2) and the numerals (10) and special characters (33) including the space character.
 
 Count|ASCII Code (Decimal)|ASCII Character
 -|-|-
@@ -56,7 +56,7 @@ Count|ASCII Code (Decimal)|ASCII Character
 
 This gives a total of 26x2 + 10 + 33 = 95 characters.
 
-Users who want to use international characters or emojis in their passwords can but must remember that they may have difficulty typing the passwords on devices other than their own. International character and emoji use will likely increase password ensecurity in that an attacker will need to include them in their attack dictionary.
+Users who want to use international characters or emojis in their passwords can but must remember that they may have difficulty typing the passwords on devices other than their own. International character and emoji use, if allowed, will likely increase password security in that an attacker will need to include them in their attack dictionary, requiring a larger attack dictionary.
 
 # What are Salts & Peppers?
 
@@ -164,6 +164,8 @@ If a salt is too short an attacker may create reverse hash lookup tables contain
 
 The salt needs to be long enough that it is not worth it for an attacker to undertake rainbow table attacks. For simplicity during these calculations let's assume a maximum expected userbase of **8 billion users** (about the number of people on planet Earth currently).
 
+### Salt Collisions
+
 If the salt length is short there will be salt collisions i.e. duplicate salts. The attacker can use their rainbow table on all password hashes that have the same salt. In the case of a 16-bit salt, a single rainbow table would be able to crack 121 896 password hashes on average.
 
 Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generated rainbow table can be used to crack 1.86 password hashes on average per rainbow table which would be barely worth it for the attacker.
@@ -185,7 +187,7 @@ Salt Bits | Unique Salts | Average Collisions per Salt
 
 <figcaption>Salt Size vs Collisions (for 8 Billion Users)</figcaption>
 
-### Rainbow Table Attack Potential
+### Rainbow Table Storage
 
 Let's start with a table of SI units used for storage. This will make it easier to visualise the quantities we are about to discuss:
 
