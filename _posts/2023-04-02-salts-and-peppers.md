@@ -123,7 +123,7 @@ Reverse hash lookup tables are most useful against slow hashing algorithms since
 
 # Rainbow Tables
 
-The reverse hash lookup process can be optimised by using a technique widely known as **[rainbow tables](#rainbow-tables)**. It can make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
+The reverse hash lookup process can be optimised by using a technique widely known as **rainbow tables**. It can make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
 
 Further reading:
 
@@ -168,9 +168,9 @@ The salt needs to be long enough that it is not worth it for an attacker to unde
 
 If the salt length is short there will be salt collisions i.e. duplicate salts. The attacker can use their rainbow table on all password hashes that have the same salt. In the case of a 16-bit salt, a single rainbow table would be able to crack 121 896 password hashes on average.
 
-Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means the generated rainbow table can be used to crack 1.86 password hashes on average per rainbow table which would be barely worth it for the attacker.
+Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means a generated rainbow table can be used to crack 1.86 password hashes on average which would be barely worth generating for the attacker.
 
-Per row values for the following table can be calculated using these formulae:
+Per row values for the following table can be calculated using:
 
 <code>Unique Salts = 2<sup>Salt Bits</sup></code>
 
@@ -203,14 +203,14 @@ Let's start with a table of SI units used for storage. This will make it easier 
 
 <figcaption>SI Units for Storage</figcaption>
 
-From the figure below we can see that global data storage is predicted to be 16 ZB by 2025 and is doubling every 4 years. A formula to predict the storage available at a given year is thus 16 × 2<sup>(year - 2025)/4</sup> ZB. To be safe we want to force our attackers' [rainbow tables](#rainbow-tables) to be larger this value for some years into the future so that there is no chance of a rainbow table attack.
+From the figure below we can see that global data storage is predicted to be 16 ZB by 2025 and is doubling every 4 years. A formula to predict the storage available at a given year is thus <code>16 × 2<sup>(year - 2025)/4</sup> ZB</code>. To be safe we want to force our attackers' rainbow tables to be larger this value for some years into the future so that there is no chance of a rainbow table attack.
 
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/data-growth.png" alt="Global Data Storage Growth 2021-2025 (source: Redgate)"/>
   <figcaption>Global Data Storage Growth 2021-2025 (source: <a href="https://www.red-gate.com/blog/database-development/whats-the-real-story-behind-the-explosive-growth-of-data">Redgate</a>)</figcaption>
 </figure>
 
-Readily available public unsalted [rainbow tables](#rainbow-tables) commonly vary from hundreds of Megabytes to Terabytes in size. Let's consider an extreme case where a [rainbow tables](#rainbow-tables) is only 1 Megabyte in size. Salting forces the number of [rainbow tables](#rainbow-tables) needed by an attacker to be equal to the number of unique salts:
+For reference, readily available public unsalted rainbow tables commonly vary from hundreds of Megabytes to Terabytes in size. Let's consider an extreme case where a rainbow tables is only 1 Megabyte in size for our calculations. Salting forces the number of rainbow tables needed by an attacker to be equal to the number of unique salts. So we get:
 
 `Size of all Rainbow Tables = Unique Salts × 1 Megabyte`
 
@@ -225,9 +225,9 @@ Readily available public unsalted [rainbow tables](#rainbow-tables) commonly var
 
 <figcaption>Salt Bits vs Size of all Rainbow Tables</figcaption>
 
-From the table above we can see that increases in the bits of salt used exponentially increases the storage required for the [rainbow tables](#rainbow-tables), and global storage increases at a relatively slower pace over time.
+From the table above we can see that increases in the bits of salt used exponentially increases the minimum storage required for the rainbow tables, and global storage increases at a relatively slower pace over time.
 
-From the table below we can see that **64-bits of salt** would be more than **sufficient** in all present day cases and **decades into the future** at the current data storage growth rate. If you want to be extra safe then you can choose 96-bits:
+From the table below we can see that **64-bits of salt** would be more than **sufficient** in all present day cases and **decades into the future** at the current data storage growth rate:
 
 | Salt Bits | Estimated Minimum Years of Protection |
 |-:|-|
@@ -238,9 +238,9 @@ From the table below we can see that **64-bits of salt** would be more than **su
 
 <figcaption>Salt Bits vs Estimated Minimum Years of Protection</figcaption>
 
-For reference we show here a couple of other recommendations for salt lengths. We feel the recommendations are somewhat arbitrary since there is no indication how they were derived:
+For reference we show here a couple of other recommendations for salt lengths. We feel these recommendations are somewhat arbitrary since there is no indication how they were derived:
 
-* The[ National Institute of Standards and Technology (NIST)](https://www.nist.gov) recommends at least 32-bits in its [Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-3/sp800-63b.html)
+* The [National Institute of Standards and Technology (NIST)](https://www.nist.gov) recommends at least 32-bits in its [Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-3/sp800-63b.html)
 
 * The [Open Web Application Security Project (OWASP)](https://owasp.deteact.com/cheat/cheatsheets/Password_Storage_Cheat_Sheet.html) recommends using salts that are 256 to 512-bits long
 
