@@ -189,7 +189,7 @@ Using the table below we can see that we should choose a **salt of 32-bits or mo
 <table>
 <thead>
 <tr>
-<th style="text-align:right"><div style="white-space:nowrap">Salt Bits</div><br /><div style="font-size:60%">&nbsp;</div></th>
+<th style="text-align:right"><div style="white-space:nowrap">Salt Bits</div><div style="font-size:60%">&nbsp;</div></th>
 <th>Unique Salts<br /><div style="font-size:60%">(2<sup>Salt Bits</sup>)</div></th>
 <th>Average Collisions per Salt<br /><div style="font-size:60%">(8 billion / Unique Salts)</div></th>
 </tr>
