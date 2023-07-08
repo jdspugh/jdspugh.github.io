@@ -6,15 +6,23 @@ title: Salts and Peppers
 
 We are going to take a deep dive into salts and peppers and, specifically, their use for safely storing passwords in a username/password login system.
 
-# Human Factors
+# Password Human Factors
 
-## Memory
+## Human Memory
 
-Humans can remember at most 4-5 distinct passwords yet are likely members of dozens of digital services. For this reason they are likely to use the same passwords more than once, or variations of them, on different services. This means if a password stolen it potentially has larger security implications than for just one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through a data breach.
+Generally people can remember at most 4-5 distinct passwords  (see [_Users are not the Enemy_, page 46](https://dl.acm.org/doi/pdf/10.1145/322796.322806)) yet are likely members of dozens of digital services that require username/password logins. For this reason they are likely to use the same passwords more than once, or variations of them, for different services. This means if a password is stolen it potentially has larger security implications than for just that one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through one of the most common security breaches: a data breach. For examples of recent data breaches, and their extents, see the [';--have i been pwned?](https://haveibeenpwned.com/) website.
+
+There are ways of overcoming our memory limitations by writing down passwords, using a password manager or by using biometric logins. Each of these solutions introduce additional attack vectors, so in this article we will focus only on username/password logins and how salts and peppers relate to them.
+
+Writing down passwords: Someone finds your paper.???
+
+Password manager: Someone discovers your master password.???
+
+Biometrics: ???
 
 ## Typeability
 
-People must be able to type their passwords on their own devices and also other people's devices in the case that they are away from their own devices or have lost one of more of their devices. For this reason we will focus on the 95 ASCII visible, typeable characters for passwords for any calculations. This includes both the upper and lower case alphabet letters (26x2) and the numerals (10) and special characters (33) including the space character.
+People must be able to type their passwords on their own devices and also other people's devices in the case that they are away from their own devices or have lost one of more of their devices. For this reason we will focus on the 95 ASCII visible, typeable characters for password calculations in this article. This includes both the upper and lower case alphabet letters (26×2), the numerals (10) and special characters (33) including the space character.
 
 Count|ASCII Code (Decimal)|ASCII Character
 -|-|-
@@ -54,9 +62,15 @@ Count|ASCII Code (Decimal)|ASCII Character
 
 <figcaption>ASCII Visible, Typeable Special Characters</figcaption>
 
-This gives a total of 26x2 + 10 + 33 = 95 characters.
+This gives a total of `26x2 + 10 + 33 = 95` characters.
 
-Users who want to use international characters or emojis in their passwords can but must remember that they may have difficulty typing the passwords on devices other than their own. International character and emoji use, if allowed, will likely increase password security in that an attacker will need to include them in their attack dictionary, requiring a larger attack dictionary.
+### Emojis & International Characters
+
+Users who want to use international characters or emojis in their passwords can if their login system allows it. Emojis in passwords can be easier to remember and add to password entropy. Most modern web based applications support Unicode characters by default which include 1424 standardised emojis (as of Unicode 15.0 ???ref wikipedia).
+
+International character and emoji use increase password security in that an attacker will need to include them in their attack dictionary, requiring a significantly larger attack dictionary.
+
+Users must be aware that they may have difficulty typing emoji or international character passwords on devices other than their own. The universality and standardisation of emojis has come far but should still be considered as a factor when creating passwords containing them.
 
 # What are Salts & Peppers?
 
@@ -85,19 +99,21 @@ Consider a typical application that stores usernames and passwords. The naive st
 
 <figcaption>Unencrypted User Table</figcaption>
 
-If the database is compromised the usernames and passwords are directly exposed and can be used to login to any user's account through the application's login user interface.
+If the database is compromised by an external hacker the usernames and passwords are directly exposed and can be used to login to any user's account through the application's login user interface.
+
+A rouge employee could also clone usernames and passwords easily with little chance being caught.
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. A hash is the output of a hash function. **A hash function is a one-way cryptographic function.** Once hashed, the password cannot be unhashed. Thus a hash function is ideal for use in storing passwords.
+A better strategy is to store the hash of the password. A hash is the output of a hash function. **A hash function is a one-way cryptographic function** that produce a seemingly random output that aims to be unique per input. Once hashed, the password hash cannot be unhashed. Thus a password hash is ideal for use in storing obscured passwords.
 
 `HashedPassword = SHA256(Password)`
 
-| Username | HashedPassword |
-|-|-|
-| user1 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 |
-| user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f |
-| ... | ... |
+Username | HashedPassword
+-|-
+user1 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5
+user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f
+... | ...
 
 <figcaption>Hashed Passwords in a User Table</figcaption>
 
@@ -105,7 +121,7 @@ In this article we are using the SHA256 hash function for simplicity. **Do not u
 
 **Use Argon2** or a similar _slow_ hash function instead which will provide effective resistance against these attacks. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions and their characteristics.
 
-Note that technically the passwords hashed, not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector to an authentication system.
+Note: People often talk of passwords being encrypted. Technically passwords should hashed, not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector to an authentication system.
 
 # Reverse Hash Lookups
 
@@ -119,11 +135,11 @@ Since cryptographic hash functions are designed to be irreversible you might thi
 
 <figcaption>Reverse Hash Lookup Table</figcaption>
 
-Reverse hash lookup tables are most useful against slow hashing algorithms since the hash computation time vs storage space ratio is the highest. For fast hashing algorithms like SHA256 the gains will be significantly less.
+Reverse hash lookup tables are most useful against slow hashing algorithms since the hash computation time will be large compared with minimal storage space required to store the hash result. For fast hashing algorithms like SHA256 the gains, if any, will be significantly less.
 
 # Rainbow Tables
 
-The reverse hash lookup process can be optimised by using a technique widely known as **rainbow tables**. It can make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
+The reverse hash lookup process can be optimised by using a technique known as **rainbow tables**. It can make the lookup tables orders of magnitude smaller with just a slight slowdown in lookup speed.
 
 Further reading:
 
@@ -134,7 +150,7 @@ Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-w
 
 # Salts
 
-Salts, like peppers, are combined with passwords before hashing, adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts used. They effectively render reverse hash lookup tables useless since a new table needs to be created for each unique salt. Without being able to reuse the tables they only add overhead to password cracking attempts.
+Salts, like peppers, are combined with passwords before hashing, adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts used. They can render reverse hash lookup tables useless since a new table needs to be created for each unique salt. Without being able to reuse the tables they only add overhead to password cracking attempts.
 
 `HashedPassword = SHA256(Password + Salt)`
 
@@ -154,11 +170,13 @@ One might think that you could use the username or email address of a user as th
 
 We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that the attacker can predict the salts beforehand and create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This is the same vulnerabilities that [short salts](#short-salts) have.
 
-The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the salt sequence number. Any reverse hash lookup tables now cannot be reused on other deployments: different peppers make the reverse hash lookups span a different range of salts.
+The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the salt sequence number. Any reverse hash lookup tables now cannot be reused on other deployments regardless of if the pepper is known or not. Different peppers make the reverse hash lookups span a different range of values.
 
 ## Short Salts
 
-If a salt is too short an attacker may create reverse hash lookup tables containing every possible salt combined with likely passwords. Using a long salt ([64 or more bits](#salt-bits)) ensures these tables would be impossibly large. This is the same solution as with [sequential salts](#sequential-salts) above.
+If a salt is too short an attacker may create reverse hash lookup tables containing every possible salt combined with likely passwords. Using a long salt ([64 or more bits](#salt-bits)) ensures these tables would be impossibly large.
+
+Another solution is to use a pepper in combination with short salts as also suggested with [sequential salts](#sequential-salts) above.
 
 ## Salt Length
 
@@ -387,7 +405,7 @@ The unhashed password complexity dictates the number of brute force attempts req
 
 ## Memory
 
-Users frequently reuse passwords across digital services. Users can remember at most 4-5 unrelated passwords. When users are forced to change passwords frequently they write them down, opening up other attack vectors (see [_Users are not the Enemy_, 1999](https://dl.acm.org/doi/pdf/10.1145/322796.322806)).
+Users frequently reuse passwords across digital services. Users can remember at most 4-5 unrelated passwords. When users are forced to change passwords frequently they write them down, opening up other attack vectors.
 
 ## Typeability
 
