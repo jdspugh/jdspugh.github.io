@@ -222,14 +222,47 @@ From the figure below we can see that global data storage is predicted to be 16 
 
 For reference, readily available public unsalted rainbow tables commonly vary from hundreds of Megabytes to Terabytes in size. Let's consider an extreme case where a rainbow tables is only 1 Megabyte in size for simplification of our calculations. Salting forces the number of rainbow tables needed by an attacker to be equal to the number of unique salts. So we get:
 
-| <div style="white-space:nowrap">Salt Bits</div><div style="font-size:60%">&nbsp;</div> | Size of all Rainbow Tables (ZB)<br /><div style="font-size:60%">(Unique Salts × 1 MB)</div> | Unique Salts<br /><div style="font-size:60%">&nbsp;</div> |
-|-:|-:|-|
-| 16 | 0.000000000065536 | 65 536 |
-| 32 | 0.00000429 | 4 294 967 296 |
-| 64 | 18 446 | 18 446 744 073 709 551 616 |
-| 96 | 79 228 162 514 264 | 79 228 162 514 264 337 593 543 950 336 |
-| 128 | 340 282 366 920 938 463 463 374 | 340 282 366 920 938 463 463 374 607 431 768 211 456 |
-| 256 | 115 792 089 237 316 195 423 570 985 008 687 907 853 269 984 665 640 564 039 457 584 | 115 792 089 237 316 195 423 570 985 008 687 907 853 269 984 665 640 564 039 457 584 007 913 129 639 936 |
+<table>
+<thead>
+<tr>
+<th style="text-align:right"><div>Salt Bits</div><div style="font-size:60%">&nbsp;</div></th>
+<th style="text-align:right">Size of all Rainbow Tables (ZB)<br /><div style="font-size:60%">(Unique Salts × 1 MB)</div></th>
+<th>Unique Salts<br /><div style="font-size:60%">&nbsp;</div></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">16</td>
+<td style="text-align:right">0.000000000065536</td>
+<td>65 536</td>
+</tr>
+<tr>
+<td style="text-align:right">32</td>
+<td style="text-align:right">0.00000429</td>
+<td>4 294 967 296</td>
+</tr>
+<tr>
+<td style="text-align:right">64</td>
+<td style="text-align:right">18 446</td>
+<td>18 446 744 073 709 551 616</td>
+</tr>
+<tr>
+<td style="text-align:right">96</td>
+<td style="text-align:right">79 228 162 514 264</td>
+<td>79 228 162 514 264 337 593 543 950 336</td>
+</tr>
+<tr>
+<td style="text-align:right">128</td>
+<td style="text-align:right">340 282 366 920 938 463 463 374</td>
+<td>340 282 366 920 938 463 463 374 607 431 768 211 456</td>
+</tr>
+<tr>
+<td style="text-align:right">256</td>
+<td style="text-align:right">115 792 089 237 316 195 423 570 985 008 687 907 853 269 984 665 640 564 039 457 584</td>
+<td>115 792 089 237 316 195 423 570 985 008 687 907 853 269 984 665 640 564 039 457 584 007 913 129 639 936</td>
+</tr>
+</tbody>
+</table>
 
 <figcaption>Salt Bits vs Size of all Rainbow Tables</figcaption>
 
