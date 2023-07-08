@@ -174,9 +174,7 @@ The vulnerability can be mitigated by combining a long random pepper ([64 or mor
 
 ## Short Salts
 
-If a salt is too short an attacker may create reverse hash lookup tables containing every possible salt combined with likely passwords. Using a long salt ([64 or more bits](#salt-bits)) ensures these tables would be impossibly large.
-
-Another solution is to use a pepper in combination with short salts as also suggested with [sequential salts](#sequential-salts) above.
+If a salt is too short an attacker may create reverse hash lookup tables containing every possible salt combined with likely passwords. Using a long salt ([64 or more bits](#salt-bits)) ensures these tables would be impossibly large. Another solution is to use a pepper in combination with short salts as also suggested with [sequential salts](#sequential-salts) above.
 
 ## Salt Length
 
@@ -188,14 +186,8 @@ If the salt length is short there will be salt collisions i.e. duplicate salts. 
 
 Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means a generated rainbow table can be used to crack 1.86 password hashes on average which would be barely worth generating for the attacker.
 
-Per row values for the following table can be calculated using:
-
-<code>Unique Salts = 2<sup>Salt Bits</sup></code>
-
-`Average Collisions per Salt = 8 billion / Unique Salts`
-
-Salt Bits | Unique Salts | Average Collisions per Salt
--:|-:|-
+Salt Bits<br /><div style="font-size:60%">&nbsp;</div> | Unique Salts<br /><div style="font-size:60%">(2<sup>Salt Bits</sup>)</div> | Average Collisions per Salt<br /><div style="font-size:60%">(8 billion / Unique Salts)</div>
+-:|-|-
 16 | 65 536 | 121 896
 32 | 4 294 967 296 | 1.86
 64 | 1.84 × 10<sup>19</sup> | 4.34 × 10<sup>-10</sup>
