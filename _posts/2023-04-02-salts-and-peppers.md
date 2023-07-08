@@ -186,14 +186,47 @@ If the salt length is short there will be salt collisions i.e. duplicate salts. 
 
 Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means a generated rainbow table can be used to crack 1.86 password hashes on average which would be barely worth generating for the attacker.
 
-Salt Bits<br /><div style="font-size:60%">&nbsp;</div> | Unique Salts<br /><div style="font-size:60%">(2<sup>Salt Bits</sup>)</div> | Average Collisions per Salt<br /><div style="font-size:60%">(8 billion / Unique Salts)</div>
--:|-|-
-16 | 65 536 | 121 896
-32 | 4 294 967 296 | 1.86
-64 | 1.84 × 10<sup>19</sup> | 4.34 × 10<sup>-10</sup>
-96 | 7.92 × 10<sup>28</sup> | 1.01 × 10<sup>-21</sup>
-128 | 3.40 × 10<sup>38</sup> | 2.35 × 10<sup>-30</sup>
-256 | 1.16 × 10<sup>77</sup> | 6.88 × 10<sup>-68</sup>
+<table>
+<thead>
+<tr>
+<th style="text-align:right"><div style="white-space:nowrap">Salt Bits</div><br /><div style="font-size:60%">&nbsp;</div></th>
+<th>Unique Salts<br /><div style="font-size:60%">(2<sup>Salt Bits</sup>)</div></th>
+<th>Average Collisions per Salt<br /><div style="font-size:60%">(8 billion / Unique Salts)</div></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">16</td>
+<td>65 536</td>
+<td>121 896</td>
+</tr>
+<tr>
+<td style="text-align:right">32</td>
+<td>4 294 967 296</td>
+<td>1.86</td>
+</tr>
+<tr>
+<td style="text-align:right">64</td>
+<td>1.84 × 10<sup>19</sup></td>
+<td>4.34 × 10<sup>-10</sup></td>
+</tr>
+<tr>
+<td style="text-align:right">96</td>
+<td>7.92 × 10<sup>28</sup></td>
+<td>1.01 × 10<sup>-21</sup></td>
+</tr>
+<tr>
+<td style="text-align:right">128</td>
+<td>3.40 × 10<sup>38</sup></td>
+<td>2.35 × 10<sup>-30</sup></td>
+</tr>
+<tr>
+<td style="text-align:right">256</td>
+<td>1.16 × 10<sup>77</sup></td>
+<td>6.88 × 10<sup>-68</sup></td>
+</tr>
+</tbody>
+</table>
 
 <figcaption>Salt Size vs Collisions (for 8 Billion Users)</figcaption>
 
@@ -365,8 +398,6 @@ Let's take the worst case of the most acceleration of the Bitcoin hash rate: dou
 |10 000 Years|
 |100 000 Years|
 |1 000 000 Years|
-
-
 
 If we are using all the world's Bitcoin hash power to crack a peppered password, we can see from the chart that from 94-bits onwards the brute force will take more than a year to complete. Since a long pepper does not take any significant extra storage or computational power you can choose at least 128-bits which will take over 20 000 000 000 years to crack.
 
