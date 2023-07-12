@@ -39,13 +39,7 @@ A username/password authentication system is a "what you know" system. We are go
 
 Generally people can remember at most 4-5 distinct passwords  (see [_Users are not the Enemy_, page 46](https://dl.acm.org/doi/pdf/10.1145/322796.322806)) yet are likely members of dozens of digital services that require username/password authentication. For this reason they are likely to use the same passwords more than once, or variations of them, for different services. This means if a password is stolen it potentially has larger security implications than for just that one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through one of the most common security breaches: a data breach. For examples of recent data breaches, and their extents, see the [';--have i been pwned?](https://haveibeenpwned.com/) website.
 
-There are ways of overcoming our memory limitations by writing down passwords, using a password manager or by using biometric authentication. Each of these solutions introduce additional attack vectors, so in this article we will focus only on username/password authentication and how salts and peppers relate to it.
-
-Writing down passwords: Someone finds your paper.???
-
-Password manager: Someone discovers your master password.???
-
-Biometrics: ???
+Memory limitations can be overcome by writing down passwords or by using a password manager. Writing down passwords is not secure in that people may find your paper. Using a password manager runs the risk of the manager being compromised and all your passwords being discovered. So in this article we will focus only on username/password authentication and how salts and peppers relate to it.
 
 ## Typeability
 
@@ -93,7 +87,7 @@ This gives a total of `26x2 + 10 + 33 = 95` characters.
 
 ### Emojis & International Characters
 
-Users who want to use international characters or emojis in their passwords can if their authentication system allows it. Emojis in passwords can be easier to remember and add to password entropy. Most modern web based applications support Unicode characters by default which include 1424 standardised emojis (as of Unicode 15.0 ???ref wikipedia).
+Users who want to use international characters or emojis in their passwords can if their authentication system allows it. Emojis in passwords can be easier to remember and add to password entropy. Most modern web based applications support Unicode characters by default which include over 3600 standardised emojis (as of [Unicode 15.0](https://home.unicode.org/emoji/about-emoji)).
 
 International character and emoji use increase password security in that an attacker will need to include them in their attack dictionary, requiring a significantly larger attack dictionary.
 
