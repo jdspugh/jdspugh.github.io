@@ -4,15 +4,42 @@ title: Salts and Peppers
 ---
 # Goal
 
-We are going to take a deep dive into salts and peppers and, specifically, their use for safely storing passwords in a username/password login system.
+We are going to take a deep dive into salts and peppers and, specifically, their use for safely storing passwords in a username/password authentication system.
+
+# Authentication Overview
+
+Authentication mechanisms:
+
+* **What you know**
+  * **Username/password**
+  * PIN
+  * Security questions
+* What you hold
+  * SIM card
+  * Mobile phone
+  * Passport
+  * Digital certificate
+* What you are
+  * Fingerprint
+  * Voice print
+  * Face recognition
+  * Retina scan
+* Where you are
+  * GPRS location
+  * Wi-Fi router location
+  * IP address location
+  
+Authentication can be achieved using one or more of the mechanisms. Depending on the application, the authentication system may choose to use more than one authentication category. This is called two factor authentication (2FA). It is less convenient for the user but adds more security.
+
+A username/password authentication system is a "what you know" system. We are going to look at this mechanism as it is simple and convenient, and doesn't require any additional hardware. It can be very secure if implemented correctly by understanding the recommendations in this article.
 
 # Password Human Factors
 
 ## Human Memory
 
-Generally people can remember at most 4-5 distinct passwords  (see [_Users are not the Enemy_, page 46](https://dl.acm.org/doi/pdf/10.1145/322796.322806)) yet are likely members of dozens of digital services that require username/password logins. For this reason they are likely to use the same passwords more than once, or variations of them, for different services. This means if a password is stolen it potentially has larger security implications than for just that one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through one of the most common security breaches: a data breach. For examples of recent data breaches, and their extents, see the [';--have i been pwned?](https://haveibeenpwned.com/) website.
+Generally people can remember at most 4-5 distinct passwords  (see [_Users are not the Enemy_, page 46](https://dl.acm.org/doi/pdf/10.1145/322796.322806)) yet are likely members of dozens of digital services that require username/password authentication. For this reason they are likely to use the same passwords more than once, or variations of them, for different services. This means if a password is stolen it potentially has larger security implications than for just that one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through one of the most common security breaches: a data breach. For examples of recent data breaches, and their extents, see the [';--have i been pwned?](https://haveibeenpwned.com/) website.
 
-There are ways of overcoming our memory limitations by writing down passwords, using a password manager or by using biometric logins. Each of these solutions introduce additional attack vectors, so in this article we will focus only on username/password logins and how salts and peppers relate to them.
+There are ways of overcoming our memory limitations by writing down passwords, using a password manager or by using biometric authentication. Each of these solutions introduce additional attack vectors, so in this article we will focus only on username/password authentication and how salts and peppers relate to it.
 
 Writing down passwords: Someone finds your paper.???
 
@@ -66,7 +93,7 @@ This gives a total of `26x2 + 10 + 33 = 95` characters.
 
 ### Emojis & International Characters
 
-Users who want to use international characters or emojis in their passwords can if their login system allows it. Emojis in passwords can be easier to remember and add to password entropy. Most modern web based applications support Unicode characters by default which include 1424 standardised emojis (as of Unicode 15.0 ???ref wikipedia).
+Users who want to use international characters or emojis in their passwords can if their authentication system allows it. Emojis in passwords can be easier to remember and add to password entropy. Most modern web based applications support Unicode characters by default which include 1424 standardised emojis (as of Unicode 15.0 ???ref wikipedia).
 
 International character and emoji use increase password security in that an attacker will need to include them in their attack dictionary, requiring a significantly larger attack dictionary.
 
@@ -826,7 +853,7 @@ If the **pepper is discovered and the database is breached** Argon2 stills offer
 
 <figcaption>Data Compromised vs Attack Possibilities</figcaption>
 
-Even with the most secure username/password login system in place users should be aware there are other less technical ways for passwords to be stolen such as over-the-shoulder or phishing attacks. At least we can secure the technical aspects so users have one less problem to worry about.
+Even with the most secure username/password authentication system in place users should be aware there are other less technical ways for passwords to be stolen such as over-the-shoulder or phishing attacks. At least we can secure the technical aspects so users have one less problem to worry about.
 
 Further aspects that should be delved into in-depth are the minimum lengths of the passwords, pepper and the parameters for tuning the Argon2 hashing algorithm.
 
