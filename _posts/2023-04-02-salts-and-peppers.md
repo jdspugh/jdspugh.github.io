@@ -21,7 +21,7 @@ Authentication mechanisms:
   * Digital certificate
 * What you are
   * Fingerprint
-  * Voice print
+  * Voiceprint
   * Face recognition
   * Retina scan
 * Where you are
@@ -29,7 +29,7 @@ Authentication mechanisms:
   * Wi-Fi router location
   * IP address location
   
-Authentication can be achieved using one or more of the mechanisms. Depending on the application, the authentication system may choose to use more than one authentication category. This is called two factor authentication (2FA). It is less convenient for the user but adds more security.
+Authentication can be achieved using one or more of the mechanisms. Depending on the application, the authentication system may choose to use more than one authentication category. This is called **two factor authentication** (2FA). It is **less convenient** for the user **but adds more security**.
 
 A username/password authentication system is a "what you know" system. We are going to look at this mechanism as it is simple and convenient, and doesn't require any additional hardware. It can be very secure if implemented correctly by understanding the recommendations in this article.
 
@@ -37,7 +37,8 @@ A username/password authentication system is a "what you know" system. We are go
 
 ## Human Memory
 
-Generally people can remember at most 4-5 distinct passwords  (see [_Users are not the Enemy_, page 46](https://dl.acm.org/doi/pdf/10.1145/322796.322806)) yet are likely members of dozens of digital services that require username/password authentication. For this reason they are likely to use the same passwords more than once, or variations of them, for different services. This means if a password is stolen it potentially has larger security implications than for just that one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through one of the most common security breaches: a data breach. For examples of recent data breaches, and their extents, see the [';--have i been pwned?](https://haveibeenpwned.com/) website.
+Generally people can remember at most 4-5 distinct passwords  ([Adams &
+Sasse, 1999, page 46](https://dl.acm.org/doi/pdf/10.1145/322796.322806)) yet are likely members of dozens of digital services that require username/password authentication. For this reason they are likely to use the same passwords more than once, or variations of them, for different services. This means if a password is stolen it potentially has larger security implications than for just that one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through one of the most common security breaches: a data breach. For examples of recent data breaches, and their extents, see the [';--have i been pwned?](https://haveibeenpwned.com/) website.
 
 Memory limitations can be overcome by writing down passwords or by using a password manager. Writing down passwords is not secure in that people may find your paper. Using a password manager runs the risk of the manager being compromised and all your passwords being discovered. So in this article we will focus only on username/password authentication and how salts and peppers relate to it.
 
@@ -87,7 +88,7 @@ This gives a total of `26x2 + 10 + 33 = 95` characters.
 
 ### Emojis & International Characters
 
-Users who want to use international characters or emojis in their passwords can if their authentication system allows it. Emojis in passwords can be easier to remember and add to password entropy. Most modern web based applications support Unicode characters by default which include over 3600 standardised emojis (as of [Unicode 15.0](https://home.unicode.org/emoji/about-emoji)).
+Users who want to use international characters or emojis in their passwords can if their authentication system allows it. Emojis in passwords can be easier to remember and add to password entropy ([_UK firm [Intelligent Environments] launches emoji alternative to Pin codes_, 2015](https://www.bbc.com/news/technology-33063344)). Modern web based applications support Unicode characters by default which include **3664 standardised emojis** (as of [Unicode 15.0](https://www.unicode.org/emoji/charts/emoji-counts.html)).
 
 International character and emoji use increase password security in that an attacker will need to include them in their attack dictionary, requiring a significantly larger attack dictionary.
 
@@ -106,8 +107,6 @@ Salts are stored in the user table in the database, one random salt per user, wh
   <figcaption>Salts and Pepper Locations</figcaption>
 </figure>
 
-In the following sections we will explain in detail the use of salts and peppers and what reverse hash lookups are.
-
 # Storing Passwords
 
 Consider a typical application that stores usernames and passwords. The naive strategy would be to store the usernames and passwords in a database without encryption:
@@ -120,9 +119,7 @@ Consider a typical application that stores usernames and passwords. The naive st
 
 <figcaption>Unencrypted User Table</figcaption>
 
-If the database is compromised by an external hacker the usernames and passwords are directly exposed and can be used to login to any user's account through the application's login user interface.
-
-A rouge employee could also clone usernames and passwords easily with little chance being caught.
+If the database is compromised by an external hacker the usernames and passwords are directly exposed and can be used to login to any user's account through the application's login user interface. A rogue employee could also clone usernames and passwords easily with little chance of being caught. They can use them in the same way to login to users' accounts.
 
 # Password Hashing
 
