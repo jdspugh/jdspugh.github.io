@@ -187,15 +187,16 @@ For extra security we can hash the incoming verification code from the client be
 
 # Password Character Sets
 
-To create a strong and secure password we recommend using the full list of 96 printable ASCII characters that are easily typed on a standard keyboard:
+To create a strong and secure password we recommend using the full list of 95 printable ASCII characters that are easily typed on a standard keyboard:
 
 | Character Type | Count | Characters |
 |-|-|-|
 | Uppercase letters       | 26    | `ABCDEFGHIJKLMNOPQRSTUVWXYZ` |
 | Lowercase letters       | 26    | `abcdefghijklmnopqrstuvwxyz` |
 | Digits                  | 10    | `0123456789` |
-| Punctuation characters  | 33    | ```!"#$%&'()*+,-./:;<=>?@[]^_`{|}~``` |
+| Special characters      | 32    | ```!"#$%&"()*+,-./:;<=>?@[\\]^_`{\}~``` |
 | Space                   | 1     | <code> </code> |
+| Total                   | 95    | |
 
 <figcaption>Recommended Character Set for Strong Passwords</figcaption>
 
