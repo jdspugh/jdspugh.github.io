@@ -194,7 +194,7 @@ To create a strong and secure password we recommend using the full list of 95 pr
 | Uppercase letters       | 26    | `ABCDEFGHIJKLMNOPQRSTUVWXYZ` |
 | Lowercase letters       | 26    | `abcdefghijklmnopqrstuvwxyz` |
 | Digits                  | 10    | `0123456789` |
-| Special characters      | 32    | ```!"#$%&"()*+,-./:;<=>?@[\\]^_`{\}~``` |
+| Special characters      | 32    | ```!"#$%&"()*+,-./:;<=>?@[\]^_`{|}~``` |
 | Space                   | 1     | <code> </code> |
 | Total                   | 95    | |
 
