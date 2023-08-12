@@ -21,7 +21,7 @@ Authentication is a way to prove who you are. This can be done in several ways:
     * Passport or Driver's License (or other physical ID cards)
   * **Digital items**
     * Authenticator app via a Time-Based One-Time-Password (TOTP)
-    * One-Time-Password (OTP) delivered via
+    * **One-Time-Password (OTP) delivered via**
       * **Email**
       * SIM card
         * via an SMS
@@ -48,7 +48,7 @@ We are focusing only on email OTP authentication.
 
 * **UPL** - traditional Username/Password Login system
 
-* **OPT** - email based One-Time-Password login system
+* **OTP** - email based One-Time-Password login system
 
 # Background
 
@@ -67,13 +67,13 @@ The traditional UPL flow looks something like this. It requires 8 UI screens to 
   <figcaption>UPL Flow</figcaption>
 </figure>
 
-## OPT Flow
+## OTP Flow
 
-Our OPT approach gives a much simpler flow with only 3 UI screens to be designed:
+Our OTP approach gives a much simpler flow with only 3 UI screens to be designed:
 
 <figure>
-  <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="OPT Flow"/>
-  <figcaption>OPT Flow</figcaption>
+  <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="OTP Flow"/>
+  <figcaption>OTP Flow</figcaption>
 </figure>
 
 # Sequence Diagrams
@@ -109,7 +109,7 @@ sequenceDiagram
   end
 ``` -->
 
-## OPT
+## OTP
 
 ```mermaid
 sequenceDiagram
@@ -161,7 +161,7 @@ sequenceDiagram
 
 * `password_salt` - One-way hashes do still have the vulnerability of rainbow table attacks on the hashes. To mitigate these, each password needs to be stored with its own random salt - hence the `password_salt` field.
 
-## OPT Fields
+## OTP Fields
 
 | Field Name                | Data Type |
 |---------------------------|-----------|
@@ -181,7 +181,7 @@ sequenceDiagram
 | `email`                   | TEXT      |
 | `token`                   | TEXT      |
 
-* `email` - The user's email address is not strictly necessary in a UPL system, but without it there would be no mechanism for password recovery. The user's email address is always required for OPT.
+* `email` - The user's email address is not strictly necessary in a UPL system, but without it there would be no mechanism for password recovery. The user's email address is always required for OTP.
 
 * `token` - Both database schemas will use a random token that is stored in the database and also in a browser cookie upon successful login in order to identify the logged-in user between requests and can also persist between browser sessions.
 
@@ -195,7 +195,7 @@ sequenceDiagram
 
 # Client-Side Hashing
 
-## OPT
+## OTP
 
 For extra security we can hash the incoming verification code from the client before it is sent. This will prevent server-side credential harvesting.
 
@@ -242,14 +242,14 @@ A secure `token` gets created on the server when a user correctly enters their v
 
 The cookie is sent to the server with every browser request. The server will cross reference the cookie's value with the `token` stored in the database to make sure that the user is still logged in.
 
-# OPT vs UPL
+# OTP vs UPL
 
-Here is a comparison of OPT vs UPL. The issues are listed in rough order of importance. Green cells indicate a positive outcomes and red cells a negative outcome. Technically we can see a many more advantages in using the OPT vs the UPL system.
+Here is a comparison of OTP vs UPL. The issues are listed in rough order of importance. Green cells indicate a positive outcomes and red cells a negative outcome. Technically we can see a many more advantages in using the OTP vs the UPL system.
 
 <table>
   <tr>
     <th>Issue</th>
-    <th>OPT</th>
+    <th>OTP</th>
     <th>UPL</th>
   </tr>
   <tr>
@@ -356,7 +356,7 @@ Here is a comparison of OPT vs UPL. The issues are listed in rough order of impo
 
 ## Password logging
 
-Both UPL and OPT are vulnerable to server-side password logging attacks. This is where the server logs (or otherwise displays) the incoming password from the client (or verification code in the case of OPT).
+Both UPL and OTP are vulnerable to server-side password logging attacks. This is where the server logs (or otherwise displays) the incoming password from the client (or verification code in the case of OTP).
 
 To prevent this in UPL the user's password salt can be sent to the client with which the password can be hashed client-side before sending to the server. The password hashes are then compared
 
@@ -409,7 +409,7 @@ Offline
 * Phishing
 * Shoulder surfing
 
-## OPT
+## OTP
 
 | | Server-Side Credential Harvesting | Brute Force | Rainbow Tables | Pass-the-Hash | Same Hash | Replay Attack | Sign Up DOS |
 |-|-|-|-|-|-|-|-|
