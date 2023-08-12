@@ -8,30 +8,41 @@ We are going to take a deep dive into salts and peppers and, specifically, their
 
 # Authentication Overview
 
-Authentication mechanisms:
+Authentication is a way to prove who you are. This can be done in several ways:
 
-* **What you know**
+* **By revealing what you know (Knowledge-based):**
   * **Username/password**
   * PIN
   * Security questions
-* What you hold
-  * SIM card
-  * Mobile phone
-  * Passport
-  * Digital certificate
-* What you are
-  * Fingerprint
+* By revealing what you hold (Possession-based):
+  * Physical items
+    * Security token
+    * Mobile phone (identified using unique attributes like IMEI number)
+    * Passport or Driver's License (or other physical ID cards)
+  * Digital items
+    * Authenticator app via a Time-Based One-Time-Password (TOTP)
+    * One-Time-Password (OTP) delivered via
+      * Email
+      * SIM card
+        * via an SMS
+        * via a Voice Call
+  * Physical or Digital items
+    * Digital Certificate
+    * QR Code
+* By revealing what you are (Inherence-based):
+  * Fingerprints or Hand Geometry
   * Voiceprint
   * Face recognition
-  * Retina scan
-* Where you are
+  * Retina or Iris scan
+  * Behaviour (like typing rhythm)
+* By revealing where you are (Location-based):
   * GPRS location
   * Wi-Fi router location
-  * IP address location
+  * IP address geolocation
   
 Authentication can be achieved using one or more of the mechanisms. Depending on the application, the authentication system may choose to use more than one authentication category. This is called **two factor authentication** (2FA). It is **less convenient** for the user **but adds more security**.
 
-A username/password authentication system is a "what you know" system. We are going to look at this mechanism as it is simple and convenient, and doesn't require any additional hardware. It can be very secure if implemented correctly by understanding the recommendations in this article.
+A username/password authentication system is a knowledge-based system. We are going to look at this mechanism as it is simple and convenient, and doesn't require any additional hardware. It is also very secure if implemented correctly by understanding the recommendations in this article.
 
 # Password Human Factors
 

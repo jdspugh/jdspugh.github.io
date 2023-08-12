@@ -10,25 +10,39 @@ To produce a login system to authenticate users that is simpler and more secure 
 
 Authentication is a way to prove who you are. This can be done in several ways:
 
-* By revealing what you know:
-  * Username / password
-  * Secret key
-* By revealing where you are:
-  * IP address
-  * Physical location
-* By revealing what you are:
-  * Biometrics
-    * Fingerprints
-    * Face recognition
-    * Voice recognition
-* By revealing what you have:
-  * Security token
-  * Phone via
-    * SMS One-Time-Password (OTP)
-    * Voice call One-Time-Password (OTP)
-    * Authenticator app One-Time-Password (OTP)
+* By revealing what you know (Knowledge-based):
+  * Username/password
+  * PIN
+  * Security questions
+* **By revealing what you hold (Possession-based):**
+  * Physical items
+    * Security token
+    * Mobile phone (identified using unique attributes like IMEI number)
+    * Passport or Driver's License (or other physical ID cards)
+  * **Digital items**
+    * Authenticator app via a Time-Based One-Time-Password (TOTP)
+    * One-Time-Password (OTP) delivered via
+      * **Email**
+      * SIM card
+        * via an SMS
+        * via a Voice Call
+  * Physical or Digital items
+    * Digital Certificate
+    * QR Code
+* By revealing what you are (Inherence-based):
+  * Fingerprints or Hand Geometry
+  * Voiceprint
+  * Face recognition
+  * Retina or Iris scan
+  * Behaviour (like typing rhythm)
+* By revealing where you are (Location-based):
+  * GPRS location
+  * Wi-Fi router location
+  * IP address geolocation
 
-For simplicity we will focus only on username/password authentication.
+Authentication can be achieved using one or more of the mechanisms. Depending on the application, the authentication system may choose to use more than one authentication category. This is called **two factor authentication** (2FA). It is **less convenient** for the user **but adds more security**.
+
+We are focusing only on email OTP authentication.
 
 # Terminology
 
@@ -196,7 +210,7 @@ To create a strong and secure password we recommend using the full list of 95 pr
 | Digits                  | 10    | `0123456789` |
 | Special characters      | 32    | ```!"#$%&"()*+,-./:;<=>?@[\]^_`{|}~``` |
 | Space                   | 1     | <code> </code> |
-| Total                   | 95    | |
+| _Total_                 | _95_  | |
 
 <figcaption>Recommended Character Set for Strong Passwords</figcaption>
 
