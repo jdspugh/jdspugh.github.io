@@ -6,7 +6,7 @@ title: Setting up a Blog with GitHub Pages
 
 GitHub Pages is a free service from GitHub that lets you start a blog quickly and easily. It's primarily **targeted at developers** since they are already familiar with using GitHub, version control systems and writing documents using the markdown syntax. Other people can try but there are simpler systems out there targeted at non developers such as WordPress.
 
-GitHub Pages uses Jekyll in the background to process your blog entries into something more presentable and SEO friendly. Each time you modify your GitHub Pages Jekyll will notice the changes and run in the background to transform them into presentable html and css (and perhaps some javscript). This process may take a minute or two to complete but can be tracked under the **"Actions" tab for your repo on the GitHub website**.
+GitHub Pages uses Jekyll in the background to process your blog entries into something more presentable and SEO friendly. Each time you modify your GitHub Pages Jekyll will notice the changes and run in the background to transform them into presentable html and css (and perhaps some javascript). This process may take a minute or two to complete but can be tracked under the **"Actions" tab for your repo on the GitHub website**.
 
 Note that some of the information below will only work with the Minima theme version 2.5 which was the Minima version at the time of writing this guide.
 
