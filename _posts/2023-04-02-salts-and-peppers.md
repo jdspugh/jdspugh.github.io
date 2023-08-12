@@ -78,7 +78,7 @@ Count|ASCII Code (Decimal)|ASCII Character
 28|95|_
 29|96|`
 30|123|{
-31|124|\|
+31|124|\||
 32|125|}
 33|126|~
 
