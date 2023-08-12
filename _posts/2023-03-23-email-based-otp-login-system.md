@@ -195,7 +195,7 @@ To create a strong and secure password we recommend using the full list of 96 pr
 | Lowercase letters       | 26    | `abcdefghijklmnopqrstuvwxyz` |
 | Digits                  | 10    | `0123456789` |
 | Punctuation characters  | 33    | ```!"#$%&'()*+,-./:;<=>?@[]^_`{|}~``` |
-| Space                   | 1     | ` ` |
+| Space                   | 1     | ``` ``` |
 
 <figcaption>Recommended Character Set for Strong Passwords</figcaption>
 
