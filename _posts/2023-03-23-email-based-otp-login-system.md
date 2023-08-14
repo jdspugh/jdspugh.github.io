@@ -6,6 +6,12 @@ title: Email based OTP Login System using Node.js
 
 To produce a login system to authenticate users that is simpler and more secure than traditional username/password login systems. We will make an implementation using Node.js and Express.
 
+# Terminology
+
+* **UPL** - traditional Username/Password Login system
+
+* **EOTP** - Email based One-Time-Password login system
+
 # What is Authentication?
 
 Authentication is a way to prove who you are. This can be done in several ways:
@@ -21,7 +27,7 @@ Authentication is a way to prove who you are. This can be done in several ways:
     * Passport or Driver's License (or other physical ID cards)
   * **Digital items**
     * Authenticator app via a Time-Based One-Time-Password (TOTP)
-    * **One-Time-Password (OTP) delivered via**
+    * **One-Time-Password delivered via**
       * **Email**
       * SIM card
         * via an SMS
@@ -42,13 +48,32 @@ Authentication is a way to prove who you are. This can be done in several ways:
 
 Authentication can be achieved using one or more of the mechanisms. Depending on the application, the authentication system may choose to use more than one authentication category. This is called **two factor authentication** (2FA). It is **less convenient** for the user **but adds more security**.
 
-We are focusing only on email OTP authentication.
+We are focusing only on email OTP authentication. It is very likely that the user will have access to their email and the application they are being authenticated for, since they both only require internet access. OTP via SMS, for instance, introduces another point of failure as the user may not have SMS access, but has internet access.
 
-# Terminology
+# EOTP vs UPL
 
-* **UPL** - traditional Username/Password Login system
+## EOTP advantages over UPL
 
-* **OTP** - email based One-Time-Password login system
+### Simplicity
+
+The simplicity of EOTP implementation leads to a reduced attack surface area. There is no need for password resets or forgotten password mechanisms.
+
+### Human Behaviour
+
+One of the main challenges with UPL systems is human behaviour. Users often:
+
+* Choose weak or easily guessable passwords (susceptible to dictionary attacks).
+* Use the same password across multiple platforms.
+* Are tempted to store passwords on paper or digitally.
+
+### Lifespan
+
+OTPs are not permanent. Even if an attacker discovers the password they will only have a short window in which to take advantage of their discovery. Username/password generally have a long lifespan. If a short timespan is enforced upon them users have greater temptation to store their passwords, opening additional attack vectors.
+
+## UPL advantages over EOTP
+
+* Familiarity
+* No email dependency: users can still login even if they do not have an email address, or loose email access.
 
 # Background
 
@@ -67,13 +92,13 @@ The traditional UPL flow looks something like this. It requires 8 UI screens to 
   <figcaption>UPL Flow</figcaption>
 </figure>
 
-## OTP Flow
+## EOTP Flow
 
-Our OTP approach gives a much simpler flow with only 3 UI screens to be designed:
+Our EOTP approach gives a much simpler flow with only 3 UI screens to be designed:
 
 <figure>
-  <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="OTP Flow"/>
-  <figcaption>OTP Flow</figcaption>
+  <img src="/image/blog/2023-03-23-minimalist-login-system/verification-code-login-flow.svg" alt="EOTP Flow"/>
+  <figcaption>EOTP Flow</figcaption>
 </figure>
 
 # Sequence Diagrams
@@ -109,7 +134,7 @@ sequenceDiagram
   end
 ``` -->
 
-## OTP
+## EOTP
 
 ```mermaid
 sequenceDiagram
@@ -161,7 +186,7 @@ sequenceDiagram
 
 * `password_salt` - One-way hashes do still have the vulnerability of rainbow table attacks on the hashes. To mitigate these, each password needs to be stored with its own random salt - hence the `password_salt` field.
 
-## OTP Fields
+## EOTP Fields
 
 | Field Name                | Data Type |
 |---------------------------|-----------|
@@ -181,7 +206,7 @@ sequenceDiagram
 | `email`                   | TEXT      |
 | `token`                   | TEXT      |
 
-* `email` - The user's email address is not strictly necessary in a UPL system, but without it there would be no mechanism for password recovery. The user's email address is always required for OTP.
+* `email` - The user's email address is not strictly necessary in a UPL system, but without it there would be no mechanism for password recovery. The user's email address is always required for EOTP.
 
 * `token` - Both database schemas will use a random token that is stored in the database and also in a browser cookie upon successful login in order to identify the logged-in user between requests and can also persist between browser sessions.
 
@@ -195,7 +220,7 @@ sequenceDiagram
 
 # Client-Side Hashing
 
-## OTP
+## EOTP
 
 For extra security we can hash the incoming verification code from the client before it is sent. This will prevent server-side credential harvesting.
 
@@ -242,14 +267,14 @@ A secure `token` gets created on the server when a user correctly enters their v
 
 The cookie is sent to the server with every browser request. The server will cross reference the cookie's value with the `token` stored in the database to make sure that the user is still logged in.
 
-# OTP vs UPL
+# EOTP vs UPL
 
-Here is a comparison of OTP vs UPL. The issues are listed in rough order of importance. Green cells indicate a positive outcomes and red cells a negative outcome. Technically we can see a many more advantages in using the OTP vs the UPL system.
+Here is a comparison of EOTP vs UPL. The issues are listed in rough order of importance. Green cells indicate a positive outcomes and red cells a negative outcome. Technically we can see a many more advantages in using the EOTP vs the UPL system.
 
 <table>
   <tr>
     <th>Issue</th>
-    <th>OTP</th>
+    <th>EOTP</th>
     <th>UPL</th>
   </tr>
   <tr>
@@ -356,7 +381,7 @@ Here is a comparison of OTP vs UPL. The issues are listed in rough order of impo
 
 ## Password logging
 
-Both UPL and OTP are vulnerable to server-side password logging attacks. This is where the server logs (or otherwise displays) the incoming password from the client (or verification code in the case of OTP).
+Both UPL and EOTP are vulnerable to server-side password logging attacks. This is where the server logs (or otherwise displays) the incoming password from the client (or verification code in the case of EOTP).
 
 To prevent this in UPL the user's password salt can be sent to the client with which the password can be hashed client-side before sending to the server. The password hashes are then compared
 
@@ -409,7 +434,7 @@ Offline
 * Phishing
 * Shoulder surfing
 
-## OTP
+## EOTP
 
 | | Server-Side Credential Harvesting | Brute Force | Rainbow Tables | Pass-the-Hash | Same Hash | Replay Attack | Sign Up DOS |
 |-|-|-|-|-|-|-|-|

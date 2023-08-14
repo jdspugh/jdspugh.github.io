@@ -42,7 +42,7 @@ Authentication is a way to prove who you are. This can be done in several ways:
   
 Authentication can be achieved using one or more of the mechanisms. Depending on the application, the authentication system may choose to use more than one authentication category. This is called **two factor authentication** (2FA). It is **less convenient** for the user **but adds more security**.
 
-A username/password authentication system is a knowledge-based system. We are going to look at this mechanism as it is simple and convenient, and doesn't require any additional hardware. It is also very secure if implemented correctly by understanding the recommendations in this article.
+A username/password authentication system is a knowledge-based system. We are going to only look at this mechanism as it is simple and convenient, and doesn't require any additional hardware. It is also very secure if implemented correctly by understanding the recommendations in this article.
 
 # Password Human Factors
 
