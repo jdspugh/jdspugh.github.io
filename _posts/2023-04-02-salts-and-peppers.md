@@ -374,39 +374,46 @@ HashedPassword = SHA256(Password + PEPPER)
 
 ## Pepper Bits
 
-For simplicity let's first look at SHA256 password hashes and how much effort would be required to crack them. As of April 2023 the highest global Bitcoin hash rate has been 440 EH/s. Since Bitcoin has by far the dominant SHA256 hash rate, the next being Litecoin at 920 TH/s, we can use this as a basis for our calculations.
+For simplicity let's first look at SHA256 password hashes and how much effort would be required to discover an arbitrary password hash's pepper, given we have the password hash and its salt. Remember that SHA256 is a _fast_ hashing algorithm, so it will give worst-case results in terms of the effort required. A _slow_ hashing algorithm will require orders of magnitude more effort.
 
-| Units | Hashes per Second |
-|-:|-|
-| KiloHashes/s (KH/s) | 1 000 H/s |
-| MegaHashes/s (MH/s) | 1 000 000 H/s |
-| GigaHashes/s (GH/s) | 1 000 000 000 H/s |
-| TeraHashes/s (TH/s) | 1 000 000 000 000 H/s |
-| PetaHashes/s (PH/s) | 1 000 000 000 000 000 H/s |
-| ExaHashes/s (EH/s) | 1 000 000 000 000 000 000 H/s |
+Again, to start with, let's reference a table of SI units denoting hash rates. This will make it easier to visualise the quantities we are about to discuss:
 
-Let's assume one password hash and salt are known. We just need to brute force one salted and peppered password hash in order to retrieve the pepper's value. We will need to try, on average, half of all the possible pepper values in order to obtain the value.
+Units | Hashes per Second
+-:|-
+KiloHashes/s (KH/s) | 1 000 H/s
+MegaHashes/s (MH/s) | 1 000 000 H/s
+GigaHashes/s (GH/s) | 1 000 000 000 H/s
+TeraHashes/s (TH/s) | 1 000 000 000 000 H/s
+PetaHashes/s (PH/s) | 1 000 000 000 000 000 H/s
+ExaHashes/s (EH/s) | 1 000 000 000 000 000 000 H/s
+
+<figcaption>SI Units for Hash Rates</figcaption>
+
+The most powerful network of computers able to produce SHA256 hashes in 2023 is the Bitcoin network. Since Bitcoin has, by many order of magnitude, the most dominant SHA256 hash rate, at 440 EH/s as of April 2023 (the next being Litecoin at 920 TH/s), we can safely use this as a basis for our calculations. It also has readily available public statistics on its hash rate over time.
+
+In order to brute force the salted and peppered password hash we will need to try, on average, half of all the possible pepper values in order to obtain the actual pepper.
 
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/sha256-brute-force-time.svg" alt="Pepper Bits vs Years to Brute Force (SHA256)"/>
   <figcaption>Pepper Bits vs Years to Brute Force (SHA256)</figcaption>
 </figure>
 
-|Date|Bitcoin Hash Rate (EH/s)|Days until Doubling|
-|-:|-:|-:|
-|May 2023|380| |
-|Jan 2022|190|490|
-|Sep 2019|93|850|
-|Apr 2019|46|150|
-|Feb 2018|23|420|
-|Dec 2017|11|62|
-|Aug 2017|5.8|120|
-|Jan 2017|2.9|210|
-|Jun 2016|1.4|210|
-|Dec 2015|0.73|180|
-|Aug 2015|0.37|120|
-|Aug 2014|0.18|370|
-|Jun 2014|0.09|61|
+
+Date|Bitcoin Hash Rate (EH/s)|Days until Doubling
+-:|-:|-:
+May 2023|380| 
+Jan 2022|190|490
+Sep 2019|93|850
+Apr 2019|46|150
+Feb 2018|23|420
+Dec 2017|11|62
+Aug 2017|5.8|120
+Jan 2017|2.9|210
+Jun 2016|1.4|210
+Dec 2015|0.73|180
+Aug 2015|0.37|120
+Aug 2014|0.18|370
+Jun 2014|0.09|61
 
 <figcaption>Bitcoin Hash Rate Doubling Time</figcaption>
 
@@ -807,7 +814,7 @@ app.listen(3000)
 
 # Conclusion
 
-Hashing the user's password with a correctly configured **Argon2** algorithm and a long random unique **salt** and a long random **pepper** provides very strong password protection, even in the case of a database breach.
+Hashing the user's password with a correctly configured **Argon2** algorithm and a long, random, unique **salt** and a long, random **pepper** provides very strong password protection, even in the case of a complete database breach.
 
 If the **pepper is discovered and the database is breached** Argon2 stills offers protection for users who created strong passwords. Weak passwords will vulnerable to discovery by dictionary or brute force attacks.
 
