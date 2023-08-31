@@ -818,10 +818,10 @@ If the **pepper is discovered and the database is breached** Argon2 stills offer
 <th colspan="2" style="text-align:center;color:white;background-color:grey">Attack</th>
 </tr>
 <tr style="border-bottom:1px solid black !important">
-<th style="background-color:#F8E6D0;font-weight:normal">User Table</th>
-<th style="background-color:#F8E6D0;border-right:1px solid black !important;font-weight:normal">Pepper</th>
-<th style="background-color:#CCD9F5;font-weight:normal">Dictionary</th>
-<th style="background-color:#CCD9F5;font-weight:normal">Brute Force</th>
+<th style="background-color:#F8E6D0">User Table</th>
+<th style="background-color:#F8E6D0;border-right:1px solid black !important">Pepper</th>
+<th style="background-color:#CCD9F5">Dictionary</th>
+<th style="background-color:#CCD9F5">Brute Force</th>
 </tr>
 </thead>
 <tbody>
