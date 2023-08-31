@@ -807,21 +807,21 @@ app.listen(3000)
 
 # Conclusion
 
-Hashing the user's password with a correctly configured **Argon2** algorithm and a long, random, unique **salt** and a long random **pepper** provides very strong password protection, even in the case of a database breach.
+Hashing the user's password with a correctly configured **Argon2** algorithm and a long random unique **salt** and a long random **pepper** provides very strong password protection, even in the case of a database breach.
 
-If the **pepper is discovered and the database is breached** Argon2 stills offers protection for users using strong passwords. Weak passwords will vulnerable to discovery by dictionary or brute force attacks.
+If the **pepper is discovered and the database is breached** Argon2 stills offers protection for users who created strong passwords. Weak passwords will vulnerable to discovery by dictionary or brute force attacks.
 
 <table style="border:1px solid black !important">
 <thead>
 <tr>
-<th colspan="2" style="text-align:center;background-color:#F8E6D0;border-right:1px solid black !important">Data</th>
-<th colspan="2" style="text-align:center;background-color:#CCD9F5">Attack</th>
+<th colspan="2" style="text-align:center;color:white;background-color:grey;border-right:1px solid black !important">Data</th>
+<th colspan="2" style="text-align:center;color:white;background-color:grey">Attack</th>
 </tr>
 <tr style="border-bottom:1px solid black !important">
-<th style="background-color:#F8E6D0">User Table</th>
-<th style="background-color:#F8E6D0;border-right:1px solid black !important">Pepper</th>
-<th style="background-color:#CCD9F5">Dictionary</th>
-<th style="background-color:#CCD9F5">Brute Force</th>
+<th style="background-color:#F8E6D0;font-weight:normal">User Table</th>
+<th style="background-color:#F8E6D0;border-right:1px solid black !important;font-weight:normal">Pepper</th>
+<th style="background-color:#CCD9F5;font-weight:normal">Dictionary</th>
+<th style="background-color:#CCD9F5;font-weight:normal">Brute Force</th>
 </tr>
 </thead>
 <tbody>
@@ -854,9 +854,9 @@ If the **pepper is discovered and the database is breached** Argon2 stills offer
 
 <figcaption>Data Compromised vs Attack Possibilities</figcaption>
 
-Even with the most secure username/password authentication system in place users should be aware there are other less technical ways for passwords to be stolen such as over-the-shoulder or phishing attacks. At least we can secure the technical aspects so users have one less problem to worry about.
+Even with the most secure username/password authentication system in place users should be aware there are other less technical ways for passwords to be stolen such as over-the-shoulder or phishing attacks. At least we can secure the technical aspects of the authentication system so users have one less problem to worry about.
 
-Further aspects that should be delved into in-depth are the minimum lengths of the passwords, pepper and the parameters for tuning the Argon2 hashing algorithm.
+Further aspects that need to be delved into in-depth are the minimum lengths of the passwords, pepper and the parameters for tuning the Argon2 hashing algorithm.
 
 # Further Reading
 
