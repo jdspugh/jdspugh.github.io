@@ -48,10 +48,9 @@ A username/password authentication system is a knowledge-based system. We are go
 
 ## Human Memory
 
-Generally people can remember at most 4-5 distinct passwords  ([Adams &
-Sasse, 1999, page 46](https://dl.acm.org/doi/pdf/10.1145/322796.322806)) yet are likely members of dozens of digital services that require username/password authentication. For this reason they are likely to use the same passwords more than once, or variations of them, for different services. This means if a password is stolen it potentially has larger security implications than for just that one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through one of the most common security breaches: a data breach. For examples of recent data breaches, and their extents, see the [';--have i been pwned?](https://haveibeenpwned.com/) website.
+Generally people can remember at most 4-5 distinct passwords  ([_Users are Not the Enemy_, 1999, page 46](https://dl.acm.org/doi/pdf/10.1145/322796.322806)) yet are likely members of dozens of digital services that require username/password authentication. For this reason they are likely to use the same passwords more than once, or variations of them, for different services. This means if a password is stolen it potentially has larger security implications than for just that one service. By applying the practises in this article it will be virtually impossible for one of these passwords to be obtained through one of the most common security breaches: a data breach. For examples of recent data breaches, and their extents, see the [';--have i been pwned?](https://haveibeenpwned.com/) website.
 
-Memory limitations can be overcome by writing down passwords or by using a password manager. Writing down passwords is not secure in that people may find your paper. Using a password manager runs the risk of the manager being compromised and all your passwords being discovered. So in this article we will focus only on username/password authentication and how salts and peppers relate to it.
+Memory limitations can be overcome by writing down passwords or by using a password manager. Writing down, or otherwise recording passwords, is not secure in that people may find your paper or find your electronic copy of your password. Using a password manager runs the risk of the manager being compromised and all your passwords being discovered. So in this article we will focus only on username/password authentication and how salts and peppers relate to it.
 
 ## Typeability
 
@@ -99,7 +98,7 @@ This gives a total of `26x2 + 10 + 33 = 95` characters.
 
 ### Emojis & International Characters
 
-Users who want to use international characters or emojis in their passwords can if their authentication system allows it. Emojis in passwords can be easier to remember and add to password entropy ([_UK firm [Intelligent Environments] launches emoji alternative to Pin codes_, 2015](https://www.bbc.com/news/technology-33063344)). Modern web based applications support Unicode characters by default which include **3664 standardised emojis** (as of [Unicode 15.0](https://www.unicode.org/emoji/charts/emoji-counts.html)).
+Users who want to use international characters or emojis in their passwords can if their authentication system allows it. Emojis in passwords can be easier to remember and add to password entropy ([_UK firm [Intelligent Environments] launches emoji alternative to Pin codes_, 2015](https://www.bbc.com/news/technology-33063344)). Modern web based applications support Unicode characters by default which include **3664 standardised emojis** (as of [Unicode 15.0, August 2023](https://www.unicode.org/emoji/charts/emoji-counts.html)).
 
 International character and emoji use increase password security in that an attacker will need to include them in their attack dictionary, requiring a significantly larger attack dictionary.
 
@@ -134,7 +133,7 @@ If the database is compromised by an external hacker the usernames and passwords
 
 # Password Hashing
 
-A better strategy is to store the hash of the password. A hash is the output of a hash function. **A hash function is a one-way cryptographic function** that produce a seemingly random output that aims to be unique per input. Once hashed, the password hash cannot be unhashed. Thus a password hash is ideal for use in storing obscured passwords.
+A better strategy is to store the hash of the password. A hash is the output of a hash function. **A hash function is a one-way cryptographic function** that produce a seemingly random output that aims to be unique per input. Once hashed, the password hash cannot be unhashed (unless there is a weakness in the hashing algorithm used). Thus a password hash is ideal for use in storing obscured passwords.
 
 `HashedPassword = SHA256(Password)`
 
@@ -150,11 +149,11 @@ In this article we are using the SHA256 hash function for simplicity. **Do not u
 
 **Use Argon2** or a similar _slow_ hash function instead which will provide effective resistance against these attacks. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions and their characteristics.
 
-Note: People often talk of passwords being encrypted. Technically passwords should hashed, not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds another attack vector to an authentication system.
+Note: People often talk of passwords being encrypted. Technically passwords should hashed, not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds additional attack vectors to an authentication system.
 
 # Reverse Hash Lookups
 
-Since cryptographic hash functions are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where strong (e.g. 10+ random characters) and a slow hash function, such as a well configured Argon2, was used this would be the case. The reality is that users often choose very weak passwords such as the ones I chose: `qwerty` and `12345678`. What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table. A specific password hash can be rapidly searched for in the table and the corresponding unhashed password extracted.
+Since cryptographic hash functions are designed to be irreversible you might think that passwords are now safe in the database, even if it is compromised. If all password where strong (e.g. 10+ random characters) and a slow hash function, such as a well configured Argon2, was used then this would be the case. The reality is that users often choose very weak passwords such as the ones I chose: `qwerty` and `12345678`. What an attacker can do is prepare a table of common passwords and their corresponding hashes. This is known as a reverse hash lookup table. A specific password hash can be rapidly searched for in the table and the corresponding unhashed password extracted.
 
 | HashedPassword | Password |
 |-|-|
@@ -179,7 +178,7 @@ Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-w
 
 # Salts
 
-Salts, like peppers, are combined with passwords before hashing, adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts used. They can render reverse hash lookup tables useless since a new table needs to be created for each unique salt. Without being able to reuse the tables they only add overhead to password cracking attempts.
+Salts, like peppers, are combined with passwords before hashing, adding to the password hash's security. Salts are different to peppers in that they are intended to be unique per user and are stored in the database alongside the username. Salts increase the storage space required for reverse hash lookup tables in proportion to the number of unique salts used. They can render reverse hash lookup tables useless since a new table needs to be created for each unique salt. Without being able to reuse the tables their use only adds overhead to password cracking attempts.
 
 `HashedPassword = SHA256(Password + Salt)`
 
@@ -199,7 +198,7 @@ One might think that you could use the username or email address of a user as th
 
 We could use a sequence number as a simple way to ensure unique salts. The vulnerability this approach has is that the attacker can predict the salts beforehand and create a reverse hash lookup of known salts (e.g. 1 to 1000) combined with likely passwords. This is the same vulnerabilities that [short salts](#short-salts) have.
 
-The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the salt sequence number. Any reverse hash lookup tables now cannot be reused on other deployments regardless of if the pepper is known or not. Different peppers make the reverse hash lookups span a different range of values.
+The vulnerability can be mitigated by combining a long random pepper ([64 or more bits](#salt-bits)) with the salt sequence number. Any reverse hash lookup tables now cannot be reused on other deployments regardless of if the pepper is known or not: different peppers make the reverse hash lookups span a different range of values.
 
 ## Short Salts
 
@@ -220,7 +219,7 @@ Using the table below we can see that we should choose a **salt of 32-bits or mo
 <tr>
 <th style="text-align:right"><div style="white-space:nowrap">Salt Bits</div><div style="font-size:60%">&nbsp;</div></th>
 <th>Unique Salts<br /><div style="font-size:60%">(2<sup>Salt Bits</sup>)</div></th>
-<th>Average Collisions per Salt<br /><div style="font-size:60%">(8 billion / Unique Salts)</div></th>
+<th>Average Collisions per Salt<br /><div style="font-size:60%">(8 billion users / Unique Salts)</div></th>
 </tr>
 </thead>
 <tbody>
@@ -282,13 +281,13 @@ From the figure below we can see that global data storage is predicted to be 16 
   <figcaption>Global Data Storage Growth 2021-2025 (source: <a href="https://www.red-gate.com/blog/database-development/whats-the-real-story-behind-the-explosive-growth-of-data">Redgate</a>)</figcaption>
 </figure>
 
-For reference, readily available public unsalted rainbow tables commonly vary from hundreds of Megabytes to Terabytes in size. Let's consider an extreme case where a rainbow tables is only 1 Megabyte in size for simplification of our calculations. Salting forces the number of rainbow tables needed by an attacker to be equal to the number of unique salts. So we get:
+For reference, readily available public unsalted rainbow tables commonly vary from hundreds of MBs to TBs in size. Let's consider an extreme case where a rainbow table is only 1 MB in size. Salting forces the number of rainbow tables needed by an attacker to be equal to the number of unique salts. So we get:
 
 <table>
 <thead>
 <tr>
 <th style="text-align:right"><div>Salt Bits</div><div style="font-size:60%">&nbsp;</div></th>
-<th style="text-align:right">Size of all Rainbow Tables (ZB)<br /><div style="font-size:60%">(Unique Salts × 1 MB)</div></th>
+<th style="text-align:right">Size of all Rainbow Tables in ZB<br /><div style="font-size:60%">(Unique Salts × 1 MB)</div></th>
 <th>Unique Salts<br /><div style="font-size:60%">&nbsp;</div></th>
 </tr>
 </thead>
