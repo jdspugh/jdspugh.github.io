@@ -91,7 +91,6 @@ Count|ASCII Code (Decimal)|ASCII Character
 31|124|\||
 32|125|}
 33|126|~
-
 <figcaption>ASCII Visible, Typeable Special Characters</figcaption>
 
 This gives a total of `26x2 + 10 + 33 = 95` characters.
@@ -126,7 +125,6 @@ Consider a typical application that stores usernames and passwords. The naive st
 | user1 | qwerty |
 | user2 | 12345678 |
 | ... | ... |
-
 <figcaption>Unencrypted User Table</figcaption>
 
 If the database is compromised by an external hacker the usernames and passwords are directly exposed and can be used to login to any user's account through the application's login user interface. A rogue employee could also clone usernames and passwords easily with little chance of being caught. They can use them in the same way to login to users' accounts.
@@ -142,7 +140,6 @@ Username | HashedPassword
 user1 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5
 user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f
 ... | ...
-
 <figcaption>Hashed Passwords in a User Table</figcaption>
 
 In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because if the database and the pepper have been compromised, weaker passwords will be easy to crack through dictionary or brute force attacks. SHA256 is a _fast_ hashing algorithm that is designed to generate hashes very quickly. This aids dictionary and brute force attacks which need to perform hash calculations as fast as possible.
@@ -160,7 +157,6 @@ Since cryptographic hash functions are designed to be irreversible you might thi
 | 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 | qwerty |
 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f | 12345678 |
 | ... | ... |
-
 <figcaption>Reverse Hash Lookup Table</figcaption>
 
 Reverse hash lookup tables are most useful against slow hashing algorithms since the hash computation time will be large compared with minimal storage space required to store the hash result. For fast hashing algorithms like SHA256 the gains, if any, will be significantly less.
@@ -187,7 +183,6 @@ Salts, like peppers, are combined with passwords before hashing, adding to the p
 | user1 | 3299942662eb7925245e6b16a1fb8db4 | 5f9eb7a905e2159f2bcde6414020e03815dc7fd4655841d36d34be091a009d30 |
 | user2 | d346a4fa7f9fd6e26efb8e400dd4f3ac | 5631c77a32ec3282bca6c8291f87409b0b5f9442bec280d283efe4e6e976e370 |
 | ... | ... | ... |
-
 <figcaption>Salts in the User Table</figcaption>
 
 ## Username or Email as Salt
@@ -255,7 +250,6 @@ Using the table below we can see that we should choose a **salt of 32-bits or mo
 </tr>
 </tbody>
 </table>
-
 <figcaption>Salt Size vs Collisions (for 8 Billion Users)</figcaption>
 
 ### Rainbow Table Storage
@@ -271,7 +265,6 @@ Let's start with a table of SI units used for storage. This will make it easier 
 | Petabyte (PB) | 1 000 000 000 000 000 |
 | Exabyte (EX) | 1 000 000 000 000 000 000 |
 | Zettabyte (ZB) | 1 000 000 000 000 000 000 000 |
-
 <figcaption>SI Units for Storage</figcaption>
 
 From the figure below we can see that global data storage is predicted to be 16 ZB by 2025 and is doubling every 4 years. A formula to predict the storage available at a given year is thus <code>16 × 2<sup>(year - 2025)/4</sup> ZB</code>. To be safe we want to force our attackers' rainbow tables to be larger this value for some years into the future so that there is no chance of a rainbow table attack.
@@ -324,7 +317,6 @@ For reference, readily available public unsalted rainbow tables commonly vary fr
 </tr>
 </tbody>
 </table>
-
 <figcaption>Salt Bits vs Size of all Rainbow Tables</figcaption>
 
 From the table above we can see that increases in the bits of salt used exponentially increases the minimum storage required for the rainbow tables, and global storage increases at a relatively slower pace over time.
@@ -344,7 +336,6 @@ From the graph above and the table below we can see that **64-bits of salt** wou
 | 96 | 161 |
 | 128 | 296 |
 | 256 | 808 |
-
 <figcaption>Salt Bits vs Estimated Minimum Years of Protection</figcaption>
 
 For reference we show here a couple of other recommendations for salt lengths. We feel these recommendations are somewhat arbitrary since there is no indication how they were derived:
@@ -369,7 +360,6 @@ HashedPassword = SHA256(Password + PEPPER)
 | user1 | 2583015da33f1fd72efc0b6384412a9d5443a55f52284fa1f7e0f9b5ebe3f38d |
 | user2 | 51d437a138ac402cba22c12349b874259eecd38087728f961e10260308d4ead7 |
 | ... | ... |
-
 <figcaption>User Table with Hashed & Peppered Passwords</figcaption>
 
 ## Pepper Bits
@@ -386,18 +376,9 @@ GigaHashes/s (GH/s) | 1 000 000 000 H/s
 TeraHashes/s (TH/s) | 1 000 000 000 000 H/s
 PetaHashes/s (PH/s) | 1 000 000 000 000 000 H/s
 ExaHashes/s (EH/s) | 1 000 000 000 000 000 000 H/s
-
 <figcaption>SI Units for Hash Rates</figcaption>
 
 The most powerful network of computers able to produce SHA256 hashes in 2023 is the Bitcoin network. Since Bitcoin has, by many order of magnitude, the most dominant SHA256 hash rate, at 440 EH/s as of April 2023 (the next being Litecoin at 920 TH/s), we can safely use this as a basis for our calculations. It also has readily available public statistics on its hash rate over time.
-
-In order to brute force the salted and peppered password hash we will need to try, on average, half of all the possible pepper values in order to obtain the actual pepper.
-
-<figure>
-  <img src="/image/blog/2023-04-02-salts-and-peppers/sha256-brute-force-time.svg" alt="Pepper Bits vs Years to Brute Force (SHA256)"/>
-  <figcaption>Pepper Bits vs Years to Brute Force (SHA256)</figcaption>
-</figure>
-
 
 Date|Bitcoin Hash Rate (EH/s)|Days until Doubling
 -:|-:|-:
@@ -414,8 +395,9 @@ Dec 2015|0.73|180
 Aug 2015|0.37|120
 Aug 2014|0.18|370
 Jun 2014|0.09|61
-
 <figcaption>Bitcoin Hash Rate Doubling Time</figcaption>
+
+In order to brute force the salted and peppered password hash we will need to try, on average, half of all the possible pepper values in order to obtain the actual pepper.
 
 Let's take the worst case of the most acceleration of the Bitcoin hash rate: doubling every 60 days. Then we can set a maximum hash rate using the formula:
 
@@ -433,6 +415,10 @@ Let's take the worst case of the most acceleration of the Bitcoin hash rate: dou
 |10 000 Years|
 |100 000 Years|
 |1 000 000 Years|
+<figure>
+  <img src="/image/blog/2023-04-02-salts-and-peppers/sha256-brute-force-time.svg" alt="Pepper Bits vs Years to Brute Force (SHA256)"/>
+  <figcaption>Pepper Bits vs Years to Brute Force (SHA256)</figcaption>
+</figure>
 
 If we are using all the world's Bitcoin hash power to crack a peppered password, we can see from the chart that from 94-bits onwards the brute force will take more than a year to complete. Since a long pepper does not take any significant extra storage or computational power you can choose at least 128-bits which will take over 20 000 000 000 years to crack.
 
@@ -554,7 +540,6 @@ Attackers, in order to not waste attacks, need to copy the general form of the u
 <td style="background-color:#F8E6D0">2<sup>256</sup> ≈ 1.16 × 10<sup>77</sup></td>
 </tr>
 </tbody></table>
-
 <figcaption>Password Hash Length vs Entropy</figcaption>
 
 <table>
@@ -726,7 +711,6 @@ Attackers, in order to not waste attacks, need to copy the general form of the u
   <td>95<sup>40</sup> ≈ 1.29 × 10<sup>79</sup></td>
 </tr>
 </tbody></table>
-
 <figcaption>Significant Password Characters vs Entropy</figcaption>
 
 The number of bits in password hash alters the number of password hash collisions that will be experienced. The number of password hash collisions will be given by <code>number of unique passwords / 2<sup>password hash bits</sup></code>.
@@ -858,7 +842,6 @@ If the **pepper is discovered and the database is breached** Argon2 stills offer
 </tr>
 </tbody>
 </table>
-
 <figcaption>Data Compromised vs Attack Possibilities</figcaption>
 
 Even with the most secure username/password authentication system in place users should be aware there are other less technical ways for passwords to be stolen such as over-the-shoulder or phishing attacks. At least we can secure the technical aspects of the authentication system so users have one less problem to worry about.
