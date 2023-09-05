@@ -715,7 +715,7 @@ We want passwords from 8 to 16 characters in length.
 
 # Node.js Implementation
 
-Here is an implementation of a web based authentication system that uses Express.js and SQLite. It implements **Argon2** hashing with **unique salts per user** and a **pepper** as recommended.
+Here is an implementation of a web based authentication system that uses Express.js and SQLite. It implements **Argon2** hashing with unique **salts** per user and a **pepper** as recommended.
 
 ```js
 import express from 'express'
@@ -786,7 +786,9 @@ app.post('/register', async (req, res) => {
 app.listen(3000)
 ```
 
-**Note:** The hash returned by the `argon2` npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC's standardised hash result format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md). It includes the algorithm, salt, hash, and the algorithm's parameters. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the `password` column. It's also good to store the algorithm and its parameters also in case we want to change these at a later point: we won't have to upgrade all the accounts at once. We can easily fine tune and increase the memory and computational complexity to account for increases in attackers' computational power and memory resources over time.
+**Note:** The hash returned by the `argon2` npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC's standardised hash result format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md). It includes the algorithm, salt, hash, and the algorithm's parameters. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the `password` column.
+
+It is good to store the algorithm and its parameters also in case we want to change these at a later point: we won't have to upgrade all the accounts at once. We can also easily fine tune and increase the memory and computational complexity of the encryption algorithm to account for increases in attackers' computational power and memory resources over time.
 
 # Conclusion
 
