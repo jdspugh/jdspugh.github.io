@@ -364,7 +364,7 @@ HashedPassword = SHA256(Password + PEPPER)
 
 ## Pepper Bits
 
-For simplicity let's first look at SHA256 password hashes and how much effort would be required to discover an arbitrary password hash's pepper, given we have the password hash and its salt. Remember that SHA256 is a _fast_ hashing algorithm, so it will give worst-case results in terms of the effort required. A _slow_ hashing algorithm will require orders of magnitude more effort.
+For simplicity let's first look at SHA256 password hashes and how much effort would be required to discover an arbitrary **password hash's pepper**, given we have the **password hash** and its **salt**. Remember that SHA256 is a _fast_ hashing algorithm, so it will give worst-case results in terms of the effort required. A _slow_ hashing algorithm will require orders of magnitude more effort.
 
 Again, to start with, let's reference a table of SI units denoting hash rates. This will make it easier to visualise the quantities we are about to discuss:
 
@@ -483,21 +483,13 @@ The number of unhashed password character combinations will be set by the applic
 
 The unhashed password complexity dictates the number of brute force attempts required to crack the password.
 
-# Human Factors
-
-## Memory
-
-Users frequently reuse passwords across digital services. Users can remember at most 4-5 unrelated passwords. When users are forced to change passwords frequently they write them down, opening up other attack vectors.
-
-## Typeability
-
-
-
 # Password Hash Length
 
-Password hashes are generally stored in databases and are of constant length. The entropy of a single password hash determines the maximum entropy of a user's unhashed password.
+Password hashes are generally stored in databases and are of constant length. The specific length is determined by the hashing algorithm used (e.g. SHA256 always produces hashes of 256 bits in length), and the parameters used by the hashing algorithm where applicable (Argon2 can produce hashes that vary in length based on its length parameter that can be set to between 32 bits and 515 MB).
 
-Increasing unhashed password entropy makes passwords more difficult for users to remember, so there is a general maximum limit for memorised passwords. When passwords become longer than this limit users will need tend to write them down, store them electronically, or use password managers, which open up another set of attack vectors.
+The entropy of a password hash determines the maximum entropy of a user's unhashed password.
+
+Increasing unhashed password entropy makes passwords more difficult for users to remember, so there is a general maximum limit of the entropy of memorised passwords. When passwords become longer than this limit users will need to write them down, store them electronically, or use password managers, which open up another set of attack vectors.
 
 The maximum number of bits a user's password hash can contain determines the maximum number of significant characters a user's unhashed password will have. Any characters beyond that number will not increase the security of the password.
 
