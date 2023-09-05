@@ -790,9 +790,7 @@ app.listen(3000)
 
 # Conclusion
 
-Hashing the user's password with a correctly configured **Argon2** algorithm and a long, random, unique **salt** and a long, random **pepper** provides very strong password protection, even in the case of a complete database breach.
-
-If the **pepper is discovered and the database is breached** Argon2 stills offers protection for users who created strong passwords. Weak passwords will vulnerable to discovery by dictionary or brute force attacks.
+Hashing a user's **strong password** with a correctly configured **slow hashing algorithm**, such as Argon2, and a long, random, unique **salt** and a long, random **pepper** provides very strong password protection, even in the worst case of a complete database breach and pepper discovery. Weak passwords, however, will be vulnerable to discovery by dictionary or brute force attacks in this worst case scenario:
 
 <table style="border:1px solid black !important">
 <thead>
