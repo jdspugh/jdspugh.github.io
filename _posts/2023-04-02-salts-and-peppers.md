@@ -485,13 +485,29 @@ The unhashed password complexity dictates the number of brute force attempts req
 
 # Password Hash Length
 
-Password hashes are generally stored in databases and are of constant length. The specific length is determined by the hashing algorithm used (e.g. SHA256 always produces hashes of 256 bits in length), and the parameters used by the hashing algorithm where applicable (Argon2 can produce hashes that vary in length based on its length parameter that can be set to between 32 bits and 515 MB).
+We want users' passwords to have high entropy so that they are difficult to guess. Entropy is the degree of disorder or randomness present in the password.
+
+An example of a long password with low entropy would be a sentence of English words. A high entropy password would be one of the same number of characters but with each character being random:
+
+Entropy<div style="font-size:60%">&nbsp;</div> | Memorability<div style="font-size:60%">&nbsp;</div> | Password<div style="font-size:60%">(46 characters)</div>
+-|-|-
+Low | Easy | <code style="white-space:nowrap">this is a password with relatively low entropy</code>
+High | Difficult | <code style="white-space:nowrap">ILtNRC22`i65~&sdbx=:i0bRWWO  ^kep0A\\>%!n: ^?7(</code>
+<figcaption>Entropy Characteristics</figcaption>
+
+An English sentence is much more likely to be guessed than the random characters, but will be relatively easy to remember, unlike the random characters.
+
+The maximum number of bits a user's password hash can contain determines the maximum number of significant characters a user's unhashed password will have. Any characters beyond that number will not increase the security of the password.
+
+The most efficient way to store the hashed passwords would be with an entropy matching that of the unhashed password. Entropy of a hashed password is given by the number of bits used to represent it. This is because hashing algorithms are designed to produce information dense random bits.
+
+Any longer and there is little point as users would not be able to remember them.
 
 The entropy of a password hash determines the maximum entropy of a user's unhashed password.
 
-Increasing unhashed password entropy makes passwords more difficult for users to remember, so there is a general maximum limit of the entropy of memorised passwords. When passwords become longer than this limit users will need to write them down, store them electronically, or use password managers, which open up another set of attack vectors.
+Password hashes are generally stored in databases and are of constant length. The specific length is determined by the hashing algorithm used (e.g. SHA256 always produces hashes of 256 bits in length), and the parameters used by the hashing algorithm where applicable. Argon2 can produce hashes that vary in length based on its length parameter that can be set to between 32 bits and 515 MB.
 
-The maximum number of bits a user's password hash can contain determines the maximum number of significant characters a user's unhashed password will have. Any characters beyond that number will not increase the security of the password.
+Increasing unhashed password entropy makes passwords more difficult for users to remember, so there is a general maximum limit of the entropy of memorised passwords. When passwords become longer than this limit users will need to write them down, store them electronically, or use password managers, which open up another set of attack vectors.
 
 Attackers, in order to not waste attacks, need to copy the general form of the users' passwords e.g. which characters are allowed, the probabilities of specific characters being used, which dictionary words and languages used.
 
