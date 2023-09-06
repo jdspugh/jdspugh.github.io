@@ -489,10 +489,10 @@ We want users' passwords to have high entropy so that they are difficult to gues
 
 An example of a long password with low entropy would be a sentence of English words. A high entropy password would be one of the same number of characters but with each character being random:
 
-Entropy<div style="font-size:60%">&nbsp;</div> | Memorability<div style="font-size:60%">&nbsp;</div> | Password<div style="font-size:60%">(46 characters)</div>
--|-|-
-Low | Easy | <code style="white-space:nowrap">this is a password with relatively low entropy</code>
-High | Difficult | <code style="white-space:nowrap">ILtNRC22`i65~&sdbx=:i0bRWWO  ^kep0A\\>%!n: ^?7(</code>
+| Entropy<div style="font-size:60%">&nbsp;</div> | Memorability<div style="font-size:60%">&nbsp;</div> | Password<div style="font-size:60%">(46 characters)</div> |
+|-|-|-|
+|Low | Easy | <code style="white-space:nowrap">this is a password with relatively low entropy</code> |
+| High | Difficult | <code style="white-space:nowrap">ILtNRC22`i65~&sdbx=:i0bRWWO  ^kep0A\\>%!n: ^?7(</code> |
 <figcaption>Entropy Characteristics</figcaption>
 
 An English sentence is much more likely to be guessed than the random characters, but will be relatively easy to remember, unlike the random characters.
