@@ -137,7 +137,7 @@ A better strategy is to store the hash of the password. A hash is the output of 
 
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/hash-functions.svg" alt="Hash Functions"/>
-  <figcaption>Hash Functions</figcaption>
+  <figcaption>Hash Functions - Unhashing is not possible</figcaption>
 </figure>
 
 `HashedPassword = SHA256(Password)`
@@ -158,7 +158,7 @@ Note: People often talk of passwords being encrypted. Technically passwords shou
 
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/encryption-functions.svg" alt="Encryption Functions"/>
-  <figcaption>Encryption Functions</figcaption>
+  <figcaption>Encryption Functions - Decryption is possible by using the same private key</figcaption>
 </figure>
 
 # Reverse Hash Lookups
