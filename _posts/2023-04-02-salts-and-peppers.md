@@ -492,8 +492,8 @@ An example of a long password with low entropy would be a sentence of English wo
 <table>
 <thead>
 <tr>
-<th>Entropy</th>
-<th>Memorability</th>
+<th>Entropy<div style="font-size:60%">&nbsp;</div></th>
+<th>Memorability<div style="font-size:60%">&nbsp;</div></th>
 <th>Password<div style="font-size:60%">(46 characters)</div></th>
 </tr>
 </thead>
