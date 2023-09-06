@@ -20,7 +20,7 @@ Authentication is a way to prove who you are. This can be done in several ways:
     * Mobile phone (identified using unique attributes like IMEI number)
     * Passport or Driver's License (or other physical ID cards)
   * Digital items
-    * Authenticator app via a Time-Based One-Time-Password (TOTP)
+    * Authenticator app
     * One-Time-Password (OTP) delivered via
       * Email
       * SIM card
@@ -54,7 +54,7 @@ Memory limitations can be overcome by writing down passwords or by using a passw
 
 ## Typeability
 
-People must be able to type their passwords on their own devices and also other people's devices in the case that they are away from their own devices or have lost one of more of their devices. For this reason we will focus on the 95 ASCII visible, typeable characters for password calculations in this article. This includes both the upper and lower case alphabet letters (26×2), the numerals (10) and special characters (33) including the space character.
+People must be able to type their passwords on their own devices and also other people's devices (in the case that they are away from their own devices or have lost one of more of their devices). For this reason we will focus on the 95 ASCII visible, typeable characters for password calculations in this article. This includes both the upper and lower case latin alphabet letters (26×2), the numerals (10) and special characters (33) including the space character.
 
 Count|ASCII Code (Decimal)|ASCII Character
 -|-|-
@@ -102,7 +102,7 @@ Users who want to use international characters or emojis in their passwords can 
 
 International character and emoji use increase password security in that an attacker will need to include them in their attack dictionary, requiring a significantly larger attack dictionary.
 
-Users must be aware that they may have difficulty typing emoji or international character passwords on devices other than their own. The universality and standardisation of emojis has come far but should still be considered as a factor when creating passwords containing them.
+Users must be aware that they may have difficulty typing emoji or international character passwords on devices other than their own. The universality, standardisation and typeability of emojis has come far but should still be considered as a factor when creating passwords containing them.
 
 # What are Salts & Peppers?
 
@@ -129,11 +129,16 @@ Consider a typical application that stores usernames and passwords. The naive st
 
 <figcaption>Unencrypted User Table</figcaption>
 
-If the database is compromised by an external hacker the usernames and passwords are directly exposed and can be used to login to any user's account through the application's login user interface. A rogue employee could also clone usernames and passwords easily with little chance of being caught. They can use them in the same way to login to users' accounts.
+If the database is compromised by an external hacker or rouge employee the usernames and passwords are directly exposed and can be used to login to any user's account through the application's login user interface.
 
 # Password Hashing
 
 A better strategy is to store the hash of the password. A hash is the output of a hash function. **A hash function is a one-way cryptographic function** that produce a seemingly random output that aims to be unique per input. Once hashed, the password hash cannot be unhashed (unless there is a weakness in the hashing algorithm used). Thus a password hash is ideal for use in storing obscured passwords.
+
+<figure>
+  <img src="/image/blog/2023-04-02-salts-and-peppers/hash-functions.svg" alt="Hash Functions"/>
+  <figcaption>Hash Functions</figcaption>
+</figure>
 
 `HashedPassword = SHA256(Password)`
 
@@ -150,6 +155,11 @@ In this article we are using the SHA256 hash function for simplicity. **Do not u
 **Use Argon2** or a similar _slow_ hash function instead which will provide effective resistance against these attacks. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions and their characteristics.
 
 Note: People often talk of passwords being encrypted. Technically passwords should hashed, not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds additional attack vectors to an authentication system.
+
+<figure>
+  <img src="/image/blog/2023-04-02-salts-and-peppers/encryption-functions.svg" alt="Encryption Functions"/>
+  <figcaption>Encryption Functions</figcaption>
+</figure>
 
 # Reverse Hash Lookups
 
@@ -520,7 +530,7 @@ An example of a long password with low entropy would be a sentence of English wo
     </tr>
   </tbody>
 </table>
-<figcaption>Entropy Characteristics</figcaption>
+<figcaption>Entropy Examples</figcaption>
 
 An English sentence is much more likely to be guessed than the random characters, but will be relatively easy to remember, unlike the random characters.
 
