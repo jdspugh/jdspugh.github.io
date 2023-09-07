@@ -650,6 +650,9 @@ Attackers, in order to not waste attacks, need to copy the general form of the u
       <td>95^9 ≈ 6.3 × 10<sup>17</sup></td>
     </tr>
     <tr>
+      <td colspan="4" style="text-align:center;font-weight:;color:white;background-color:#888;text-transform:uppercase;font-size:70%">⇧&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Human memory limit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⇧</td>
+    </tr>
+    <tr>
       <td>10</td>
       <td>66</td>
       <td>9</td>
@@ -972,7 +975,7 @@ Hashing a user's **strong password** with a correctly configured **slow hashing 
 
 Even with the most secure username/password authentication system in place users should be aware there are other less technical ways for passwords to be stolen such as over-the-shoulder or phishing attacks. At least we can secure the technical aspects of the authentication system so users have one less problem to worry about.
 
-Further aspects that need to be delved into in-depth are the minimum lengths of the passwords, pepper and the parameters for tuning the Argon2 hashing algorithm.
+Further aspects that need to be delved into in-depth are the minimum lengths of the pepper and the parameters for tuning the Argon2 hashing algorithm.
 
 # Further Reading
 
