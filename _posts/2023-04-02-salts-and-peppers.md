@@ -181,8 +181,8 @@ The reverse hash lookup process can be optimised by using a technique known as *
 
 Further reading:
 
-* _Making a Faster Cryptanalytic Time-Memory
-Trade-Of_, Philippe Oechslin, 2003, <https://lasecwww.epfl.ch/pub/lasec/doc/Oech03.pdf>
+* [_Making a Faster Cryptanalytic Time-Memory
+Trade-Of_, Philippe Oechslin, 2003], <https://lasecwww.epfl.ch/pub/lasec/doc/Oech03.pdf>
 * _Rainbow Tables (probably) aren’t what you think — Part 1: Precomputed Hash Chains_,
 Ryan Sheasby, 2021, <https://rsheasby.medium.com/rainbow-tables-probably-arent-what-you-think-30f8a61ba6a5>
 
@@ -505,7 +505,7 @@ The unhashed password complexity dictates the number of brute force attempts req
 
 # Password Hash Length
 
-We want users' passwords to have high entropy so that they are difficult to guess. Entropy is the degree of disorder or randomness present in the password.
+We want users' passwords to have high entropy (entropy being the degree of disorder or randomness) so that they are difficult to guess. Increasing password entropy makes passwords more difficult for users to remember, so there is a general maximum limit of the entropy of memorised passwords. When passwords become longer than this limit users will need to write them down, store them electronically, or use password managers, which open up another set of attack vectors ([NIST Special Publication 800-63B, 2017](https://pages.nist.gov/800-63-3/sp800-63b.html#a3-complexity)).
 
 An example of a long password with low entropy would be a sentence of English words. A high entropy password would be one of the same number of characters but with each character being random:
 
@@ -544,8 +544,6 @@ The entropy of a password hash determines the maximum entropy of a user's unhash
 
 Password hashes are generally stored in databases and are of constant length. The specific length is determined by the hashing algorithm used (e.g. SHA256 always produces hashes of 256 bits in length), and the parameters used by the hashing algorithm where applicable. Argon2 can produce hashes that vary in length based on its length parameter that can be set to between 32 bits and 515 MB.
 
-Increasing unhashed password entropy makes passwords more difficult for users to remember, so there is a general maximum limit of the entropy of memorised passwords. When passwords become longer than this limit users will need to write them down, store them electronically, or use password managers, which open up another set of attack vectors.
-
 Attackers, in order to not waste attacks, need to copy the general form of the users' passwords e.g. which characters are allowed, the probabilities of specific characters being used, which dictionary words and languages used.
 
 <table>
@@ -562,7 +560,7 @@ Attackers, in order to not waste attacks, need to copy the general form of the u
 <tbody><tr>
 <td style="background-color:#FDF3D0">32</td>
 <td style="background-color:#FDF3D0">4</td>
-<td style="background-color:#FDF3D0">2<sup>32</sup> ≈ 4.29 × 10<sup>09</sup></td>
+<td style="background-color:#FDF3D0">2<sup>32</sup> ≈ 4.29 × 10<sup>9</sup></td>
 </tr>
 <tr>
 <td style="background-color:#D8D3E7">64</td>
@@ -588,175 +586,258 @@ Attackers, in order to not waste attacks, need to copy the general form of the u
 <figcaption>Password Hash Length vs Entropy</figcaption>
 
 <table>
-<thead>
-<tr>
-<th>Significant Password Characters (95 chars)</th>
-<th>Unique Possible Values</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td>1</td>
-  <td>95<sup>1</sup> ≈ 9.50 × 10<sup>1</sup></td>
-</tr>
-<tr>
-  <td>2</td>
-  <td>95<sup>2</sup> ≈ 9.03 × 10<sup>3</sup></td>
-</tr>
-<tr>
-  <td>3</td>
-  <td>95<sup>3</sup> ≈ 8.57 × 10<sup>5</sup></td>
-</tr>
-<tr style="background-color:#FDF3D0">
-  <td>4</td>
-  <td>95<sup>4</sup> ≈ 8.15 × 10<sup>7</sup></td>
-</tr>
-<tr>
-  <td>5</td>
-  <td>95<sup>5</sup> ≈ 7.74 × 10<sup>9</sup></td>
-</tr>
-<tr>
-  <td>6</td>
-  <td>95<sup>6</sup> ≈ 7.35 × 10<sup>11</sup></td>
-</tr>
-<tr>
-  <td>7</td>
-  <td>95<sup>7</sup> ≈ 6.98 × 10<sup>13</sup></td>
-</tr>
-<tr>
-  <td>8</td>
-  <td>95<sup>8</sup> ≈ 6.63 × 10<sup>15</sup></td>
-</tr>
-<tr style="background-color:#D8D3E7">
-  <td>9</td>
-  <td>95<sup>9</sup> ≈ 6.30 × 10<sup>17</sup></td>
-</tr>
-<tr>
-  <td>10</td>
-  <td>95<sup>10</sup> ≈ 5.99 × 10<sup>19</sup></td>
-</tr>
-<tr>
-  <td>11</td>
-  <td>95<sup>11</sup> ≈ 5.69 × 10<sup>21</sup></td>
-</tr>
-<tr>
-  <td>12</td>
-  <td>95<sup>12</sup> ≈ 5.40 × 10<sup>23</sup></td>
-</tr>
-<tr>
-  <td>13</td>
-  <td>95<sup>13</sup> ≈ 5.13 × 10<sup>25</sup></td>
-</tr>
-<tr style="background-color:#D3DFE2">
-  <td>14</td>
-  <td>95<sup>14</sup> ≈ 4.88 × 10<sup>27</sup></td>
-</tr>
-<tr>
-  <td>15</td>
-  <td>95<sup>15</sup> ≈ 4.63 × 10<sup>29</sup></td>
-</tr>
-<tr>
-  <td>16</td>
-  <td>95<sup>16</sup> ≈ 4.40 × 10<sup>31</sup></td>
-</tr>
-<tr>
-  <td>17</td>
-  <td>95<sup>17</sup> ≈ 4.18 × 10<sup>33</sup></td>
-</tr>
-<tr style="background-color:#DCE9D5">
-  <td>18</td>
-  <td>95<sup>18</sup> ≈ 3.97 × 10<sup>35</sup></td>
-</tr>
-<tr>
-  <td>19</td>
-  <td>95<sup>19</sup> ≈ 3.77 × 10<sup>37</sup></td>
-</tr>
-<tr>
-  <td>20</td>
-  <td>95<sup>20</sup> ≈ 3.58 × 10<sup>39</sup></td>
-</tr>
-<tr>
-  <td>21</td>
-  <td>95<sup>21</sup> ≈ 3.41 × 10<sup>41</sup></td>
-</tr>
-<tr>
-  <td>22</td>
-  <td>95<sup>22</sup> ≈ 3.24 × 10<sup>43</sup></td>
-</tr>
-<tr>
-  <td>23</td>
-  <td>95<sup>23</sup> ≈ 3.07 × 10<sup>45</sup></td>
-</tr>
-<tr>
-  <td>24</td>
-  <td>95<sup>24</sup> ≈ 2.92 × 10<sup>47</sup></td>
-</tr>
-<tr>
-  <td>25</td>
-  <td>95<sup>25</sup> ≈ 2.77 × 10<sup>49</sup></td>
-</tr>
-<tr>
-  <td>26</td>
-  <td>95<sup>26</sup> ≈ 2.64 × 10<sup>51</sup></td>
-</tr>
-<tr>
-  <td>27</td>
-  <td>95<sup>27</sup> ≈ 2.50 × 10<sup>53</sup></td>
-</tr>
-<tr>
-  <td>28</td>
-  <td>95<sup>28</sup> ≈ 2.38 × 10<sup>55</sup></td>
-</tr>
-<tr>
-  <td>29</td>
-  <td>95<sup>29</sup> ≈ 2.26 × 10<sup>57</sup></td>
-</tr>
-<tr>
-  <td>30</td>
-  <td>95<sup>30</sup> ≈ 2.15 × 10<sup>59</sup></td>
-</tr>
-<tr>
-  <td>31</td>
-  <td>95<sup>31</sup> ≈ 2.04 × 10<sup>61</sup></td>
-</tr>
-<tr>
-  <td>32</td>
-  <td>95<sup>32</sup> ≈ 1.94 × 10<sup>63</sup></td>
-</tr>
-<tr>
-  <td>33</td>
-  <td>95<sup>33</sup> ≈ 1.84 × 10<sup>65</sup></td>
-</tr>
-<tr>
-  <td>34</td>
-  <td>95<sup>34</sup> ≈ 1.75 × 10<sup>67</sup></td>
-</tr>
-<tr>
-  <td>35</td>
-  <td>95<sup>35</sup> ≈ 1.66 × 10<sup>69</sup></td>
-</tr>
-<tr>
-  <td>36</td>
-  <td>95<sup>36</sup> ≈ 1.58 × 10<sup>71</sup></td>
-</tr>
-<tr>
-  <td>37</td>
-  <td>95<sup>37</sup> ≈ 1.50 × 10<sup>73</sup></td>
-</tr>
-<tr style="background-color:#F8E6D0">
-  <td>38</td>
-  <td>95<sup>38</sup> ≈ 1.42 × 10<sup>75</sup></td>
-</tr>
-<tr>
-  <td>39</td>
-  <td>95<sup>39</sup> ≈ 1.35 × 10<sup>77</sup></td>
-</tr>
-<tr>
-  <td>40</td>
-  <td>95<sup>40</sup> ≈ 1.29 × 10<sup>79</sup></td>
-</tr>
-</tbody></table>
-<figcaption>Significant Password Characters vs Entropy</figcaption>
+  <thead>
+    <tr>
+      <th>Password Length<div style="font-size:60%">(characters)</div></th>
+      <th>Bits<div style="font-size:60%">(rounded)</div></th>
+      <th>Bytes<div style="font-size:60%">(rounded)</div></th>
+      <th>Unique Possible Values<div style="font-size:60%">&nbsp;</div></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>7</td>
+      <td>1</td>
+      <td>95^1 ≈ 9.5 × 10<sup>1</sup></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>13</td>
+      <td>2</td>
+      <td>95^2 ≈ 9.03 × 10<sup>3</sup></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>20</td>
+      <td>3</td>
+      <td>95^3 ≈ 8.57 × 10<sup>5</sup></td>
+    </tr>
+    <tr style="background-color:#FDF3D0">
+      <td>4</td>
+      <td>26</td>
+      <td>4</td>
+      <td>95^4 ≈ 8.15 × 10<sup>7</sup></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>33</td>
+      <td>5</td>
+      <td>95^5 ≈ 7.74 × 10<sup>9</sup></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>39</td>
+      <td>5</td>
+      <td>95^6 ≈ 7.35 × 10<sup>11</sup></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>46</td>
+      <td>6</td>
+      <td>95^7 ≈ 6.98 × 10<sup>13</sup></td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>53</td>
+      <td>7</td>
+      <td>95^8 ≈ 6.63 × 10<sup>15</sup></td>
+    </tr>
+    <tr style="background-color:#D8D3E7">
+      <td>9</td>
+      <td>59</td>
+      <td>8</td>
+      <td>95^9 ≈ 6.3 × 10<sup>17</sup></td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>66</td>
+      <td>9</td>
+      <td>95^10 ≈ 5.99 × 10<sup>19</sup></td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>72</td>
+      <td>9</td>
+      <td>95^11 ≈ 5.69 × 10<sup>21</sup></td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>79</td>
+      <td>10</td>
+      <td>95^12 ≈ 5.4 × 10<sup>23</sup></td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>85</td>
+      <td>11</td>
+      <td>95^13 ≈ 5.13 × 10<sup>25</sup></td>
+    </tr>
+    <tr style="background-color:#D3DFE2">
+      <td>14</td>
+      <td>92</td>
+      <td>12</td>
+      <td>95^14 ≈ 4.88 × 10<sup>27</sup></td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>99</td>
+      <td>13</td>
+      <td>95^15 ≈ 4.63 × 10<sup>29</sup></td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>105</td>
+      <td>14</td>
+      <td>95^16 ≈ 4.4 × 10<sup>31</sup></td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>112</td>
+      <td>14</td>
+      <td>95^17 ≈ 4.18 × 10<sup>33</sup></td>
+    </tr>
+    <tr style="background-color:#DCE9D5">
+      <td>18</td>
+      <td>118</td>
+      <td>15</td>
+      <td>95^18 ≈ 3.97 × 10<sup>35</sup></td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>125</td>
+      <td>16</td>
+      <td>95^19 ≈ 3.77 × 10<sup>37</sup></td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>131</td>
+      <td>17</td>
+      <td>95^20 ≈ 3.58 × 10<sup>39</sup></td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>138</td>
+      <td>18</td>
+      <td>95^21 ≈ 3.41 × 10<sup>41</sup></td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>145</td>
+      <td>19</td>
+      <td>95^22 ≈ 3.24 × 10<sup>43</sup></td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>151</td>
+      <td>19</td>
+      <td>95^23 ≈ 3.07 × 10<sup>45</sup></td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>158</td>
+      <td>20</td>
+      <td>95^24 ≈ 2.92 × 10<sup>47</sup></td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>164</td>
+      <td>21</td>
+      <td>95^25 ≈ 2.77 × 10<sup>49</sup></td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>171</td>
+      <td>22</td>
+      <td>95^26 ≈ 2.64 × 10<sup>51</sup></td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>177</td>
+      <td>23</td>
+      <td>95^27 ≈ 2.5 × 10<sup>53</sup></td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>184</td>
+      <td>23</td>
+      <td>95^28 ≈ 2.38 × 10<sup>55</sup></td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td>191</td>
+      <td>24</td>
+      <td>95^29 ≈ 2.26 × 10<sup>57</sup></td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>197</td>
+      <td>25</td>
+      <td>95^30 ≈ 2.15 × 10<sup>59</sup></td>
+    </tr>
+    <tr>
+      <td>31</td>
+      <td>204</td>
+      <td>26</td>
+      <td>95^31 ≈ 2.04 × 10<sup>61</sup></td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>210</td>
+      <td>27</td>
+      <td>95^32 ≈ 1.94 × 10<sup>63</sup></td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>217</td>
+      <td>28</td>
+      <td>95^33 ≈ 1.84 × 10<sup>65</sup></td>
+    </tr>
+    <tr>
+      <td>34</td>
+      <td>223</td>
+      <td>28</td>
+      <td>95^34 ≈ 1.75 × 10<sup>67</sup></td>
+    </tr>
+    <tr>
+      <td>35</td>
+      <td>230</td>
+      <td>29</td>
+      <td>95^35 ≈ 1.66 × 10<sup>69</sup></td>
+    </tr>
+    <tr>
+      <td>36</td>
+      <td>237</td>
+      <td>30</td>
+      <td>95^36 ≈ 1.58 × 10<sup>71</sup></td>
+    </tr>
+    <tr>
+      <td>37</td>
+      <td>243</td>
+      <td>31</td>
+      <td>95^37 ≈ 1.5 × 10<sup>73</sup></td>
+    </tr>
+    <tr style="background-color:#F8E6D0">
+      <td>38</td>
+      <td>250</td>
+      <td>32</td>
+      <td>95^38 ≈ 1.42 × 10<sup>75</sup></td>
+    </tr>
+    <tr>
+      <td>39</td>
+      <td>256</td>
+      <td>32</td>
+      <td>95^39 ≈ 1.35 × 10<sup>77</sup></td>
+    </tr>
+    <tr>
+      <td>40</td>
+      <td>263</td>
+      <td>33</td>
+      <td>95^40 ≈ 1.29 × 10<sup>79</sup></td>
+    </tr>
+  </tbody>
+</table>
+<figcaption>Password Length vs Entropy</figcaption>
 
 The number of bits in password hash alters the number of password hash collisions that will be experienced. The number of password hash collisions will be given by <code>number of unique passwords / 2<sup>password hash bits</sup></code>.
 
