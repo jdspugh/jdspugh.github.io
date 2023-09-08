@@ -632,7 +632,7 @@ Attackers, in order to not waste attacks, need to copy the general form of the u
       <td>95^6 ≈ 7.35 × 10<sup>11</sup></td>
     </tr>
     <tr>
-      <td colspan="4" style="text-align:center;font-weight:;color:white;background-color:#888;text-transform:uppercase;font-size:70%">⇩&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Human memory limit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⇩</td>
+      <td colspan="4" style="text-align:center;color:white;background-color:#888"><div style="transform:scale(1,-1);display:inline-block">&#8679;</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:70%;text-transform:uppercase">Lower human memory limit</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div style="transform:scale(1,-1);display:inline-block">&#8679;</div></td>
     </tr>
     <tr>
       <td>7</td>
@@ -653,7 +653,7 @@ Attackers, in order to not waste attacks, need to copy the general form of the u
       <td>95^9 ≈ 6.3 × 10<sup>17</sup></td>
     </tr>
     <tr>
-      <td colspan="4" style="text-align:center;font-weight:;color:white;background-color:#888;text-transform:uppercase;font-size:70%">⇧&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Human memory limit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⇧</td>
+      <td colspan="4" style="text-align:center;color:white;background-color:#888"><span>&#8679;</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:70%;text-transform:uppercase">Upper human memory limit</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>&#8679;</span></td>
     </tr>
     <tr>
       <td>10</td>
