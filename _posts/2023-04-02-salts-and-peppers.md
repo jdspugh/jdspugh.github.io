@@ -632,6 +632,9 @@ Attackers, in order to not waste attacks, need to copy the general form of the u
       <td>95^6 ≈ 7.35 × 10<sup>11</sup></td>
     </tr>
     <tr>
+      <td colspan="4" style="text-align:center;font-weight:;color:white;background-color:#888;text-transform:uppercase;font-size:70%">⇩&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Human memory limit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⇩</td>
+    </tr>
+    <tr>
       <td>7</td>
       <td>46</td>
       <td>6</td>
