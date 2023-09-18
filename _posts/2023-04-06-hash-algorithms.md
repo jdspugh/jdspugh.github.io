@@ -1,8 +1,8 @@
 ---
 layout: post
-title: One-Way Cryptographic Algorithms
+title: Hash Algorithms
 ---
-# Hashing Algorithms
+# Hash Algorithms
 
 Some hashing algorithms are designed to the fast e.g. BLAKE3 and SHA-256. Some are designed to be slow e.g. Argon2, scrypt and bcrypt. Both have their own use cases, but for password hashing a slow algorithm is required. A slow algorithm makes it much more costly to generate rainbow tables and to perform dictionary and brute force attacks. Let's take a look at dictionary and brute force attacks now.
 

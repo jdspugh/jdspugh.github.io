@@ -152,7 +152,7 @@ user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f
 
 In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because if the database and the pepper have been compromised, weaker passwords will be easy to crack through dictionary or brute force attacks. SHA256 is a _fast_ hashing algorithm that is designed to generate hashes very quickly. This aids dictionary and brute force attacks which need to perform hash calculations as fast as possible.
 
-**Use Argon2** or a similar _slow_ hash function instead which will provide effective resistance against these attacks. See my article _[One-Way Cryptographic Algorithms](https://jdspugh.github.io/2023/04/06/one-way-cryptographic-algorithms.html)_ for more details about various one-way cryptographic functions and their characteristics.
+**Use Argon2** or a similar _slow_ hash function instead which will provide effective resistance against these attacks. See my article an _[Hash Algorithms](https://jdspugh.github.io/2023/04/06/hash-algorithms.html)_ for more details about various hash functions and their characteristics.
 
 Note: People often talk of passwords being encrypted. Technically passwords should hashed, not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds additional attack vectors to an authentication system.
 
