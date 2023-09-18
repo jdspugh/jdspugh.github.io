@@ -216,13 +216,15 @@ If a salt is too short an attacker may create reverse hash lookup tables contain
 
 ## Salt Length
 
-The salt needs to be long enough that it is not worth it for an attacker to undertake rainbow table attacks. For simplicity during these calculations let's assume a maximum expected userbase of **8 billion users** (about the number of people on planet Earth currently).
+The salt needs to be long enough that it is not worth it for an attacker to undertake rainbow table attacks. For simplicity during these calculations let's assume a maximum expected userbase of **8 billion users** (about the number of people on planet Earth as of 2023).
 
 ### Salt Collisions
 
-If the salt length is short there will be salt collisions i.e. duplicate salts. The attacker can use their rainbow table on all password hashes that have the same salt. In the case of a 16-bit salt, a single rainbow table would be able to crack 121 896 password hashes on average.
+If the salt length is short there will be salt collisions i.e. duplicate salts. The attacker can use their rainbow table on all password hashes that have the same salt. In the case of a 16 bit salt, a single rainbow table would be able to crack `122 070.31` password hashes on average given 8 billion users
 
-Using the table below we can see that we should choose a **salt of 32-bits or more to avoid excessive collisions**. A collision rate of 1.86 means a generated rainbow table can be used to crack 1.86 password hashes on average which would be barely worth generating for the attacker.
+<code>8 000 000 000 / 2<sup>32</sup> = 122 070.31</code>
+
+Using the table below we can see that we should choose a **salt of 32 bits or more to avoid excessive collisions**. A collision rate of 1.86 means a generated rainbow table can be used to crack 1.86 password hashes on average which would be barely worth generating for the attacker.
 
 <table>
 <thead>
@@ -236,7 +238,7 @@ Using the table below we can see that we should choose a **salt of 32-bits or mo
 <tr>
 <td style="text-align:right">16</td>
 <td>65 536</td>
-<td>121 896</td>
+<td>122 070</td>
 </tr>
 <tr>
 <td style="text-align:right">32</td>
@@ -251,17 +253,17 @@ Using the table below we can see that we should choose a **salt of 32-bits or mo
 <tr>
 <td style="text-align:right">96</td>
 <td>7.92 × 10<sup>28</sup></td>
-<td>1.01 × 10<sup>-21</sup></td>
+<td>1.01 × 10<sup>-19</sup></td>
 </tr>
 <tr>
 <td style="text-align:right">128</td>
 <td>3.40 × 10<sup>38</sup></td>
-<td>2.35 × 10<sup>-30</sup></td>
+<td>2.35 × 10<sup>-29</sup></td>
 </tr>
 <tr>
 <td style="text-align:right">256</td>
 <td>1.16 × 10<sup>77</sup></td>
-<td>6.88 × 10<sup>-68</sup></td>
+<td>6.91 × 10<sup>-68</sup></td>
 </tr>
 </tbody>
 </table>
@@ -344,7 +346,7 @@ Let's graph the global storage projection over a longer period of time and see h
   <figcaption>Global Data Storage vs Year</figcaption>
 </figure>
 
-From the graph above and the table below we can see that **64-bits of salt** would be more than **sufficient** in all present day cases and **decades into the future** at the current data storage growth rate:
+From the graph above and the table below we can see that **64 bits of salt** would be more than **sufficient** in all present day cases and **decades into the future** at the current data storage growth rate:
 
 | Salt Bits | Estimated Minimum Years of Protection |
 |-:|-|
@@ -357,9 +359,9 @@ From the graph above and the table below we can see that **64-bits of salt** wou
 
 For reference we show here a couple of other recommendations for salt lengths. We feel these recommendations are somewhat arbitrary since there is no indication how they were derived:
 
-* The [National Institute of Standards and Technology (NIST)](https://www.nist.gov) recommends at least 32-bits in its [Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-3/sp800-63b.html)
+* The [National Institute of Standards and Technology (NIST)](https://www.nist.gov) recommends at least 32 bits in its [Digital Identity Guidelines (SP 800-63B)](https://pages.nist.gov/800-63-3/sp800-63b.html)
 
-* The [Open Web Application Security Project (OWASP)](https://owasp.deteact.com/cheat/cheatsheets/Password_Storage_Cheat_Sheet.html) recommends using salts that are 256 to 512-bits long
+* The [Open Web Application Security Project (OWASP)](https://owasp.deteact.com/cheat/cheatsheets/Password_Storage_Cheat_Sheet.html) recommends using salts that are 256 to 512 bits long
 
 # Pepper
 
@@ -440,7 +442,7 @@ Let's take the worst case of the most acceleration of the Bitcoin hash rate: dou
   <figcaption>Pepper Bits vs Years to Brute Force (SHA256)</figcaption>
 </figure>
 
-If we are using all the world's Bitcoin hash power to crack a peppered password, we can see from the chart that from 94-bits onwards the brute force will take more than a year to complete. Since a long pepper does not take any significant extra storage or computational power you can choose at least 128-bits which will take over 20 000 000 000 years to crack.
+If we are using all the world's Bitcoin hash power to crack a peppered password, we can see from the chart that from 94 bits onwards the brute force will take more than a year to complete. Since a long pepper does not take any significant extra storage or computational power you can choose at least **128 bits** which will take over 20 000 000 000 years to crack.
 
 ## Risks
 
@@ -448,7 +450,7 @@ This method is secure if the pepper is kept secret. But if the pepper is discove
 
 If the pepper is lost (or is changed) users will have to create new passwords to create newly peppered password hashes.
 
-## Node.js Implementation
+## Node.js Pepper Implementation
 
 In a Node.js implementation we would commonly store the pepper in a `.env` file that can be accessed by the `dotenv` package. For security reasons (especially if using a public code repo) make sure you remove the `.env` file from your version control system by modifying your `.gitignore` file to include:
 
@@ -475,7 +477,29 @@ dotenv.config()
 console.log(process.env.PEPPER)
 ```
 
-# Dictionary & Brute Force Attacks
+# Password Hash Length
+
+## Password Hash Attacks
+
+In the case of a database breach, password hashes are susceptible to brute force [reverse hash lookup](#reverse-hash-lookups) attacks. These are the different types of brute force reverse hash lookups we need to consider:
+
+* Brute force reverse hash lookup
+  * Dictionary reverse hash lookup
+    * Precomputed
+      * Rainbow table
+    * Realtime
+  * Precomputed
+    * Rainbow table
+  * Realtime
+
+Fortunately the implementation of a hidden pepper can eliminate all brute force attacks.
+
+Let's go further and consider the worst case data breach where the pepper is discovered (as well as the database being breached). In this case, salts can protect against precomputed brute force and precomputed dictionary attacks.
+
+The remaining attacks to be dealt with now are realtime dictionary and realtime brute force attacks. ???. The use of a slow hashing algorithm. Weak passwords. Estimate of time taken to crack one password. ???
+
+
+The simplest brute force reverse attacks hash all possible combinations of passwords and check to see if the resultant hashes exist in the user table. If a match is found then the unhashed password is known.
 
 A brute force attack will discover any password whereas a dictionary attack will only discover a portion of passwords that is determined by the match between the users' password and the attack dictionary entries. A brute force attack is thus more likely to be used to target an individual user whereas a dictionary attack will obtain a large number of passwords quickly but will only reveal a certain percentage of them (the weaker ones).
 
@@ -487,7 +511,7 @@ The other option is forcing users to choose **strong passwords**. This will make
 
 Biometric data or QR codes can be used to overcome the problem of forgetting strong passwords but they incur their own sets of security risks. Biometric data needs to be stored securely since its value never changes and additionally it needs to secure the user's privacy. With QR codes, a device could be hacked and the QR code stolen.
 
-## Dictionary Attacks
+### Dictionary Attacks
 
 Dictionary attacks attack weak passwords. Weak passwords are passwords that are short and/or easy-to-guess passwords. The attacker will use a dictionary of common passwords and hash each of them along with the known salt for that user and the application's pepper. Each resulting hash will be compared to the user's password hash from the user table. If a match is found then the attacker has just found the user's unhashed password.
 
@@ -495,7 +519,7 @@ The attack success rate and number of attacks required to find the password will
 
 In terms of the speed of the attack a dictionary attack may be successful with a fast hashing algorithm like SHA256. A single dedicated consumer SHA256 ASIC cryptocurrency mining rig can, as of May 2023, do more than 100 TH/s. This means that more than 100 passwords could be attacked per second (with up to 20% success rate). Thus it's recommended to use a slow, configurable, hashing algorithm like Argon2 that is orders of magnitude slower when computing a password's hash. It is unlikely that your application will have lots of simultaneous sign ups or password changes which means that you should configure your Argon2 parameters so that the hashes take around a second to complete. This is short enough that the user will not be too disturbed by the delay computing it, but long enough to provide good brute force resistance. Set the memory complexity as high as your computer can handle since this will provide maximum GPU resistance, making it harder for attackers. Your attacker may have a faster computer than you, so let's say your Argon2 hash takes 1 second, the attacker may be able to perform the same hash 10x faster. So each brute force attack will take around `.1s × 1 000 000 000 / 2 = 50 000 000s = 578 days` to complete (with up to 20% success rate). This is very good security considering your system has been completely compromised.
 
-## Brute Force Attacks
+### Brute Force Attacks
 
 Brute force attacks attack short passwords by trying every combination of characters for the password, starting from the shortest and moving up to longer ones. The **number of attempts required to crack a password via brute force** is directly proportional to the **number of unhashed password character combinations**.
 
@@ -503,359 +527,71 @@ The number of unhashed password character combinations will be set by the applic
 
 The unhashed password complexity dictates the number of brute force attempts required to crack the password.
 
-# Password Hash Length
+### Password Hash Length
 
-We want users' passwords to have high entropy (entropy being the degree of disorder or randomness) so that they are difficult to guess. Increasing password entropy makes passwords more difficult for users to remember, so there is a general maximum limit of the entropy of memorised passwords. When passwords become longer than this limit users will need to write them down, store them electronically, or use password managers, which open up another set of attack vectors ([NIST Special Publication 800-63B, 2017](https://pages.nist.gov/800-63-3/sp800-63b.html#a3-complexity)).
+Humans are not the best at creating or remembering random data. This means human generated passwords are not entirely random. Technically we can say the entropy is lower than truly random data.
 
-An example of a long password with low entropy would be a sentence of English words. A high entropy password would be one of the same number of characters but with each character being random:
+The calculations for determining password hash length are similar to that for the salt length. This is because a good hash function will distribute users' passwords randomly into password hash values, so we can consider password hashes to be random values as we did with salt values.
 
-<table>
-  <thead>
-    <tr>
-      <th>Entropy<div style="font-size:60%">&nbsp;</div></th>
-      <th>Memorability<div style="font-size:60%">&nbsp;</div></th>
-      <th>Password<div style="font-size:60%">(46 characters)</div></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Low</td>
-      <td>Easy</td>
-      <td><code style="white-space:nowrap">this is a password with relatively low entropy</code></td>
-    </tr>
-    <tr>
-      <td>High</td>
-      <td>Difficult</td>
-      <td><code style="white-space:nowrap">ILtNRC22`i65~&sdbx=:i0bRWWO  ^kep0A\\>%!n: ^?7(</code></td>
-    </tr>
-  </tbody>
-</table>
-<figcaption>Entropy Examples</figcaption>
+The difference with Studies show that there are common passwords that are used by a large proportion of users:
 
-An English sentence is much more likely to be guessed than the random characters, but will be relatively easy to remember, unlike the random characters.
+> _Just over  10% of people use at least one of the 25 worst passwords on this year's list, with nearly 4% of people using the worst password, 123456._ - [_Announcing our Worst Passwords of 2016_, SplashData, 2016](https://teampassword.com/blog/worst-passwords-2016)
 
-The maximum number of bits a user's password hash can contain determines the maximum number of significant characters a user's unhashed password will have. Any characters beyond that number will not increase the security of the password.
+If many users are using the same passwords it actually means our password hash can be smaller since the input entropy is lower. We can safely discount this effect so our resultant calculation will be on the cautious side of having a slightly larger and harder to crack password hash than necessary.
 
-The most efficient way to store the hashed passwords would be with an entropy matching that of the unhashed password. Entropy of a hashed password is given by the number of bits used to represent it. This is because hashing algorithms are designed to produce information dense random bits.
-
-Any longer and there is little point as users would not be able to remember them.
-
-The entropy of a password hash determines the maximum entropy of a user's unhashed password.
-
-Password hashes are generally stored in databases and are of constant length. The specific length is determined by the hashing algorithm used (e.g. SHA256 always produces hashes of 256 bits in length), and the parameters used by the hashing algorithm where applicable. Argon2 can produce hashes that vary in length based on its length parameter that can be set to between 32 bits and 515 MB.
-
-Attackers, in order to not waste attacks, need to copy the general form of the users' passwords e.g. which characters are allowed, the probabilities of specific characters being used, which dictionary words and languages used.
+The number of bits in a password hash alters the number of password hash collisions that will be experienced. The number of password hash collisions will be given by <code>number of unique passwords / 2<sup>password hash bits</sup></code>. Given an upper limit of 8 billion users, <code>8 000 000 000 / 2<sup>32</sup> ≈ 1.86</code>
 
 <table>
 <thead>
 <tr>
-<th colspan="2">Password Hash Length</th>
-<th rowspan="2">Unique Possible Values</th>
-</tr>
-<tr>
-<th>Bits</th>
-<th>Bytes</th>
+<th style="text-align:right"><div style="white-space:nowrap">Password Hash Bits</div><div style="font-size:60%">&nbsp;</div></th>
+<th>Unique Password Hashes<br /><div style="font-size:60%">(2<sup>Salt Bits</sup>)</div></th>
+<th>Average Collisions per Password Hash<br /><div style="font-size:60%">(8 billion users / Unique Salts)</div></th>
 </tr>
 </thead>
-<tbody><tr>
-<td style="background-color:#FDF3D0">32</td>
-<td style="background-color:#FDF3D0">4</td>
-<td style="background-color:#FDF3D0">2<sup>32</sup> ≈ 4.29 × 10<sup>9</sup></td>
+<tbody>
+<tr>
+<td style="text-align:right">16</td>
+<td>65 536</td>
+<td>122 070</td>
 </tr>
 <tr>
-<td style="background-color:#D8D3E7">64</td>
-<td style="background-color:#D8D3E7">8</td>
-<td style="background-color:#D8D3E7">2<sup>64</sup> ≈ 1.84 × 10<sup>19</sup></td>
+<td style="text-align:right">32</td>
+<td>4 294 967 296</td>
+<td>1.86</td>
 </tr>
 <tr>
-<td style="background-color:#D3DFE2">96</td>
-<td style="background-color:#D3DFE2">12</td>
-<td style="background-color:#D3DFE2">2<sup>96</sup> ≈ 7.92 × 10<sup>28</sup></td>
+<td style="text-align:right">64</td>
+<td>1.84 × 10<sup>19</sup></td>
+<td>4.34 × 10<sup>-10</sup></td>
 </tr>
 <tr>
-<td style="background-color:#DCE9D5">128</td>
-<td style="background-color:#DCE9D5">16</td>
-<td style="background-color:#DCE9D5">2<sup>128</sup> ≈ 3.40 × 10<sup>38</sup></td>
+<td style="text-align:right">96</td>
+<td>7.92 × 10<sup>28</sup></td>
+<td>1.01 × 10<sup>-19</sup></td>
 </tr>
 <tr>
-<td style="background-color:#F8E6D0">256</td>
-<td style="background-color:#F8E6D0">32</td>
-<td style="background-color:#F8E6D0">2<sup>256</sup> ≈ 1.16 × 10<sup>77</sup></td>
+<td style="text-align:right">128</td>
+<td>3.40 × 10<sup>38</sup></td>
+<td>2.35 × 10<sup>-29</sup></td>
 </tr>
-</tbody></table>
-<figcaption>Password Hash Length vs Entropy</figcaption>
-
-<table>
-  <thead>
-    <tr>
-      <th>Password Length<div style="font-size:60%">(characters)</div></th>
-      <th>Bits<div style="font-size:60%">(rounded)</div></th>
-      <th>Bytes<div style="font-size:60%">(rounded)</div></th>
-      <th>Unique Possible Values<div style="font-size:60%">&nbsp;</div></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>1</td>
-      <td>7</td>
-      <td>1</td>
-      <td>95^1 ≈ 9.5 × 10<sup>1</sup></td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>13</td>
-      <td>2</td>
-      <td>95^2 ≈ 9.03 × 10<sup>3</sup></td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>20</td>
-      <td>3</td>
-      <td>95^3 ≈ 8.57 × 10<sup>5</sup></td>
-    </tr>
-    <tr style="background-color:#FDF3D0">
-      <td>4</td>
-      <td>26</td>
-      <td>4</td>
-      <td>95^4 ≈ 8.15 × 10<sup>7</sup></td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td>33</td>
-      <td>5</td>
-      <td>95^5 ≈ 7.74 × 10<sup>9</sup></td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td>39</td>
-      <td>5</td>
-      <td>95^6 ≈ 7.35 × 10<sup>11</sup></td>
-    </tr>
-    <tr>
-      <td colspan="4" style="text-align:center;color:white;background-color:#888"><div style="transform:scale(1,-1);display:inline-block">&#8679;</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:70%;text-transform:uppercase">Lower human memory limit</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div style="transform:scale(1,-1);display:inline-block">&#8679;</div></td>
-    </tr>
-    <tr>
-      <td>7</td>
-      <td>46</td>
-      <td>6</td>
-      <td>95^7 ≈ 6.98 × 10<sup>13</sup></td>
-    </tr>
-    <tr>
-      <td>8</td>
-      <td>53</td>
-      <td>7</td>
-      <td>95^8 ≈ 6.63 × 10<sup>15</sup></td>
-    </tr>
-    <tr style="background-color:#D8D3E7">
-      <td>9</td>
-      <td>59</td>
-      <td>8</td>
-      <td>95^9 ≈ 6.3 × 10<sup>17</sup></td>
-    </tr>
-    <tr>
-      <td colspan="4" style="text-align:center;color:white;background-color:#888"><span>&#8679;</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size:70%;text-transform:uppercase">Upper human memory limit</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>&#8679;</span></td>
-    </tr>
-    <tr>
-      <td>10</td>
-      <td>66</td>
-      <td>9</td>
-      <td>95^10 ≈ 5.99 × 10<sup>19</sup></td>
-    </tr>
-    <tr>
-      <td>11</td>
-      <td>72</td>
-      <td>9</td>
-      <td>95^11 ≈ 5.69 × 10<sup>21</sup></td>
-    </tr>
-    <tr>
-      <td>12</td>
-      <td>79</td>
-      <td>10</td>
-      <td>95^12 ≈ 5.4 × 10<sup>23</sup></td>
-    </tr>
-    <tr>
-      <td>13</td>
-      <td>85</td>
-      <td>11</td>
-      <td>95^13 ≈ 5.13 × 10<sup>25</sup></td>
-    </tr>
-    <tr style="background-color:#D3DFE2">
-      <td>14</td>
-      <td>92</td>
-      <td>12</td>
-      <td>95^14 ≈ 4.88 × 10<sup>27</sup></td>
-    </tr>
-    <tr>
-      <td>15</td>
-      <td>99</td>
-      <td>13</td>
-      <td>95^15 ≈ 4.63 × 10<sup>29</sup></td>
-    </tr>
-    <tr>
-      <td>16</td>
-      <td>105</td>
-      <td>14</td>
-      <td>95^16 ≈ 4.4 × 10<sup>31</sup></td>
-    </tr>
-    <tr>
-      <td>17</td>
-      <td>112</td>
-      <td>14</td>
-      <td>95^17 ≈ 4.18 × 10<sup>33</sup></td>
-    </tr>
-    <tr style="background-color:#DCE9D5">
-      <td>18</td>
-      <td>118</td>
-      <td>15</td>
-      <td>95^18 ≈ 3.97 × 10<sup>35</sup></td>
-    </tr>
-    <tr>
-      <td>19</td>
-      <td>125</td>
-      <td>16</td>
-      <td>95^19 ≈ 3.77 × 10<sup>37</sup></td>
-    </tr>
-    <tr>
-      <td>20</td>
-      <td>131</td>
-      <td>17</td>
-      <td>95^20 ≈ 3.58 × 10<sup>39</sup></td>
-    </tr>
-    <tr>
-      <td>21</td>
-      <td>138</td>
-      <td>18</td>
-      <td>95^21 ≈ 3.41 × 10<sup>41</sup></td>
-    </tr>
-    <tr>
-      <td>22</td>
-      <td>145</td>
-      <td>19</td>
-      <td>95^22 ≈ 3.24 × 10<sup>43</sup></td>
-    </tr>
-    <tr>
-      <td>23</td>
-      <td>151</td>
-      <td>19</td>
-      <td>95^23 ≈ 3.07 × 10<sup>45</sup></td>
-    </tr>
-    <tr>
-      <td>24</td>
-      <td>158</td>
-      <td>20</td>
-      <td>95^24 ≈ 2.92 × 10<sup>47</sup></td>
-    </tr>
-    <tr>
-      <td>25</td>
-      <td>164</td>
-      <td>21</td>
-      <td>95^25 ≈ 2.77 × 10<sup>49</sup></td>
-    </tr>
-    <tr>
-      <td>26</td>
-      <td>171</td>
-      <td>22</td>
-      <td>95^26 ≈ 2.64 × 10<sup>51</sup></td>
-    </tr>
-    <tr>
-      <td>27</td>
-      <td>177</td>
-      <td>23</td>
-      <td>95^27 ≈ 2.5 × 10<sup>53</sup></td>
-    </tr>
-    <tr>
-      <td>28</td>
-      <td>184</td>
-      <td>23</td>
-      <td>95^28 ≈ 2.38 × 10<sup>55</sup></td>
-    </tr>
-    <tr>
-      <td>29</td>
-      <td>191</td>
-      <td>24</td>
-      <td>95^29 ≈ 2.26 × 10<sup>57</sup></td>
-    </tr>
-    <tr>
-      <td>30</td>
-      <td>197</td>
-      <td>25</td>
-      <td>95^30 ≈ 2.15 × 10<sup>59</sup></td>
-    </tr>
-    <tr>
-      <td>31</td>
-      <td>204</td>
-      <td>26</td>
-      <td>95^31 ≈ 2.04 × 10<sup>61</sup></td>
-    </tr>
-    <tr>
-      <td>32</td>
-      <td>210</td>
-      <td>27</td>
-      <td>95^32 ≈ 1.94 × 10<sup>63</sup></td>
-    </tr>
-    <tr>
-      <td>33</td>
-      <td>217</td>
-      <td>28</td>
-      <td>95^33 ≈ 1.84 × 10<sup>65</sup></td>
-    </tr>
-    <tr>
-      <td>34</td>
-      <td>223</td>
-      <td>28</td>
-      <td>95^34 ≈ 1.75 × 10<sup>67</sup></td>
-    </tr>
-    <tr>
-      <td>35</td>
-      <td>230</td>
-      <td>29</td>
-      <td>95^35 ≈ 1.66 × 10<sup>69</sup></td>
-    </tr>
-    <tr>
-      <td>36</td>
-      <td>237</td>
-      <td>30</td>
-      <td>95^36 ≈ 1.58 × 10<sup>71</sup></td>
-    </tr>
-    <tr>
-      <td>37</td>
-      <td>243</td>
-      <td>31</td>
-      <td>95^37 ≈ 1.5 × 10<sup>73</sup></td>
-    </tr>
-    <tr style="background-color:#F8E6D0">
-      <td>38</td>
-      <td>250</td>
-      <td>32</td>
-      <td>95^38 ≈ 1.42 × 10<sup>75</sup></td>
-    </tr>
-    <tr>
-      <td>39</td>
-      <td>256</td>
-      <td>32</td>
-      <td>95^39 ≈ 1.35 × 10<sup>77</sup></td>
-    </tr>
-    <tr>
-      <td>40</td>
-      <td>263</td>
-      <td>33</td>
-      <td>95^40 ≈ 1.29 × 10<sup>79</sup></td>
-    </tr>
-  </tbody>
+<tr>
+<td style="text-align:right">256</td>
+<td>1.16 × 10<sup>77</sup></td>
+<td>6.91 × 10<sup>-68</sup></td>
+</tr>
+</tbody>
 </table>
-<figcaption>Password Length vs Entropy</figcaption>
+<figcaption>Password Hash Size vs Collisions (for 8 Billion Users)</figcaption>
 
-The number of bits in password hash alters the number of password hash collisions that will be experienced. The number of password hash collisions will be given by <code>number of unique passwords / 2<sup>password hash bits</sup></code>.
+So a 
 
-Minimum password length is given by the password hash bits.
+# Node.js Username/Password Authentication Implementation
 
-Maximum password length is given by the password hash bits. A password hash of 32-bits would effectively mean everything over 
-
-We want passwords from 8 to 16 characters in length.
-
-# Node.js Implementation
-
-Here is an implementation of a web based authentication system that uses Express.js and SQLite. It implements **Argon2** hashing with unique **salts** per user and a **pepper** as recommended.
+Here is an implementation of a web based authentication system that uses Express.js and SQLite. It implements **Argon2** hashing with unique **salts** per user and a **pepper** as recommended in this article. It uses the argon2 npm library's default parameters which are:
+* Hash Length: 32 bytes
+* Time Cost: 3
+* Memory Cost: 64 MB
 
 ```js
 import express from 'express'
@@ -889,7 +625,7 @@ app.post('/login', async (req, res) => {
   const savedPassword = db.prepare(
     'SELECT password FROM users WHERE (username=?)'
   ).get(u)?.password
-  if (savedPassword && await argon2.verify(savedPassword, p + process.env.PEPPER)) {
+  if (savedPassword && await argon2.verify(savedPassword, p + process.env.PEPPER)) { // ???
     res.send('Login Success')
   } else {
     res.status(401).send('Login Failure')
@@ -915,7 +651,11 @@ app.post('/register', async (req, res) => {
     db.prepare(
       'INSERT INTO users (username, password) VALUES (?, ?)'
     ).run(
-      u, await argon2.hash(p + process.env.PEPPER)
+      u, await argon2.hash(p, {
+        hashLength: 8, // 8 bytes = 64 bits
+        saltLength: 8, // 8 bytes = 64 bits
+        secret: process.env.PEPPER // 128 bits
+      })
     )
     res.send('Registration successful')
   } catch {
@@ -932,7 +672,7 @@ It is good to store the algorithm and its parameters also in case we want to cha
 
 # Conclusion
 
-Hashing a user's **strong password** with a correctly configured **slow hashing algorithm**, such as Argon2, and a long, random, unique **salt** and a long, random **pepper** provides very strong password protection, even in the worst case of a complete database breach and pepper discovery. Weak passwords, however, will be vulnerable to discovery by dictionary or brute force attacks in this worst case scenario:
+Hashing a user's **strong password** with a correctly configured **slow hashing algorithm**, such as Argon2, and a long, random, unique **salt** and a long, random **pepper** provides very strong password protection, even in the worst case of a complete database breach and pepper discovery. Weak passwords, however, will still be vulnerable to discovery by dictionary or brute force attacks, even though their rate of discovery will be dramatically slowed by the well configured slow hashing algorithm:
 
 <table style="border:1px solid black !important">
 <thead>
@@ -978,13 +718,15 @@ Hashing a user's **strong password** with a correctly configured **slow hashing 
 
 Even with the most secure username/password authentication system in place users should be aware there are other less technical ways for passwords to be stolen such as over-the-shoulder or phishing attacks. At least we can secure the technical aspects of the authentication system so users have one less problem to worry about.
 
+Using the recommended salts and slow hashing algorithm will make lists of usernames and passwords difficult for hackers to generate, even in worst-case data breaches. This helps particularly to reduce the number of cases of attacks where users have re-used passwords amongst different services and consequently we should see less cases of long listings on [';--have i been pwned?](https://haveibeenpwned.com/).
+
 Further aspects that need to be delved into in-depth are the minimum lengths of the pepper and the parameters for tuning the Argon2 hashing algorithm.
 
 # Further Reading
 
 * _How to securely hash passwords?_, <https://security.stackexchange.com/questions/211/how-to-securely-hash-passwords>
 
-* _Client-Plus-Server Password Hashing as a Potential Way to Improve Security Against Brute Force Attacks without Overloading the Server_, "Sergeant Major" Hare, 2015, <http://ithare.com/client-plus-server-password-hashing-as-a-potential-way-to-improve-security-against-brute-force-attacks-without-overloading-server/>
+* _Client-Plus-Server Password Hashing as a Potential Way to Improve Security Against Brute Force Attacks without Overloading the Server_, "Sergeant Major" Hare, 2015, <http://ithare.com/client-plus-server-password-hashing-as-a-potential-way-to-improve-security-against-brute-force-attacks-without-overloading-server>
 
 * _Method to Protect Passwords in Databases for Web
 Applications_, Scott Contini, 2014, <https://eprint.iacr.org/2015/387.pdf>
