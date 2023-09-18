@@ -108,6 +108,7 @@ blockquote{
   border-left: 6px solid #ddd;
   position: relative;
   background-color: #eee;
+  font-size: inherit;
 }
 blockquote::before{
   font-family: Arial;
