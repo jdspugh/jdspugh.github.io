@@ -152,7 +152,7 @@ user2 | ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f
 
 In this article we are using the SHA256 hash function for simplicity. **Do not use SHA256 password hashing** in a production environment because if the database and the pepper have been compromised, weaker passwords will be easy to crack through dictionary or brute force attacks. SHA256 is a _fast_ hashing algorithm that is designed to generate hashes very quickly. This aids dictionary and brute force attacks which need to perform hash calculations as fast as possible.
 
-**Use Argon2** or a similar _slow_ hash function instead which will provide effective resistance against these attacks. See my article an _[Hash Algorithms](https://jdspugh.github.io/2023/04/06/hash-algorithms.html)_ for more details about various hash functions and their characteristics.
+**Use Argon2** or a similar _slow_ hash function instead which will provide effective resistance against these attacks. See my article on _[Hash Algorithms](https://jdspugh.github.io/2023/04/06/hash-algorithms.html)_ for more details about various hash functions and their characteristics.
 
 Note: People often talk of passwords being encrypted. Technically passwords should hashed, not encrypted. **Encryption is a two-way cryptographic process.** This means the original password can be recovered from the encrypted password if the encryption key is known. Recovery of the original password is not needed for password storage and just adds additional attack vectors to an authentication system.
 
@@ -665,10 +665,31 @@ app.post('/register', async (req, res) => {
 
 app.listen(3000)
 ```
+<figcaption>auth.mjs</figcaption>
 
-**Note:** The hash returned by the `argon2` npm package is of the form `$id$param1=value1[,param2=value2,...]$salt$hash`. This is the [PHC's standardised hash result format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md). It includes the algorithm, salt, hash, and the algorithm's parameters. This means we don't need a separate `salt` column in our `users` table because the salt is already included in the `password` column.
+Save the above code in a file called `auth.mjs`. You can then run the code using:
 
-It is good to store the algorithm and its parameters also in case we want to change these at a later point: we won't have to upgrade all the accounts at once. We can also easily fine tune and increase the memory and computational complexity of the encryption algorithm to account for increases in attackers' computational power and memory resources over time.
+`$ node auth.mjs`
+
+Note that for production use you **must configure** your webserver to act as an **https reverse proxy** so that the connection is secure. If you do not, any usernames and passwords will be visible to attackers on the network.
+
+Visit <code>[http://localhost:3000/register](http://localhost:3000/register)</code>
+
+After registering you can view the contents of the database using:
+
+`$ sqlite3 users.db .dump`
+
+Look for the line that looks similar to this:
+
+`INSERT INTO users VALUES('a','$argon2id$v=19$m=65536,t=1,p=1$nQXrIgvV7K8$hpL1ZR7iHmA');`
+
+The hash returned by the `argon2` npm package is of the form:
+
+`$id$param1=value1[,param2=value2,...]$salt$hash`
+
+This is the [PHC's standardised hash result format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md). It includes the algorithm used, the algorithm's parameters, the salt and the hash.
+
+It is good to store the algorithm and its parameters also in case we want to change these at a later point. In that case we won't have to upgrade all the accounts at once. We can also easily fine tune and increase the memory and computational complexity of the encryption algorithm to account for increases in attackers' computational power and memory resources over time.
 
 # Conclusion
 
