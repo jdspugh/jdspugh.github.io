@@ -4,11 +4,28 @@ title: Hash Algorithms
 ---
 # Goal
 
-We will look at the major modern hash algorithms and their characteristics.
+We will look at established and modern hash algorithms and their characteristics.
 
-# Fast vs Slow
+# Fast Algorithms
 
-Some hashing algorithms are designed to the fast e.g. BLAKE3 and SHA-256. Some are designed to be slow e.g. Argon2, scrypt and bcrypt. Both have their own use cases, but for password hashing a slow algorithm is required. A slow algorithm makes it much more costly to generate rainbow tables and to perform dictionary and brute force attacks. Let's take a look at dictionary and brute force attacks now.
+Some hashing algorithms are designed to the fast e.g.
+
+* BLAKE3
+* BLAKE2
+* SHA-512
+* SHA-256
+
+BLAKE3 is a modern fast hashing algorithm that exploits parallelism in order to run very fast on modern computers. This is particularly the case with the advent of massively parallel consumer-grade GPUs. BLAKE2 is also capable of some parallelism will run slower than BLAKE3. It has the advantage of being more established.
+
+SHA-256 is an established and well known but older fast hashing algorithm and does not support parallelism. SHA-512 can compute faster on 64 bit architectures and offers a larger output hash size. The larger hash size offers future proofing.
+
+# Slow Algorithms
+
+Some are designed to be slow e.g. Argon2, scrypt and bcrypt.
+
+Each has their own use cases. For password hashing, for example, a slow algorithm is required. A slow algorithm makes it much more costly to perform dictionary and brute force attacks, and precomputed reverse hash lookup attacks such as rainbow table attacks.
+
+Let's take a look at dictionary and brute force attacks now.
 
 # Dictionary & Brute Force Attacks
 
@@ -48,15 +65,6 @@ Argon2 settings:
 # Fast vs Slow
 
 The speed of hashing functions is by design. Some are designed to be fast. Some are designed to be deliberately slow i.e. computationally and/or memory intensive. In most cases you want fast hash functions for better performance, efficiency and responsiveness of your application.
-
-## Fast Hashing Algorithms
-
-* SHA-256
-* SHA-512
-* BLAKE2
-* BLAKE3
-
-In some circumstances it's important to use slow hash functions. Such a case is for hashing passwords. You don't want attackers to be able to compute hashes fast for creating tables of password/hash combinations (see my [Salts and Peppers](https://jdspugh.github.io/2023/04/02/salts-and-peppers.html) post for details about rainbow tables and rainbow table attacks).
 
 ## Slow Hashing Algorithms
 
@@ -139,6 +147,93 @@ Argon2 has three variants that have slightly different characteristics. They are
 | Side-Channel Attack Resistance | Lower | Higher | Higher (depends on configuration) |
 
 <figcaption>Argon2 Variants</figcaption>
+
+#### Introduction
+
+Argon2 was the winner of [Password Hashing Competition (PHC)](https://www.password-hashing.net/) 2013 to 2015. Argon2 is a slow one-way hash function. You can read about different types of hash function, their characteristics and their uses in my post [Hash Algorithms](https://jdspugh.github.io/2023/04/06/hash-algorithms.html). Here we will look at different **implementations** of Argon2 and the **parameters** Argon2 accepts.
+
+We will be looking at two main implementations:
+
+* Reference C implementation: <https://github.com/P-H-C/phc-winner-argon2>
+* Browser WASM implementation: <https://github.com/antelle/argon2-browser>
+
+#### Use in Cryptocurrency
+
+The cryptocurrency, Nimiq, uses Argon2 with these settings:
+
+| Settings | Parameter | Value |
+|-|-|-|
+| Algorithm variant || Argon2d |
+| Memory cost | m | 512 Kb |
+| Time cost | t | 1 iteration |
+| Parallelism | p | 1 lane and 1 thread |
+
+The fastest consumer grade hardware (GPUs, as no ASICs are available as of yet), as of April 2023, gives:
+
+| Hardware | USD | Hash Rate | Cost (USD) |
+|-|-|-|-|
+| Radeon VII graphic card | 1816 | 800 h/s | $2.27 per h/s |
+| Radeon RX 5700xt graphics card | 300 | 550 h/s | $0.55 per h/s |
+
+<figcaption>Fastest and Most Efficient Argon2 Hash Rates<br />(Source <a href="https://acemining.co">https://acemining.co</a>)</figcaption>
+
+Argon2 has three variants that have slightly different characteristics. They are summarised in the table below:
+
+| Property | Argon2d | Argon2i | Argon2id |
+|-|-|-|-|
+| GPU Resistance | Highest | High | Mix |
+| Memory Access Pattern | Data-dependent | Data-independent | Hybrid (Argon2i + Argon2d) |
+| Recommended Use Cases | Password hashing | Use in cases where there is risk of side-channel attacks | Mix |
+| Side-Channel Attack Resistance | No | Yes | Mix |
+
+<figcaption>Argon2 Variants</figcaption>
+
+We used these Argon2 settings using the WebAssembly implementation at https://antelle.net/argon2-browser:
+
+Argon2 settings:
+* Memory: see table below
+* Iterations: 1
+* Hash Length: 8 bytes
+* Parallelism: 1
+* Type: Argon2d
+
+| Memory | Macbook Pro 16<br />Hash Time |
+|:-:|:-:|
+| 512 KB (64 MB) | 1 ms (.001s) 
+| 65536 KB (64 MB) | 70 ms (.07s) |
+| 262144 KB (256 MB) | 210 ms (.21s) |
+| 1048576 KB (1 GB) | 770 ms (.77s) |
+
+<figcaption>Memory vs Hash Time for Argon2 Rust Reference Implementation<br />(<a href="https://github.com/p-h-c/phc-winner-argon2">https://github.com/p-h-c/phc-winner-argon2</a>)</figcaption>
+
+| Memory | Macbook Pro 16<br />Hash Time |
+|:-:|:-:|
+| 512 KB (64 MB) | - |
+| 65536 KB (64 MB) | 67 ms (.067s) |
+| 262144 KB (256 MB) | 290 ms (.29s) |
+| 1048576 KB (1 GB) | 1200 ms (1.2s) |
+
+<figcaption>Memory vs Hash Time for Argon2 Node.js Implementation<br />{type: argon2.argon2i, hashLength: 32, timeCost: 2, parallelism: 1}<br />(<a href="https://antelle.net/argon2-browser">https://antelle.net/argon2-browser</a>)</figcaption>
+
+| Memory | Macbook Pro 16<br />Hash Time | iPhone SE<br />Hash Time |
+|:-:|:-:|:-:|
+| 512 KB (64 MB) | 5 ms (.005s) | 5ms (.005s) |
+| 65536 KB (64 MB) | 120 ms (.12s) | 330ms (.33s) |
+| 262144 KB (256 MB) | 410 ms (.41s) | 1300ms (1.3s) |
+| 1048576 KB (1 GB) | 3900 ms (3.9s) | Out of memory error |
+
+<figcaption>Memory vs Hash Time for Argon2 Browser Implementation on Different Devices<br />(<a href="https://antelle.net/argon2-browser">https://antelle.net/argon2-browser</a>)</figcaption>
+
+| Year | Memory (CPU or GPU RAM) | Memory Type |
+|-|-|-|
+| Early 2000s    | 64 MB - 128 MB | CPU |
+| Mid-2000s      | 256 MB - 512 MB | CPU |
+| Late 2000s     | 1 GB | CPU |
+| Early 2010s    | 2 GB - 4 GB | GPU |
+| Mid-2010s      | 4 GB - 8 GB | GPU |
+| Late 2010s to Early 2020s | 8 GB - 32 GB | GPU |
+
+<figcaption>Memory Trends</figcaption>
 
 # References
 
