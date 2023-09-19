@@ -2,7 +2,11 @@
 layout: post
 title: Hash Algorithms
 ---
-# Hash Algorithms
+# Goal
+
+We will look at the major modern hash algorithms and their characteristics.
+
+# Fast vs Slow
 
 Some hashing algorithms are designed to the fast e.g. BLAKE3 and SHA-256. Some are designed to be slow e.g. Argon2, scrypt and bcrypt. Both have their own use cases, but for password hashing a slow algorithm is required. A slow algorithm makes it much more costly to generate rainbow tables and to perform dictionary and brute force attacks. Let's take a look at dictionary and brute force attacks now.
 
@@ -40,10 +44,6 @@ Argon2 settings:
 | 1048576 KB (1 GB) | 3900 ms (3.9s) | Out of memory error |
 
 <figcaption>Memory vs Hash Time for Argon2 Browser Implementation on Different Devices<br />(<a href="https://antelle.net/argon2-browser">https://antelle.net/argon2-browser</a>)</figcaption>
-
-# Goal
-
-We will look at the major modern one-way cryptographic algorithms and their characteristics.
 
 # Fast vs Slow
 
