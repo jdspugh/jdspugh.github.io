@@ -427,16 +427,19 @@ Let's take the worst case of the most acceleration of the Bitcoin hash rate: dou
 
 <code>hashes = 2<sup>pepper bits</sup></code>
 
-|Time|Bitcoin Hash Rate Upper Limit|
+|Years into the Future|Bitcoin Hash Rate|
 |-|-|
-|0 Years|380 EH/s|
-|1 Year|26 000 EH/s|
-|10 Years|780 000 000 000 000 000 000 EH/s|
-|100 Years|5.0 × 10<sup>185</sup> EH/s|
-|1 000 Years|
-|10 000 Years|
-|100 000 Years|
-|1 000 000 Years|
+|0 Years|3.80 × 10<sup>2</sup> EH/s|
+|1 Years|2.43 × 10<sup>4</sup> EH/s|
+|10 Years|4.38 × 10<sup>20</sup> EH/s|
+|100 Years|4.04 × 10<sup>185</sup> EH/s|
+|1 000 Years|8.90 × 10<sup>1 834</sup> EH/s|
+|10 000 Years|6.04 × 10<sup>18 327</sup> EH/s|
+|100 000 Years|3.89 × 10<sup>183 254</sup> EH/s|
+|1 000 000 Years|4.77 × 10<sup>1 832 522</sup> EH/s|
+
+<figcaption>Extrapolated Bitcoin Hash Rates</figcaption>
+
 <figure>
   <img src="/image/blog/2023-04-02-salts-and-peppers/sha256-brute-force-time.svg" alt="Pepper Bits vs Years to Brute Force (SHA256)"/>
   <figcaption>Pepper Bits vs Years to Brute Force (SHA256)</figcaption>
@@ -589,9 +592,6 @@ So a
 # Node.js Username/Password Authentication Implementation
 
 Here is an implementation of a web based authentication system that uses Express.js and SQLite. It implements **Argon2** hashing with unique **salts** per user and a **pepper** as recommended in this article. It uses the argon2 npm library's default parameters which are:
-* Hash Length: 32 bytes
-* Time Cost: 3
-* Memory Cost: 64 MB
 
 ```js
 import express from 'express'
@@ -689,7 +689,13 @@ The hash returned by the `argon2` npm package is of the form:
 
 This is the [PHC's standardised hash result format](https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md). It includes the algorithm used, the algorithm's parameters, the salt and the hash.
 
-It is good to store the algorithm and its parameters also in case we want to change these at a later point. In that case we won't have to upgrade all the accounts at once. We can also easily fine tune and increase the memory and computational complexity of the encryption algorithm to account for increases in attackers' computational power and memory resources over time.
+It is good to store the algorithm and its parameters also in case we want to change these at a later point. In that case we won't have to upgrade all the accounts at once. We can also easily fine tune and increase the memory and computational complexity of the encryption algorithm to account for increases in attackers' computational power and memory resources over time. In this case we have the following parameters:
+
+Time complexity: 1
+
+Parallelism: 1
+
+Type: argon2id (resistant against GPU and side-channel attacks)
 
 # Conclusion
 
