@@ -208,10 +208,10 @@ Argon2 settings:
 
 | Memory | Macbook Pro 16<br />Hash Time |
 |:-:|:-:|
-| 512 KB (64 MB) | - |
-| 65536 KB (64 MB) | 67 ms (.067s) |
-| 262144 KB (256 MB) | 290 ms (.29s) |
-| 1048576 KB (1 GB) | 1200 ms (1.2s) |
+| 512 KiB (64 MiB) | - |
+| 65536 KiB (64 MiB) | 67 ms (.067s) |
+| 262144 KiB (256 MiB) | 290 ms (.29s) |
+| 1048576 KiB (1 GiB) | 1200 ms (1.2s) |
 
 <figcaption>Memory vs Hash Time for Argon2 Node.js Implementation<br />{type: argon2.argon2id, hashLength: 8, timeCost: 2, parallelism: 1}<br />(<a href="https://github.com/ranisalt/node-argon2">https://github.com/ranisalt/node-argon2</a>)</figcaption>
 
