@@ -8,7 +8,7 @@ We will look at established and modern hash algorithms and their characteristics
 
 # Fast Algorithms
 
-Some hashing algorithms are designed to the fast e.g.
+Some hashing algorithms are designed to the fast e.g.:
 
 * BLAKE3
 * BLAKE2
@@ -238,6 +238,25 @@ Argon2 settings:
 Using the Argon2 hash algorithm configured to use 1 GB, the best consumer grade GPU hardware as of the "Late 2010s to Early 2020s" will be able to process up to 32 hashes in parallel:
 
 `Maximum GPU RAM / Argon2 memory = 32 GB / 1 GB = 32`
+
+# CPU vs GPU Hashing
+
+Even though modern hashing functions can benefit greatly from the parallelisation offered by modern GPUs, this benefit can be mitigated by the overheads involved in transferring the code and data from the CPU to the GPU and to initiating the GPU calculation.
+
+In the case where there is a bulk of data on which hashes need to be calculated, GPU implementations can outperform CPU based implementations. This applies to cryptocurrency mining applications.
+
+In the case of calculating the hash of a password for a username/password authentication system the overheads will likely outweigh the costs and CPU implementations will win.
+
+<table>
+<tr><th>CPU</th><th>GPU</th></tr>
+<tr><td style="background-color:#D4E7CE">Lower Latency</td><td style="background-color:#F2C5C6">Higher Latency</td></tr>
+<tr><td style="background-color:#F2C5C6">Lower Memory Bandwidth</td><td style="background-color:#D4E7CE">Higher Memory Bandwidth</td></tr>
+<tr><td style="background-color:#F2C5C6">Lower Parallelism</td><td style="background-color:#D4E7CE">Higher Parallelism</td></tr>
+</table>
+
+To summarise:
+* Use **CPU** hashing for **one-off** hashes
+* Use **GPU** hashing for **bulk** hashes
 
 # References
 
