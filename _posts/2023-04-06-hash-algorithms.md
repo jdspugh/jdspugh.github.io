@@ -4,7 +4,7 @@ title: Hash Algorithms
 ---
 # Goal
 
-We will look at established and modern hash algorithms and their characteristics.
+We will look at established and modern hash algorithms and their characteristics so developers can select which algorithms to use in their specific circumstances.
 
 # Fast Algorithms
 
@@ -15,13 +15,13 @@ Some hashing algorithms are designed to the fast e.g.
 * SHA-512
 * SHA-256
 
-BLAKE3 is a modern fast hashing algorithm that exploits parallelism in order to run very fast on modern computers. This is particularly the case with the advent of massively parallel consumer-grade GPUs. BLAKE2 is also capable of some parallelism will run slower than BLAKE3. It has the advantage of being more established.
+BLAKE3 is a modern fast hashing algorithm that exploits parallelism in order to run very fast on modern computers. This is particularly the case with the advent of massively parallel mass-produced GPUs. BLAKE2 is also capable of some parallelism, but not as much, and will run slower than BLAKE3. It has the advantage of being more established.
 
-SHA-256 is an established and well known but older fast hashing algorithm and does not support parallelism. SHA-512 can compute faster on 64 bit architectures and offers a larger output hash size. The larger hash size offers future proofing.
+SHA-256 is an established and well known older fast hashing algorithm (older than BLAKE2). It does not support parallelism. SHA-512 is similar but can compute faster on 64 bit architectures and offers a larger output hash size. The larger hash size offers future proofing against brute force attacks, which has arguable benefits since even a 256 hash should not be able to be brute forced well into the future. <!-- ref??? -->
 
 # Slow Algorithms
 
-Some are designed to be slow e.g. Argon2, scrypt and bcrypt.
+Some hashing algorithms are designed to be slow e.g. Argon2, scrypt and bcrypt.
 
 Each has their own use cases. For password hashing, for example, a slow algorithm is required. A slow algorithm makes it much more costly to perform dictionary and brute force attacks, and precomputed reverse hash lookup attacks such as rainbow table attacks.
 
@@ -31,7 +31,7 @@ Let's take a look at dictionary and brute force attacks now.
 
 These days hashes can be computed very quickly. This is mainly due to the rise of cryptocurrencies and the advent of specialised mining hardware. Because of this, if the correct hashing algorithm and parameters are not used then user tables can be vulnerable to dictionary and brute force attacks.
 
-Consumer grade hardware these days can compute over 100 000 000 000 000 SHA-256 hashes per second. So weak passwords hashed with a known salt using SHA-256 can be cracked in sub second time. This can be prevented by ensuring you are using a sufficiently slow hashing algorithm. Note that consumer grade hardware can compute 10 000 000 000 000 scrypt hashes per second and scrypt is considered a slow hash - so check the algorithm and its parameters.
+A single piece of consumer-grade hardware these days can compute over 100 000 000 000 000 SHA-256 hashes per second. So weak passwords hashed with a known salt using SHA-256 can be cracked in sub second time. This can be prevented by using sufficiently slow hashing algorithm. Note that consumer-grade hardware can also compute 10 000 000 000 000 scrypt hashes per second and scrypt is considered a slow hash - so check the algorithm you want to use and its parameters.
 
 We recommend using **Argon2**. Argon2 can only be hashed at about 1 000 hashes per second on consumer grade hardware. Even still you will need to **tune the parameters** for your application’s needs - making it fast enough that the user experience is not compromised, and slow enough that it remains secure.
 
@@ -213,7 +213,7 @@ Argon2 settings:
 | 262144 KB (256 MB) | 290 ms (.29s) |
 | 1048576 KB (1 GB) | 1200 ms (1.2s) |
 
-<figcaption>Memory vs Hash Time for Argon2 Node.js Implementation<br />{type: argon2.argon2i, hashLength: 32, timeCost: 2, parallelism: 1}<br />(<a href="https://antelle.net/argon2-browser">https://antelle.net/argon2-browser</a>)</figcaption>
+<figcaption>Memory vs Hash Time for Argon2 Node.js Implementation<br />{type: argon2.argon2id, hashLength: 8, timeCost: 2, parallelism: 1}<br />(<a href="https://github.com/ranisalt/node-argon2">https://github.com/ranisalt/node-argon2</a>)</figcaption>
 
 | Memory | Macbook Pro 16<br />Hash Time | iPhone SE<br />Hash Time |
 |:-:|:-:|:-:|
@@ -224,7 +224,7 @@ Argon2 settings:
 
 <figcaption>Memory vs Hash Time for Argon2 Browser Implementation on Different Devices<br />(<a href="https://antelle.net/argon2-browser">https://antelle.net/argon2-browser</a>)</figcaption>
 
-| Year | Memory (CPU or GPU RAM) | Memory Type |
+| Year | Memory (RAM) | Memory Type |
 |-|-|-|
 | Early 2000s    | 64 MB - 128 MB | CPU |
 | Mid-2000s      | 256 MB - 512 MB | CPU |
@@ -235,7 +235,12 @@ Argon2 settings:
 
 <figcaption>Memory Trends</figcaption>
 
+Using the Argon2 hash algorithm configured to use 1 GB, the best consumer grade GPU hardware as of the "Late 2010s to Early 2020s" will be able to process up to 32 hashes in parallel:
+
+`Maximum GPU RAM / Argon2 memory = 32 GB / 1 GB = 32`
+
 # References
 
-* _Argon2: The Better Password Hashing Function Than
-Bcrypt_, Daniel Ryan Levyson, 2019, https://informatika.stei.itb.ac.id/~rinaldi.munir/Matdis/2019-2020/Makalah2019/13516132.pdf
+* _Argon2: The Better Password Hashing Function Than Bcrypt_, Daniel Ryan Levyson, 2019, https://informatika.stei.itb.ac.id/~rinaldi.munir/Matdis/2019-2020/Makalah2019/13516132.pdf
+
+* _Argon2 Memory-Hard Function for Password Hashing and Proof-of-Work Applications_, Internet Research Task Force, RFC9106, 2021, https://datatracker.ietf.org/doc/html/rfc9106
