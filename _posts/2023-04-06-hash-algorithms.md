@@ -19,6 +19,17 @@ BLAKE3 is a modern fast hashing algorithm that exploits parallelism in order to 
 
 SHA-256 is an established and well known older fast hashing algorithm (older than BLAKE2). It does not support parallelism. SHA-512 is similar but can compute faster on 64 bit architectures and offers a larger output hash size. The larger hash size offers future proofing against brute force attacks, which has arguable benefits since even a 256 hash should not be able to be brute forced eons into the future (see the calculations at [Pepper Bits](https://jdspugh.github.io/2023/04/02/salts-and-peppers.html#pepper-bits) in my [Salts and Peppers](https://jdspugh.github.io/2023/04/02/salts-and-peppers.html) article).
 
+When choosing which algorithm to use the main consideration will be balancing modern algorithms with established ones. Modern algorithms can have many benefits but are not as tried and tested as the more established algorithms.
+
+| Algorithm | Cryptographic Security | Speed | Parallelism | Software Complexity | Resource Usage | Release Year |
+|-|-|-|-|-|-|-|
+| BLAKE3	| High | Very Fast | Yes	| Low     | Low      | 2020 |
+| BLAKE2	| High | Fast      | Yes | Low      | Low      | 2012 |
+| SHA-256	| High | Moderate  | No  | Moderate | Moderate | 2001 |
+| SHA-512	| High | Moderate  | No  | Moderate | Moderate | 2001 |
+
+<figcaption>Fast Hashing Algorithms Summary</figcaption>
+
 # Slow Algorithms
 
 Some hashing algorithms are designed to be slow e.g. Argon2, scrypt and bcrypt.
