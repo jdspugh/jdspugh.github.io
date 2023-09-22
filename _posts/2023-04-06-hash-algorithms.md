@@ -4,7 +4,7 @@ title: Hash Algorithms
 ---
 # Goal
 
-We will look at established and modern hash algorithms and their characteristics so developers can select which algorithms to use in their specific circumstances.
+We will look at established and modern hash algorithms and their characteristics so developers can select which algorithms to use for their specific use cases.
 
 # Fast Algorithms
 
@@ -15,9 +15,9 @@ Some hashing algorithms are designed to the fast e.g.:
 * SHA-512
 * SHA-256
 
-BLAKE3 is a modern fast hashing algorithm that exploits parallelism in order to run very fast on modern computers. This is particularly the case with the advent of massively parallel mass-produced GPUs. BLAKE2 is also capable of some parallelism, but not as much, and will run slower than BLAKE3. It has the advantage of being more established.
+BLAKE3 is a modern fast hashing algorithm that exploits parallelism in order to run very fast on modern computers. It is a much improved version of BLAKE2, although BLAKE2 has the advantage of being more established.
 
-SHA-256 is an established and well known older fast hashing algorithm (older than BLAKE2). It does not support parallelism. SHA-512 is similar but can compute faster on 64 bit architectures and offers a larger output hash size. The larger hash size offers future proofing against brute force attacks, which has arguable benefits since even a 256 hash should not be able to be brute forced well into the future. <!-- ref??? -->
+SHA-256 is an established and well known older fast hashing algorithm (older than BLAKE2). It does not support parallelism. SHA-512 is similar but can compute faster on 64 bit architectures and offers a larger output hash size. The larger hash size offers future proofing against brute force attacks, which has arguable benefits since even a 256 hash should not be able to be brute forced eons into the future (see the calculations at [Pepper Bits](https://jdspugh.github.io/2023/04/02/salts-and-peppers.html#pepper-bits) in my [Salts and Peppers](https://jdspugh.github.io/2023/04/02/salts-and-peppers.html) article).
 
 # Slow Algorithms
 
@@ -26,6 +26,23 @@ Some hashing algorithms are designed to be slow e.g. Argon2, scrypt and bcrypt.
 Each has their own use cases. For password hashing, for example, a slow algorithm is required. A slow algorithm makes it much more costly to perform dictionary and brute force attacks, and precomputed reverse hash lookup attacks such as rainbow table attacks.
 
 Let's take a look at dictionary and brute force attacks now.
+
+# CPU vs GPU Parallelism
+
+Hashing algorithms that are designed to perform well in parallel computing environments can benefit greatly from the parallelisation offered by modern GPUs. This benefit can be mitigated by the overheads involved in transferring the code and data from the CPU to the GPU, initiating the GPU calculation, and receiving the results.
+
+In the case where there is a bulk of data on which hashes need to be calculated, GPU implementations can outperform CPU based implementations. This applies to blockchain mining applications.
+
+In the case of calculating the hash of a password for a username/password authentication system the overheads will likely outweigh the costs and CPU implementations will win.
+
+<table>
+<tr><th></th><th>CPU</th><th>GPU</th></tr>
+<tr><th>Latency</th><td style="background-color:#D4E7CE">Lower</td><td style="background-color:#F2C5C6">Higher</td></tr>
+<tr><th>Memory Bandwidth</th><td style="background-color:#F2C5C6">Lower</td><td style="background-color:#D4E7CE">Higher</td></tr>
+<tr><th>Parallelism</th><td style="background-color:#F2C5C6">Lower</td><td style="background-color:#D4E7CE">Higher</td></tr>
+<tr><th>Use Cases</th><td>Password Hashing</td><td>Blockchain Mining</td></tr>
+</table>
+<figcaption>CPU vs GPU Hashing</figcaption>
 
 # Dictionary & Brute Force Attacks
 
@@ -239,20 +256,7 @@ Using the Argon2 hash algorithm configured to use 1 GB, the best consumer grade 
 
 `Maximum GPU RAM / Argon2 memory = 32 GB / 1 GB = 32`
 
-# CPU vs GPU Hashing
 
-Even though modern hashing functions can benefit greatly from the parallelisation offered by modern GPUs, this benefit can be mitigated by the overheads involved in transferring the code and data from the CPU to the GPU and to initiating the GPU calculation.
-
-In the case where there is a bulk of data on which hashes need to be calculated, GPU implementations can outperform CPU based implementations. This applies to cryptocurrency mining applications.
-
-In the case of calculating the hash of a password for a username/password authentication system the overheads will likely outweigh the costs and CPU implementations will win.
-
-<table>
-<tr><th>CPU</th><th>GPU</th></tr>
-<tr><td style="background-color:#D4E7CE">Lower Latency</td><td style="background-color:#F2C5C6">Higher Latency</td></tr>
-<tr><td style="background-color:#F2C5C6">Lower Memory Bandwidth</td><td style="background-color:#D4E7CE">Higher Memory Bandwidth</td></tr>
-<tr><td style="background-color:#F2C5C6">Lower Parallelism</td><td style="background-color:#D4E7CE">Higher Parallelism</td></tr>
-</table>
 
 To summarise:
 * Use **CPU** hashing for **one-off** hashes
