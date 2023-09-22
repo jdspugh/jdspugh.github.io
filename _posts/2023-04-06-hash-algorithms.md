@@ -6,9 +6,17 @@ title: Hash Algorithms
 
 We will look at established and modern hash algorithms and their characteristics so developers can select which algorithms to use for their specific use cases.
 
+# Slow vs Fast
+
+Slow and fast hashing algorithms have their own use cases.
+
+A **slow** hashing algorithm is required for **password hashing**. It makes it costly to perform dictionary and brute force attacks, and precomputed reverse hash lookup attacks such as rainbow table attacks.
+
+A **fast** algorithm would be useful, for example, when calculating the **checksum for a file**.
+
 # Fast Algorithms
 
-Some hashing algorithms are designed to the fast e.g.:
+Examples:
 
 * BLAKE3
 * BLAKE2
@@ -32,13 +40,26 @@ When choosing which algorithm to use the main consideration will be balancing mo
 
 # Slow Algorithms
 
-Some hashing algorithms are designed to be slow e.g. Argon2, scrypt and bcrypt.
+Examples:
+* Argon2
+* scrypt
+* bcrypt
 
-Each has their own use cases. For password hashing, for example, a slow algorithm is required. A slow algorithm makes it much more costly to perform dictionary and brute force attacks, and precomputed reverse hash lookup attacks such as rainbow table attacks.
+| Algorithm | Cryptographic Security | Speed | Computationally Hard | Memory Hard (GPU Resistance) | Parallelism | Software Complexity | Release Year |
+|-|-|-|-|-|-|-|-|
+| Argon2 | High | Slow | Yes (configurable) | Yes (configurable) | Yes (configurable) | Moderate to High | 2015 |
+| scrypt | High | Slow | Yes (limited configurability) | Yes (limited configurability) | Limited  | Moderate to High | 2009 |
+| bcrypt | High | Slow | Yes                | No (4 KB) | No       | Moderate         | 1999 |
 
-Let's take a look at dictionary and brute force attacks now.
+<figcaption>Slow Hashing Algorithms Summary</figcaption>
 
-# CPU vs GPU Parallelism
+Another new, little known slow hashing algorithm with potential is **bscrypt** (see <https://github.com/Sc00bz/bscrypt>). It targets cache bottlenecks leading to greater hardness than memory focused algorithms.
+
+Further reading on Argon2 vs scrypt vs bcrypt:
+* _Argon2: The Better Password Hashing Function Than
+Bcrypt_, Daniel Levyson et al, 2019, https://informatika.stei.itb.ac.id/~rinaldi.munir/Matdis/2019-2020/Makalah2019/13516132.pdf
+
+# CPU vs GPU Parallel Hashing
 
 Hashing algorithms that are designed to perform well in parallel computing environments can benefit greatly from the parallelisation offered by modern GPUs. This benefit can be mitigated by the overheads involved in transferring the code and data from the CPU to the GPU, initiating the GPU calculation, and receiving the results.
 
@@ -51,7 +72,7 @@ In the case of calculating the hash of a password for a username/password authen
 <tr><th>Latency</th><td style="background-color:#D4E7CE">Lower</td><td style="background-color:#F2C5C6">Higher</td></tr>
 <tr><th>Memory Bandwidth</th><td style="background-color:#F2C5C6">Lower</td><td style="background-color:#D4E7CE">Higher</td></tr>
 <tr><th>Parallelism</th><td style="background-color:#F2C5C6">Lower</td><td style="background-color:#D4E7CE">Higher</td></tr>
-<tr><th>Use Cases</th><td>Password Hashing</td><td>Blockchain Mining</td></tr>
+<tr><th>Sample Use Cases</th><td>Password Hashing</td><td>Blockchain Mining, Password Cracking</td></tr>
 </table>
 <figcaption>CPU vs GPU Hashing</figcaption>
 
@@ -90,23 +111,6 @@ Argon2 settings:
 
 <figcaption>Memory vs Hash Time for Argon2 Browser Implementation on Different Devices<br />(<a href="https://antelle.net/argon2-browser">https://antelle.net/argon2-browser</a>)</figcaption>
 
-# Fast vs Slow
-
-The speed of hashing functions is by design. Some are designed to be fast. Some are designed to be deliberately slow i.e. computationally and/or memory intensive. In most cases you want fast hash functions for better performance, efficiency and responsiveness of your application.
-
-## Slow Hashing Algorithms
-
-| Algorithm | Description |
-|-|-|
-| bcrypt | computational cost |
-| scrypt | computational and memory cost |
-| Argon2 | configurable computational and memory cost |
-
-<figcaption>Slow Hashing Algorithms<br />(see <a href="https://informatika.stei.itb.ac.id/~rinaldi.munir/Matdis/2019-2020/Makalah2019/13516132.pdf">Argon2: The Better Password Hashing Function Than
-Bcrypt)</a></figcaption>
-
-Another little know algorithm with potential is **bscrypt** (<https://github.com/Sc00bz/bscrypt>). It targets cache bottlenecks leading to greater hardness than memory focused algorithms. Since there is no browser implementation of bscrypt yet I won't be covering it here.
-
 # Fast Hashing Algorithms
 
 ## Crypto Mining Rigs
@@ -123,12 +127,6 @@ Another little know algorithm with potential is **bscrypt** (<https://github.com
 From the results we can see that scrypt is about 10x slower than SHA-256 and Argon2 is about 10000000000x (10<sup>10</sup>) slower than scrypt. These results are approximate and will vary widely based on the parameters used in the scrypt and Argon2 algorithms.
 
 # Slow Hashing Algorithms
-
-## Memory Hardness
-
-* bcrypt - 4kb
-* scrypt - configurable
-* Argon2 - configurable
 
 ## Crypto Mining
 
@@ -266,12 +264,6 @@ Argon2 settings:
 Using the Argon2 hash algorithm configured to use 1 GB, the best consumer grade GPU hardware as of the "Late 2010s to Early 2020s" will be able to process up to 32 hashes in parallel:
 
 `Maximum GPU RAM / Argon2 memory = 32 GB / 1 GB = 32`
-
-
-
-To summarise:
-* Use **CPU** hashing for **one-off** hashes
-* Use **GPU** hashing for **bulk** hashes
 
 # References
 
