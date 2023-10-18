@@ -3,8 +3,9 @@ first_name: Jonathan
 last_name: Pugh
 email: jdspugh@gmail.com
 description: Jonathan Pugh B.Sc.(Hons) M.Sc.
+theme: minima
+google_analytics: G-M7VGBQVJM8
 twitter_username: jdspugh
 github_username:  jdspugh
-theme: minima
 disqus:
   shortname: tech-blog-jdspugh
